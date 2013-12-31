@@ -65,6 +65,12 @@ module ChupaText
       self["content-type"] = type
     end
 
+    # @return [Bool] true if content-type is "text/plain", false
+    #   otherwise.
+    def text?
+      content_type == "text/plain"
+    end
+
     private
     def read_body
       return nil if @path.nil?

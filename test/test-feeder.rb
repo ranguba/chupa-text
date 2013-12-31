@@ -29,12 +29,19 @@ class TestFeeder < Test::Unit::TestCase
       texts
     end
 
-    sub_test_case("text") do
+    sub_test_case("no decomposers") do
       def test_text
         data = ChupaText::Data.new
         data.content_type = "text/plain"
         data.body = "Hello"
         assert_equal(["Hello"], feed(data))
+      end
+
+      def test_not_text
+        data = ChupaText::Data.new
+        data.content_type = "text/html"
+        data.body = "<html><body>Hello</body></html>"
+        assert_equal([], feed(data))
       end
     end
   end

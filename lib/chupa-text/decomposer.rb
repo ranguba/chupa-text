@@ -14,35 +14,13 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-require "chupa-text/data"
-
 module ChupaText
-  class Feeder
-    def initialize
-      @decomposers = []
+  class Decomposer
+    def target?(data)
+      false
     end
 
-    def add_decomposer(decomposer)
-      @decomposers << decomposer
-    end
-
-    def feed(data)
-      loop do
-        if data.text?
-          yield(data)
-          return
-        end
-        decomposer = find_decomposer(data)
-        return if decomposer.nil?
-        data = decomposer.decompose(data)
-      end
-    end
-
-    private
-    def find_decomposer(data)
-      @decomposers.find do |decomposer|
-        decomposer.target?(data)
-      end
+    def decompose(data)
     end
   end
 end
