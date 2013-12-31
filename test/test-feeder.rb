@@ -44,5 +44,33 @@ class TestFeeder < Test::Unit::TestCase
         assert_equal([], feed(data))
       end
     end
+
+    sub_test_case("use decomposer") do
+      class HTMLDecomposer < ChupaText::Decomposer
+        def target?(data)
+          data.content_type == "text/html"
+        end
+
+        def decompose(data)
+          extracted = ChupaText::Data.new
+          extracted.content_type = "text/plain"
+          extracted.body = data.body.gsub(/<.+?>/, "")
+          extracted
+        end
+      end
+
+      def setup
+        super
+        decomposer = HTMLDecomposer.new
+        @feeder.add_decomposer(decomposer)
+      end
+
+      def test_decompose
+        data = ChupaText::Data.new
+        data.content_type = "text/html"
+        data.body = "<html><body>Hello</body></html>"
+        assert_equal(["Hello"], feed(data))
+      end
+    end
   end
 end
