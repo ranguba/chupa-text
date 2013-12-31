@@ -15,4 +15,23 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 class TestData < Test::Unit::TestCase
+  def setup
+    @data = ChupaText::Data.new
+  end
+
+  sub_test_case("content-type") do
+    sub_test_case("guess") do
+      private
+      def guess(path)
+        @data.path = path
+        @data.content_type
+      end
+
+      sub_test_case("extension") do
+        def test_txt
+          assert_equal("text/plain", guess("README.txt"))
+        end
+      end
+    end
+  end
 end

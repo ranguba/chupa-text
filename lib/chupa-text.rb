@@ -18,3 +18,5 @@ require "chupa-text/version"
 
 require "chupa-text/feeder"
 require "chupa-text/decomposer"
+
+require "chupa-text/command"

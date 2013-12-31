@@ -18,18 +18,6 @@ require "pathname"
 
 module ChupaText
   class Data
-    class << self
-      def open(path)
-        data = new
-        data.path = path
-        if block_given?
-          yield(data)
-        else
-          data
-        end
-      end
-    end
-
     attr_writer :body
     attr_accessor :attributes
     attr_reader :path
@@ -58,7 +46,7 @@ module ChupaText
     end
 
     def content_type
-      self["content-type"]
+      self["content-type"] || guess_content_type
     end
 
     def content_type=(type)
@@ -77,6 +65,23 @@ module ChupaText
       @path.open("rb") do |file|
         file.read
       end
+    end
+
+    def guess_content_type
+      guess_content_type_from_path or
+        guess_content_type_from_body
+    end
+
+    EXTENSION_TO_CONTENT_TYPE_MAP = {
+      ".txt" => "text/plain",
+    }
+    def guess_content_type_from_path
+      return nil if @path.nil?
+      EXTENSION_TO_CONTENT_TYPE_MAP[@path.extname.downcase]
+    end
+
+    def guess_content_type_from_body
+      nil
     end
   end
 end
