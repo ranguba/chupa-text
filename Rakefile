@@ -24,7 +24,7 @@ require "rubygems"
 require "bundler/gem_helper"
 require "packnga"
 
-base_dir = Pathname(__FILE_).dirname
+base_dir = Pathname(__FILE__).dirname
 
 helper = Bundler::GemHelper.new(base_dir.to_s)
 def helper.version_tag
