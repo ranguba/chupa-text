@@ -33,8 +33,8 @@ module ChupaText
         reader.each do |entry|
           next unless entry.file?
           extracted = Data.new
-          extracted.path = entry.full_name
-          extracted.body = entry.read
+          extracted.path   = entry.full_name
+          extracted.body   = entry.read
           extracted.source = data
           yield(extracted)
         end
