@@ -16,6 +16,8 @@
 
 require "pathname"
 
+require "chupa-text/content-type"
+
 module ChupaText
   class Data
     attr_writer :body
@@ -80,11 +82,8 @@ module ChupaText
         guess_content_type_from_body
     end
 
-    EXTENSION_TO_CONTENT_TYPE_MAP = {
-      ".txt" => "text/plain",
-    }
     def guess_content_type_from_path
-      EXTENSION_TO_CONTENT_TYPE_MAP[extension]
+      ContentType.registory.find(extension)
     end
 
     def guess_content_type_from_body

@@ -17,6 +17,7 @@
 class TestData < Test::Unit::TestCase
   def setup
     @data = ChupaText::Data.new
+    ChupaText::ContentType.registory.clear
   end
 
   sub_test_case("content-type") do
@@ -29,6 +30,7 @@ class TestData < Test::Unit::TestCase
 
       sub_test_case("extension") do
         def test_txt
+          ChupaText::ContentType.registory.register("txt", "text/plain")
           assert_equal("text/plain", guess("README.txt"))
         end
       end
