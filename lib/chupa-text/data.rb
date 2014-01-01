@@ -36,6 +36,12 @@ module ChupaText
       @source = nil
     end
 
+    def initialize_copy(object)
+      super
+      @attributes = @attributes.dup
+      self
+    end
+
     def body
       @body ||= read_body
     end

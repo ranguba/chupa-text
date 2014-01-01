@@ -55,7 +55,7 @@ class TestExtractor < Test::Unit::TestCase
           extracted = ChupaText::Data.new
           extracted.content_type = "text/plain"
           extracted.body = data.body.gsub(/<.+?>/, "")
-          extracted
+          yield(extracted)
         end
       end
 
@@ -70,6 +70,34 @@ class TestExtractor < Test::Unit::TestCase
         data.content_type = "text/html"
         data.body = "<html><body>Hello</body></html>"
         assert_equal(["Hello"], extract(data))
+      end
+    end
+
+    sub_test_case("multi decomposed") do
+      class CopyDecomposer < ChupaText::Decomposer
+        def target?(data)
+          data["copied"].nil?
+        end
+
+        def decompose(data)
+          copied_data = data.dup
+          copied_data["copied"] = true
+          yield(copied_data.dup)
+          yield(copied_data.dup)
+        end
+      end
+
+      def setup
+        super
+        decomposer = CopyDecomposer.new
+        @extractor.add_decomposer(decomposer)
+      end
+
+      def test_decompose
+        data = ChupaText::Data.new
+        data.content_type = "text/plain"
+        data.body = "Hello"
+        assert_equal(["Hello", "Hello"], extract(data))
       end
     end
   end
