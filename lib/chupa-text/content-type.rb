@@ -19,8 +19,19 @@ require "chupa-text/content-type-registry"
 module ChupaText
   module ContentType
     class << self
+      # @return [ContentTypeRegistry] The content-type registry for
+      #   this process.
       def registry
         @@registry ||= ContentTypeRegistry.new
+      end
+
+      # Normally, this method should not be used. It is just for test.
+      #
+      # @param [ContenTypeRegistry, nil] registry
+      #   The new content-type registry for this process.
+      #   If you specify `nil`, reset the registry.
+      def registry=(registry)
+        @@registry = registry
       end
     end
   end

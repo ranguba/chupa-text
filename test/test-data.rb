@@ -17,7 +17,13 @@
 class TestData < Test::Unit::TestCase
   def setup
     @data = ChupaText::Data.new
-    ChupaText::ContentType.registry.clear
+    @registry = ChupaText::ContentTypeRegistry.new
+    @original_registry = ChupaText::ContentType.registry
+    ChupaText::ContentType.registry = @registry
+  end
+
+  def teardown
+    ChupaText::ContentType.registry = @original_registry
   end
 
   sub_test_case("content-type") do
