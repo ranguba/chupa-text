@@ -39,42 +39,42 @@ class TestTarDecomposer < Test::Unit::TestCase
       decomposed
     end
 
-  sub_test_case("top-level") do
-    def setup
-      super
-      @data = ChupaText::Data.new
-      @data.path = fixture_path("top-level.tar")
+    sub_test_case("top-level") do
+      def setup
+        super
+        @data = ChupaText::Data.new
+        @data.path = fixture_path("top-level.tar")
+      end
+
+      def test_decompose
+        assert_equal([
+                       {
+                         :path   => "top-level.txt",
+                         :body   => "top level\n",
+                         :source => @data.path.to_s,
+                       },
+                     ],
+                     decompose(@data))
+      end
     end
 
-    def test_decompose
-      assert_equal([
-                     {
-                       :path   => "top-level.txt",
-                       :body   => "top level\n",
-                       :source => @data.path.to_s,
-                     },
-                   ],
-                   decompose(@data))
-    end
-  end
+    sub_test_case("directory") do
+      def setup
+        super
+        @data = ChupaText::Data.new
+        @data.path = fixture_path("directory.tar")
+      end
 
-  sub_test_case("directory") do
-    def setup
-      super
-      @data = ChupaText::Data.new
-      @data.path = fixture_path("directory.tar")
+      def test_decompose
+        assert_equal([
+                       {
+                         :path   => "directory/hello.txt",
+                         :body   => "Hello in directory\n",
+                         :source => @data.path.to_s,
+                       },
+                     ],
+                     decompose(@data))
+      end
     end
-
-    def test_decompose
-      assert_equal([
-                     {
-                       :path   => "directory/hello.txt",
-                       :body   => "Hello in directory\n",
-                       :source => @data.path.to_s,
-                     },
-                   ],
-                   decompose(@data))
-    end
-  end
   end
 end
