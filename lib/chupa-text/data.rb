@@ -83,7 +83,7 @@ module ChupaText
     end
 
     def guess_content_type_from_path
-      ContentType.registory.find(extension)
+      ContentType.registry.find(extension)
     end
 
     def guess_content_type_from_body

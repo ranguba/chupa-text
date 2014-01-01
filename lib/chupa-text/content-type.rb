@@ -14,13 +14,13 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-require "chupa-text/content-type-registory"
+require "chupa-text/content-type-registry"
 
 module ChupaText
   module ContentType
     class << self
-      def registory
-        @@registory ||= ContentTypeRegistory.new
+      def registry
+        @@registry ||= ContentTypeRegistry.new
       end
     end
   end

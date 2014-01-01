@@ -44,7 +44,7 @@ module ChupaText
       def create_feeder
         Decomposer.load
         feeder = Feeder.new
-        Decomposer.registory.decomposers.each do |decomposer|
+        Decomposer.registry.decomposers.each do |decomposer|
           feeder.add_decomposer(decomposer)
         end
         feeder

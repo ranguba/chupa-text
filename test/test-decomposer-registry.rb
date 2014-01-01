@@ -14,22 +14,22 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-class TestDecomposerRegistory < Test::Unit::TestCase
+class TestDecomposerRegistry < Test::Unit::TestCase
   class CSVDecomposer < ChupaText::Decomposer
   end
 
   def setup
-    @registory = ChupaText::DecomposerRegistory.new
+    @registry = ChupaText::DecomposerRegistry.new
   end
 
   def test_register
-    assert_equal([], @registory.to_a)
-    @registory.register(CSVDecomposer)
-    assert_equal([CSVDecomposer], @registory.to_a)
+    assert_equal([], @registry.to_a)
+    @registry.register(CSVDecomposer)
+    assert_equal([CSVDecomposer], @registry.to_a)
   end
 
   def test_decomposers
-    @registory.register(CSVDecomposer)
-    assert_equal([CSVDecomposer], @registory.decomposers.collect(&:class))
+    @registry.register(CSVDecomposer)
+    assert_equal([CSVDecomposer], @registry.decomposers.collect(&:class))
   end
 end

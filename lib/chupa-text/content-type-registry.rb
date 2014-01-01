@@ -15,7 +15,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 module ChupaText
-  class ContentTypeRegistory
+  class ContentTypeRegistry
     def initialize
       @from_extension_map = {}
     end
