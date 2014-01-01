@@ -34,4 +34,28 @@ class TestData < Test::Unit::TestCase
       end
     end
   end
+
+  sub_test_case("extension") do
+    def test_no_path
+      assert_nil(extension(nil))
+    end
+
+    def test_lower_case
+      assert_equal(".md", extension("README.md"))
+    end
+
+    def test_upper_case
+      assert_equal(".md", extension("README.MD"))
+    end
+
+    def test_mixed_case
+      assert_equal(".md", extension("README.mD"))
+    end
+
+    private
+    def extension(path)
+      @data.path = path
+      @data.extension
+    end
+  end
 end

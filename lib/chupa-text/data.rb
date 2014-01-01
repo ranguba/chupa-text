@@ -53,6 +53,14 @@ module ChupaText
       self["content-type"] = type
     end
 
+    # @return [String, nil] Normalized extension as String if {#path}
+    #   is not `nil`, `nil` otherwise. The normalized extension uses
+    #   lower case like `.pdf` not `.PDF`.
+    def extension
+      return nil if @path.nil?
+      @path.extname.downcase
+    end
+
     # @return [Bool] true if content-type is "text/plain", false
     #   otherwise.
     def text?
