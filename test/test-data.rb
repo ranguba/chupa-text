@@ -43,15 +43,15 @@ class TestData < Test::Unit::TestCase
     end
 
     def test_lower_case
-      assert_equal(".md", extension("README.md"))
+      assert_equal("md", extension("README.md"))
     end
 
     def test_upper_case
-      assert_equal(".md", extension("README.MD"))
+      assert_equal("md", extension("README.MD"))
     end
 
     def test_mixed_case
-      assert_equal(".md", extension("README.mD"))
+      assert_equal("md", extension("README.mD"))
     end
 
     private

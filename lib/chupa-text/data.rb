@@ -57,10 +57,10 @@ module ChupaText
 
     # @return [String, nil] Normalized extension as String if {#path}
     #   is not `nil`, `nil` otherwise. The normalized extension uses
-    #   lower case like `.pdf` not `.PDF`.
+    #   lower case like `pdf` not `PDF`.
     def extension
       return nil if @path.nil?
-      @path.extname.downcase
+      @path.extname.downcase.gsub(/\A\./, "")
     end
 
     # @return [Bool] true if content-type is "text/plain", false
