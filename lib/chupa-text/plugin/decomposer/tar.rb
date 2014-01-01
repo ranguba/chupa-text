@@ -35,6 +35,7 @@ module ChupaText
           extracted = Data.new
           extracted.path = entry.full_name
           extracted.body = entry.read
+          extracted.source = data
           yield(extracted)
         end
       end

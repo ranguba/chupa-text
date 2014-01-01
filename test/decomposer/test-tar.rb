@@ -22,17 +22,22 @@ class TestTarDecomposer < Test::Unit::TestCase
   end
 
   private
-  def decompose(data)
-    decomposed = []
-    @decomposer.decompose(data) do |decomopsed_data|
-      decomposed << decomopsed_data
-    end
-    decomposed
-  end
-
   def fixture_path(*components)
     super("tar", *components)
   end
+
+  sub_test_case("decompose") do
+    def decompose(data)
+      decomposed = []
+      @decomposer.decompose(data) do |decomposed_data|
+        decomposed << {
+          :path   => decomposed_data.path.to_s,
+          :body   => decomposed_data.body,
+          :source => decomposed_data.source.path.to_s,
+        }
+      end
+      decomposed
+    end
 
   sub_test_case("top-level") do
     def setup
@@ -42,13 +47,14 @@ class TestTarDecomposer < Test::Unit::TestCase
     end
 
     def test_decompose
-      decomposed = decompose(@data).collect do |data|
-        [data.path, data.body]
-      end
       assert_equal([
-                     [Pathname("top-level.txt"), "top level\n"],
+                     {
+                       :path   => "top-level.txt",
+                       :body   => "top level\n",
+                       :source => @data.path.to_s,
+                     },
                    ],
-                   decomposed)
+                   decompose(@data))
     end
   end
 
@@ -60,13 +66,15 @@ class TestTarDecomposer < Test::Unit::TestCase
     end
 
     def test_decompose
-      decomposed = decompose(@data).collect do |data|
-        [data.path, data.body]
-      end
       assert_equal([
-                     [Pathname("directory/hello.txt"), "Hello in directory\n"],
+                     {
+                       :path   => "directory/hello.txt",
+                       :body   => "Hello in directory\n",
+                       :source => @data.path.to_s,
+                     },
                    ],
-                   decomposed)
+                   decompose(@data))
     end
+  end
   end
 end

@@ -24,10 +24,16 @@ module ChupaText
     attr_accessor :attributes
     attr_reader :path
 
+    # @return [Data, nil] The source of the data. For example, text
+    #   data (`hello.txt`) in archive data (`hello.tar`) have the
+    #   archive data in {#source}.
+    attr_accessor :source
+
     def initialize
       @body = nil
       @attributes = {}
       @path = nil
+      @source = nil
     end
 
     def body
