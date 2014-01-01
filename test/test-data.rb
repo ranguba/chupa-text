@@ -28,16 +28,30 @@ class TestData < Test::Unit::TestCase
 
   sub_test_case("content-type") do
     sub_test_case("guess") do
-      private
-      def guess(path)
-        @data.path = path
-        @data.content_type
-      end
-
       sub_test_case("extension") do
         def test_txt
           ChupaText::ContentType.registry.register("txt", "text/plain")
           assert_equal("text/plain", guess("README.txt"))
+        end
+
+        private
+        def guess(path)
+          @data.path = path
+          @data.content_type
+        end
+      end
+
+      sub_test_case("body") do
+        def test_txt
+          body = "Hello"
+          body.force_encoding("ASCII-8BIT")
+          assert_equal("text/plain", guess(body))
+        end
+
+        private
+        def guess(body)
+          @data.body = body
+          @data.content_type
         end
       end
     end

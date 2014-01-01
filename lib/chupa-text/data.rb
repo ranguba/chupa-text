@@ -99,7 +99,22 @@ module ChupaText
     end
 
     def guess_content_type_from_body
-      nil
+      content_type = nil
+      change_encoding(body, "UTF-8") do |_body|
+        content_type = "text/plain" if _body.valid_encoding?
+      end
+      content_type
+    end
+
+    def change_encoding(string, encoding)
+      return if string.nil?
+      begin
+        original_encoding = string.encoding
+        string.force_encoding(encoding)
+        yield(string)
+      ensure
+        string.force_encoding(original_encoding)
+      end
     end
   end
 end
