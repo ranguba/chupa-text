@@ -14,16 +14,16 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-class TestFeeder < Test::Unit::TestCase
+class TestExtractor < Test::Unit::TestCase
   def setup
-    @feeder = ChupaText::Feeder.new
+    @extractor = ChupaText::Extractor.new
   end
 
-  sub_test_case("feed") do
+  sub_test_case("extract") do
     private
-    def feed(data)
+    def extract(data)
       texts = []
-      @feeder.feed(data) do |extracted_data|
+      @extractor.extract(data) do |extracted_data|
         texts << extracted_data.body
       end
       texts
@@ -34,14 +34,14 @@ class TestFeeder < Test::Unit::TestCase
         data = ChupaText::Data.new
         data.content_type = "text/plain"
         data.body = "Hello"
-        assert_equal(["Hello"], feed(data))
+        assert_equal(["Hello"], extract(data))
       end
 
       def test_not_text
         data = ChupaText::Data.new
         data.content_type = "text/html"
         data.body = "<html><body>Hello</body></html>"
-        assert_equal([], feed(data))
+        assert_equal([], extract(data))
       end
     end
 
@@ -62,14 +62,14 @@ class TestFeeder < Test::Unit::TestCase
       def setup
         super
         decomposer = HTMLDecomposer.new
-        @feeder.add_decomposer(decomposer)
+        @extractor.add_decomposer(decomposer)
       end
 
       def test_decompose
         data = ChupaText::Data.new
         data.content_type = "text/html"
         data.body = "<html><body>Hello</body></html>"
-        assert_equal(["Hello"], feed(data))
+        assert_equal(["Hello"], extract(data))
       end
     end
   end

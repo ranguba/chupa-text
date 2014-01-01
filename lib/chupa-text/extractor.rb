@@ -17,7 +17,7 @@
 require "chupa-text/data"
 
 module ChupaText
-  class Feeder
+  class Extractor
     def initialize
       @decomposers = []
     end
@@ -26,7 +26,7 @@ module ChupaText
       @decomposers << decomposer
     end
 
-    def feed(data)
+    def extract(data)
       loop do
         if data.text?
           yield(data)

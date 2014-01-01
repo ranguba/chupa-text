@@ -16,7 +16,7 @@
 
 require "chupa-text/version"
 
-require "chupa-text/feeder"
+require "chupa-text/extractor"
 require "chupa-text/decomposer"
 
 require "chupa-text/command"

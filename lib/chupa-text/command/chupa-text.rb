@@ -29,11 +29,11 @@ module ChupaText
 
       def run(*arguments)
         paths = arguments
-        feeder = create_feeder
+        extractor = create_extractor
         paths.each do |path|
           data = Data.new
           data.path = path
-          feeder.feed(data) do |extracted|
+          extractor.extract(data) do |extracted|
             puts(extracted.body)
           end
         end
@@ -41,13 +41,13 @@ module ChupaText
       end
 
       private
-      def create_feeder
+      def create_extractor
         Decomposer.load
-        feeder = Feeder.new
+        extractor = Extractor.new
         Decomposer.registry.decomposers.each do |decomposer|
-          feeder.add_decomposer(decomposer)
+          extractor.add_decomposer(decomposer)
         end
-        feeder
+        extractor
       end
     end
   end
