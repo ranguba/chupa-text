@@ -14,33 +14,28 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-require "chupa-text/decomposer-registory"
+class TestDecomposer < Test::Unit::TestCase
+  sub_test_case("not-implemented") do
+    class NotImplementedDecomposer < ChupaText::Decomposer
+    end
 
-module ChupaText
-  class Decomposer
-    class << self
-      def registory
-        @@registory ||= DecomposerRegistory.new
-      end
+    def setup
+      @decomposer = NotImplementedDecomposer.new
+      @data = ChupaText::Data.new
+    end
 
-      def load
-        $LOAD_PATH.each do |load_path|
-          next unless File.directory?(load_path)
-          Dir.chdir(load_path) do
-            Dir.glob("chupa-text/plugin/decomposer/*.rb") do |plugin_path|
-              require plugin_path.gsub(/\.rb\z/, "")
-            end
-          end
-        end
+    def test_target?
+      message = "must implement #{NotImplementedDecomposer}\#target?"
+      assert_raise(NotImplementedError.new(message)) do
+        @decomposer.target?(@data)
       end
     end
 
-    def target?(data)
-      raise NotImplementedError, "must implement #{self.class}\##{__method__}"
-    end
-
-    def decompose(data)
-      raise NotImplementedError, "must implement #{self.class}\##{__method__}"
+    def test_decompose
+      message = "must implement #{NotImplementedDecomposer}\#decompose"
+      assert_raise(NotImplementedError.new(message)) do
+        @decomposer.decompose(@data)
+      end
     end
   end
 end
