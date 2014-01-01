@@ -14,8 +14,27 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
+require "chupa-text/decomposer-registory"
+
 module ChupaText
   class Decomposer
+    class << self
+      def registory
+        @@registory ||= DecomposerRegistory.new
+      end
+
+      def load
+        $LOAD_PATH.each do |load_path|
+          next unless File.directory?(load_path)
+          Dir.chdir(load_path) do
+            Dir.glob("chupa-text/plugin/decomposer/*.rb") do |plugin_path|
+              require plugin_path.gsub(/\.rb\z/, "")
+            end
+          end
+        end
+      end
+    end
+
     def target?(data)
       false
     end

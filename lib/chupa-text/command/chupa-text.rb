@@ -25,19 +25,29 @@ module ChupaText
       end
 
       def initialize
-        @feeder = Feeder.new
       end
 
       def run(*arguments)
         paths = arguments
+        feeder = create_feeder
         paths.each do |path|
           data = Data.new
           data.path = path
-          @feeder.feed(data) do |extracted|
+          feeder.feed(data) do |extracted|
             puts(extracted.body)
           end
         end
         true
+      end
+
+      private
+      def create_feeder
+        Decomposer.load
+        feeder = Feeder.new
+        Decomposer.registory.decomposers.each do |decomposer|
+          feeder.add_decomposer(decomposer)
+        end
+        feeder
       end
     end
   end
