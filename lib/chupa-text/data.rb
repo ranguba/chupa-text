@@ -84,8 +84,7 @@ module ChupaText
       ".txt" => "text/plain",
     }
     def guess_content_type_from_path
-      return nil if @path.nil?
-      EXTENSION_TO_CONTENT_TYPE_MAP[@path.extname.downcase]
+      EXTENSION_TO_CONTENT_TYPE_MAP[extension]
     end
 
     def guess_content_type_from_body
