@@ -1,5 +1,3 @@
-#!/usr/bin/env ruby
-#
 # Copyright (C) 2013  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
@@ -16,20 +14,11 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-$VERBOSE = true
-
 require "pathname"
 
-require "test-unit"
-
-base_dir = Pathname(__FILE__).dirname
-lib_dir = base_dir + "lib"
-$LOAD_PATH.unshift(lib_dir.to_s)
-
-require "chupa-text"
-
-ChupaText::Decomposer.load
-
-require_relative "helper"
-
-exit(Test::Unit::AutoRunner.run(true))
+module Helper
+  def fixture_path(*components)
+    base_path = Pathname(__FILE__).dirname + "fixture"
+    base_path.join(*components)
+  end
+end

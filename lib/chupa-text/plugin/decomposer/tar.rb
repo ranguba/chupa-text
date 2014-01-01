@@ -1,5 +1,3 @@
-#!/usr/bin/env ruby
-#
 # Copyright (C) 2013  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
@@ -16,20 +14,30 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-$VERBOSE = true
-
-require "pathname"
-
-require "test-unit"
-
-base_dir = Pathname(__FILE__).dirname
-lib_dir = base_dir + "lib"
-$LOAD_PATH.unshift(lib_dir.to_s)
+require "stringio"
+require "rubygems/package"
 
 require "chupa-text"
 
-ChupaText::Decomposer.load
+module ChupaText
+  class TarDecomposer < Decomposer
+    registory.register(self)
 
-require_relative "helper"
+    def target?(data)
+      data.extension == "tar" or
+        data.content_type == "application/x-tar"
+    end
 
-exit(Test::Unit::AutoRunner.run(true))
+    def decompose(data)
+      Gem::Package::TarReader.new(StringIO.new(data.body)) do |reader|
+        reader.each do |entry|
+          next unless entry.file?
+          extracted = Data.new
+          extracted.path = entry.full_name
+          extracted.body = entry.read
+          yield(extracted)
+        end
+      end
+    end
+  end
+end
