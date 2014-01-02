@@ -40,9 +40,12 @@ module ChupaText
         else
           data.path = @path
         end
+        formatter = create_formatter
+        formatter.format_start(data)
         extractor.extract(data) do |extracted|
-          puts(extracted.body)
+          formatter.format_extracted(extracted)
         end
+        formatter.format_finish(data)
         true
       end
 
@@ -78,6 +81,10 @@ module ChupaText
           extractor.add_decomposer(decomposer)
         end
         extractor
+      end
+
+      def create_formatter
+        Formatters::JSON.new($stdout)
       end
     end
   end

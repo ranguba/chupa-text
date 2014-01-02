@@ -42,7 +42,7 @@ class TestCommandChupaText < Test::Unit::TestCase
   private
   def run_command(*arguments)
     succeeded = ChupaText::Command::ChupaText.run(*arguments)
-    [succeeded, @stdout.string]
+    [succeeded, JSON.parse(@stdout.string)]
   end
 
   def fixture_path(*components)
@@ -52,16 +52,47 @@ class TestCommandChupaText < Test::Unit::TestCase
   sub_test_case("output") do
     sub_test_case("file") do
       def test_single
-        assert_equal([true, "Hello\n"],
-                     run_command(fixture_path("hello.txt")))
+        body = "Hello\n"
+        path = fixture_path("hello.txt").to_s
+        assert_equal([
+                       true,
+                       {
+                         "content-type" => "text/plain",
+                         "path"         => path,
+                         "size"         => body.bytesize,
+                         "texts"        => [
+                           {
+                             "content-type" => "text/plain",
+                             "path"         => path,
+                             "size"         => body.bytesize,
+                             "body"         => body,
+                           },
+                         ],
+                       },
+                     ],
+                     run_command(path))
       end
     end
 
     sub_test_case("standard input") do
       def test_single
+        body = "Hello\n"
         @stdin << "Hello\n"
         @stdin.rewind
-        assert_equal([true, "Hello\n"],
+        assert_equal([
+                       true,
+                       {
+                         "content-type" => "text/plain",
+                         "size"         => body.bytesize,
+                         "texts"        => [
+                           {
+                             "content-type" => "text/plain",
+                             "size"         => body.bytesize,
+                             "body"         => body,
+                           },
+                         ],
+                       },
+                     ],
                      run_command)
       end
     end

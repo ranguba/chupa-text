@@ -51,6 +51,12 @@ module ChupaText
       @path = path
     end
 
+    def size
+      _body = body
+      return 0 if _body.nil?
+      _body.bytesize
+    end
+
     def [](name)
       @attributes[name]
     end
