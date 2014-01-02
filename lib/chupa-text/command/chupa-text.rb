@@ -14,6 +14,8 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
+require "optparse"
+
 module ChupaText
   module Command
     class ChupaText
@@ -25,22 +27,50 @@ module ChupaText
       end
 
       def initialize
+        @path = nil
       end
 
       def run(*arguments)
-        paths = arguments
+        return false unless parse_arguments(arguments)
+
         extractor = create_extractor
-        paths.each do |path|
-          data = Data.new
-          data.path = path
-          extractor.extract(data) do |extracted|
-            puts(extracted.body)
-          end
+        data = Data.new
+        if @path.nil?
+          data.body = $stdin.read
+        else
+          data.path = @path
+        end
+        extractor.extract(data) do |extracted|
+          puts(extracted.body)
         end
         true
       end
 
       private
+      def parse_arguments(arguments)
+        parser = create_option_parser
+        rest = nil
+        begin
+          rest = parser.parse!(arguments)
+        rescue OptionParser::ParseError
+          puts($!.message)
+          return false
+        end
+        if rest.size > 1
+          puts(parser.help)
+          return false
+        end
+        @path, = rest
+        true
+      end
+
+      def create_option_parser
+        parser = OptionParser.new
+        parser.banner += " [FILE]"
+        parser.version = VERSION
+        parser
+      end
+
       def create_extractor
         Decomposer.load
         extractor = Extractor.new
