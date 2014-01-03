@@ -37,6 +37,15 @@ class TestDecomposers < Test::Unit::TestCase
     end
 
     def test_glob
+      @configuration.decomposer.names = ["*sv"]
+      decomposers = create
+      assert_equal([CSVDecomposer], decomposers.collect(&:class))
+    end
+
+    def test_ext_glob
+      unless File.const_defined?(:FNM_EXTGLOB)
+        omit("File::FNM_EXTGLOB is required")
+      end
       @configuration.decomposer.names = ["{a,b,c}sv"]
       decomposers = create
       assert_equal([CSVDecomposer], decomposers.collect(&:class))
