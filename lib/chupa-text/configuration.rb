@@ -14,17 +14,20 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-class TestDecomposerRegistry < Test::Unit::TestCase
-  class CSVDecomposer < ChupaText::Decomposer
-  end
+module ChupaText
+  class Configuration
+    attr_reader :decomposer
+    def initialize
+      @decomposer = DecomposerConfiguration.new
+    end
 
-  def setup
-    @registry = ChupaText::DecomposerRegistry.new
-  end
-
-  def test_register
-    assert_equal([], @registry.to_a)
-    @registry.register("csv", CSVDecomposer)
-    assert_equal([["csv", CSVDecomposer]], @registry.to_a)
+    class DecomposerConfiguration
+      attr_accessor :names
+      attr_accessor :options
+      def initialize
+        @names = ["*"]
+        @options = {}
+      end
+    end
   end
 end

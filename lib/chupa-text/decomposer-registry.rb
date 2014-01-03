@@ -26,14 +26,12 @@ module ChupaText
       @decomposer_classes[name] = decomposer_class
     end
 
-    def each(&block)
-      @decomposer_classes.each(&block)
+    def find(name)
+      @decomposer_classes[name]
     end
 
-    def decomposers
-      collect do |name, decomposer_class|
-        decomposer_class.new({})
-      end
+    def each(&block)
+      @decomposer_classes.each(&block)
     end
   end
 end

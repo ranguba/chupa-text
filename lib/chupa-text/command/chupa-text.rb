@@ -28,6 +28,7 @@ module ChupaText
 
       def initialize
         @path = nil
+        @configuration = Configuration.new
       end
 
       def run(*arguments)
@@ -75,9 +76,11 @@ module ChupaText
       end
 
       def create_extractor
-        Decomposer.load
+        Decomposers.load
         extractor = Extractor.new
-        Decomposer.registry.decomposers.each do |decomposer|
+        decomposers = Decomposers.create(Decomposer.registry,
+                                         @configuration.decomposer)
+        decomposers.each do |decomposer|
           extractor.add_decomposer(decomposer)
         end
         extractor

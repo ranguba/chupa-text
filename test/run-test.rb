@@ -28,7 +28,7 @@ $LOAD_PATH.unshift(lib_dir.to_s)
 
 require "chupa-text"
 
-ChupaText::Decomposer.load
+ChupaText::Decomposers.load
 
 require_relative "helper"
 
