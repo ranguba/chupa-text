@@ -56,12 +56,11 @@ module ChupaText
       def method_missing(name, *arguments)
         return super if block_given?
 
-        case arguments.size
-        when 0
-          self[name.to_s]
-        when 1
+        if name.to_s.end_with?("=") and arguments.size == 1
           value = arguments.first
-          self[name.to_s] = value
+          self[name.to_s.gsub(/=\z/, "")] = value
+        elsif arguments.empty?
+          self[name.to_s]
         else
           super
         end
