@@ -33,7 +33,7 @@ module ChupaText
     end
 
     def decomposer
-      DecomposerConfigurationLoader.new(@configuration.decomposer)
+      DecomposerLoader.new(@configuration.decomposer)
     end
 
     private
@@ -47,7 +47,7 @@ module ChupaText
       path
     end
 
-    class DecomposerConfigurationLoader
+    class DecomposerLoader
       def initialize(configuration)
         @configuration = configuration
       end
