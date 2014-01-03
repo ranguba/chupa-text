@@ -84,11 +84,7 @@ module ChupaText
       def create_extractor
         Decomposers.load
         extractor = Extractor.new
-        decomposers = Decomposers.create(Decomposer.registry,
-                                         @configuration.decomposer)
-        decomposers.each do |decomposer|
-          extractor.add_decomposer(decomposer)
-        end
+        extractor.apply_configuration(@configuration)
         extractor
       end
 

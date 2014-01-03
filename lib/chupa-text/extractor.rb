@@ -20,6 +20,21 @@ module ChupaText
       @decomposers = []
     end
 
+    # Sets the extractor up by the configuration. It adds decomposers
+    # enabled in the configuration.
+    #
+    # @param [Configuration] configuration The configuration to be
+    #   applied.
+    #
+    # @return [void]
+    def apply_configuration(configuration)
+      decomposers = Decomposers.create(Decomposer.registry,
+                                       configuration.decomposer)
+      decomposers.each do |decomposer|
+        add_decomposer(decomposer)
+      end
+    end
+
     def add_decomposer(decomposer)
       @decomposers << decomposer
     end
