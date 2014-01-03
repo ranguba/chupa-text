@@ -27,18 +27,14 @@ module ChupaText
     end
 
     def extract(data)
-      processed = {}
       targets = [data]
       until targets.empty?
         target = targets.pop
         decomposer = find_decomposer(target)
-        processed_key = [target, decomposer]
-        decomposer = nil if processed[processed_key]
         if decomposer.nil?
           yield(target) if target.text?
           next
         end
-        processed[processed_key] = true
         decomposer.decompose(target) do |decomposed|
           targets.push(decomposed)
         end
