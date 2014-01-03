@@ -16,8 +16,6 @@
 
 require "pathname"
 
-require "chupa-text/configuration"
-
 module ChupaText
   class ConfigurationLoader
     attr_reader :decomposer

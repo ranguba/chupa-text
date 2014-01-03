@@ -16,11 +16,15 @@
 
 require "chupa-text/version"
 
-require "chupa-text/extractor"
-require "chupa-text/decomposer"
-require "chupa-text/decomposers"
-require "chupa-text/formatters"
 require "chupa-text/configuration"
 require "chupa-text/configuration-loader"
+require "chupa-text/data"
+require "chupa-text/decomposer"
+require "chupa-text/decomposer-registry"
+require "chupa-text/decomposers"
+require "chupa-text/extractor"
+require "chupa-text/formatters"
+require "chupa-text/mime-type"
+require "chupa-text/mime-type-registry"
 
 require "chupa-text/command"

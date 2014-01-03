@@ -17,8 +17,6 @@
 require "uri"
 require "open-uri"
 
-require "chupa-text/mime-type"
-
 module ChupaText
   class Data
     attr_accessor :body
