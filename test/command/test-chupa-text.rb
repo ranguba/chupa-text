@@ -166,6 +166,7 @@ class TestCommandChupaText < Test::Unit::TestCase
                      true,
                      {
                        "uri"   => gz.to_s,
+                       "content-type" => "application/x-gzip",
                        "size"  => gz.stat.size,
                        "texts" => [],
                      },
