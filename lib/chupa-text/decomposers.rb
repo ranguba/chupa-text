@@ -34,7 +34,7 @@ module ChupaText
         enabled_names = resolve_names(registry, configuration.names)
         enabled_names.collect do |enabled_name|
           decomposer_class = registry.find(enabled_name)
-          options = configuration.options[name]
+          options = configuration.options[name] || {}
           decomposer_class.new(options)
         end
       end
