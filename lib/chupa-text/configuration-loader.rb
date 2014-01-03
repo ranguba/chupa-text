@@ -19,9 +19,11 @@ require "chupa-text/configuration"
 module ChupaText
   class ConfigurationLoader
     attr_reader :decomposer
+    attr_reader :content_type
     def initialize(configuration)
       @configuration = configuration
       @decomposer = DecomposerLoader.new(@configuration.decomposer)
+      @content_type = ContentTypeLoader.new(@configuration.content_type_registry)
       @load_paths = []
       data_dir = File.join(File.dirname(__FILE__), "..", "..", "data")
       @load_paths << File.expand_path(data_dir)
@@ -77,6 +79,16 @@ module ChupaText
         else
           super
         end
+      end
+    end
+
+    class ContentTypeLoader
+      def initialize(registry)
+        @registry = registry
+      end
+
+      def []=(extension, content_type)
+        @registry.register(extension, content_type)
       end
     end
   end

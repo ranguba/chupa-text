@@ -17,8 +17,10 @@
 module ChupaText
   class Configuration
     attr_reader :decomposer
+    attr_accessor :content_type_registry
     def initialize
       @decomposer = DecomposerConfiguration.new
+      @content_type_registry = ContentType.registry
     end
 
     class DecomposerConfiguration
