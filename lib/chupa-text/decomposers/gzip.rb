@@ -21,33 +21,33 @@ require "chupa-text"
 
 module ChupaText
   module Decomposers
-  class Gzip < Decomposer
-    registry.register(self)
+    class Gzip < Decomposer
+      registry.register(self)
 
-    TARGET_EXTENSIONS = ["gz", "tgz"]
-    TARGET_CONTENT_TYPES = [
-      "application/gzip",
-      "application/x-gzip",
-      "application/x-gtar-compressed",
-    ]
-    def target?(data)
-      TARGET_EXTENSIONS.include?(data.extension) or
-        TARGET_CONTENT_TYPES.include?(data.content_type)
-    end
-
-    def decompose(data)
-      reader = Zlib::GzipReader.new(StringIO.new(data.body))
-      extracted = Data.new
-      case data.extension
-      when "gz"
-        extracted.path = data.path.to_s.gsub(/\.gz\z/i, "")
-      when "tgz"
-        extracted.path = data.path.to_s.gsub(/\.tgz\z/i, ".tar")
+      TARGET_EXTENSIONS = ["gz", "tgz"]
+      TARGET_CONTENT_TYPES = [
+        "application/gzip",
+        "application/x-gzip",
+        "application/x-gtar-compressed",
+      ]
+      def target?(data)
+        TARGET_EXTENSIONS.include?(data.extension) or
+          TARGET_CONTENT_TYPES.include?(data.content_type)
       end
-      extracted.body   = reader.read
-      extracted.source = data
-      yield(extracted)
+
+      def decompose(data)
+        reader = Zlib::GzipReader.new(StringIO.new(data.body))
+        extracted = Data.new
+        case data.extension
+        when "gz"
+          extracted.path = data.path.to_s.gsub(/\.gz\z/i, "")
+        when "tgz"
+          extracted.path = data.path.to_s.gsub(/\.tgz\z/i, ".tar")
+        end
+        extracted.body   = reader.read
+        extracted.source = data
+        yield(extracted)
+      end
     end
-  end
   end
 end

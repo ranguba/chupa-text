@@ -21,26 +21,26 @@ require "chupa-text"
 
 module ChupaText
   module Decomposers
-  class Tar < Decomposer
-    registry.register(self)
+    class Tar < Decomposer
+      registry.register(self)
 
-    def target?(data)
-      data.extension == "tar" or
-        data.content_type == "application/x-tar"
-    end
+      def target?(data)
+        data.extension == "tar" or
+          data.content_type == "application/x-tar"
+      end
 
-    def decompose(data)
-      Gem::Package::TarReader.new(StringIO.new(data.body)) do |reader|
-        reader.each do |entry|
-          next unless entry.file?
-          extracted = Data.new
-          extracted.path   = entry.full_name
-          extracted.body   = entry.read
-          extracted.source = data
-          yield(extracted)
+      def decompose(data)
+        Gem::Package::TarReader.new(StringIO.new(data.body)) do |reader|
+          reader.each do |entry|
+            next unless entry.file?
+            extracted = Data.new
+            extracted.path   = entry.full_name
+            extracted.body   = entry.read
+            extracted.source = data
+            yield(extracted)
+          end
         end
       end
     end
-  end
   end
 end
