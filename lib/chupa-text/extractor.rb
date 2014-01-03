@@ -14,6 +14,9 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
+require "pathname"
+require "uri"
+
 module ChupaText
   class Extractor
     def initialize
@@ -39,8 +42,21 @@ module ChupaText
       @decomposers << decomposer
     end
 
-    def extract(data)
-      targets = [data]
+    # Extracts texts from input. Each extracted text is passes to the
+    # given block.
+    #
+    # @param [Data, String] input The input to be extracted texts.
+    #   If `input` is `String`, it is treated as the local file path or URI
+    #   of input data.
+    #
+    # @yield [text_data] Gives extracted text data to the block.
+    #   The block may be called zero or more times.
+    # @yieldparam [Data] text_data The extracted text data.
+    #   You can get text data by `text_data.body`.
+    #
+    # @return [void]
+    def extract(input)
+      targets = [ensure_data(input)]
       until targets.empty?
         target = targets.pop
         decomposer = find_decomposer(target)
@@ -55,6 +71,17 @@ module ChupaText
     end
 
     private
+    def ensure_data(input)
+      case input
+      when String, Pathname, URI::Generic
+        data = Data.new
+        data.uri = input.to_s
+        data
+      else
+        input
+      end
+    end
+
     def find_decomposer(data)
       @decomposers.find do |decomposer|
         decomposer.target?(data)

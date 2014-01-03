@@ -15,8 +15,15 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 class TestExtractor < Test::Unit::TestCase
+  include Helper
+
   def setup
     @extractor = ChupaText::Extractor.new
+  end
+
+  private
+  def fixture_path(*components)
+    super("extractor", *components)
   end
 
   sub_test_case("extract") do
@@ -27,6 +34,20 @@ class TestExtractor < Test::Unit::TestCase
         texts << extracted_data.body
       end
       texts
+    end
+
+    sub_test_case("input") do
+      def test_string
+        extract(fixture_path("hello.txt").to_s)
+      end
+
+      def test_uri
+        extract(URI.parse(fixture_path("hello.txt").to_s))
+      end
+
+      def test_path
+        extract(fixture_path("hello.txt"))
+      end
     end
 
     sub_test_case("no decomposers") do
