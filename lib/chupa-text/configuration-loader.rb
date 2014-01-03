@@ -20,9 +20,13 @@ module ChupaText
   class ConfigurationLoader
     def initialize(configuration=nil)
       @configuration = configuration || Configuration.new
+      @load_paths = []
+      data_dir = File.join(File.dirname(__FILE__), "..", "..", "data")
+      @load_paths << File.expand_path(data_dir)
     end
 
     def load(path)
+      path = resolve_path(path)
       File.open(path) do |file|
         instance_eval(file.read, path, 1)
       end
@@ -30,6 +34,17 @@ module ChupaText
 
     def decomposer
       DecomposerConfigurationLoader.new(@configuration.decomposer)
+    end
+
+    private
+    def resolve_path(path)
+      return path if File.exist?(path)
+      return path if Pathname(path).absolute?
+      @load_paths.each do |load_path|
+        resolved_path = File.join(load_path, path)
+        return resolved_path if File.exist?(resolved_path)
+      end
+      path
     end
 
     class DecomposerConfigurationLoader
