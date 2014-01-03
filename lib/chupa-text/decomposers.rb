@@ -42,9 +42,11 @@ module ChupaText
       private
       def resolve_names(registry, enabled_names)
         resolved_names = []
+        flag = 0
+        flag |= File::FNM_EXTGLOB if File.const_defined?(:FNM_EXTGLOB)
         enabled_names.each do |enabled_name|
           registry.each do |name,|
-            next unless File.fnmatch(enabled_name, name, File::FNM_EXTGLOB)
+            next unless File.fnmatch(enabled_name, name, flag)
             resolved_names << name
           end
         end

@@ -36,6 +36,12 @@ class TestDecomposers < Test::Unit::TestCase
       assert_equal([], decomposers.collect(&:class))
     end
 
+    def test_glob
+      @configuration.decomposer.names = ["{a,b,c}sv"]
+      decomposers = create
+      assert_equal([CSVDecomposer], decomposers.collect(&:class))
+    end
+
     private
     def create
       ChupaText::Decomposers.create(@registry, @configuration.decomposer)
