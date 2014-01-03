@@ -36,6 +36,7 @@ module ChupaText
 
     def initialize
       @body = nil
+      @mime_type = nil
       @attributes = {}
       @uri = nil
       @source = nil
@@ -74,12 +75,19 @@ module ChupaText
       @attributes[name] = value
     end
 
+    # @return [String] The MIME type of the data. If MIME type
+    #   isn't set, guesses MIME type from path and body.
+    # @return [nil] If MIME type isn't set and it can't guess MIME type
+    #   from path and body.
     def mime_type
-      self["mime-type"] || guess_mime_type
+      @mime_type || guess_mime_type
     end
 
+    # @param [String, nil] type The MIME type of the data. You can
+    #   unset MIME type by `nil`. If you unset MIME type, MIME type
+    #   is guessed from path and body of the data.
     def mime_type=(type)
-      self["mime-type"] = type
+      @mime_type = type
     end
 
     # @return [String, nil] Normalized extension as String if {#uri}
@@ -90,7 +98,7 @@ module ChupaText
       File.extname(@uri.path).downcase.gsub(/\A\./, "")
     end
 
-    # @return [Bool] true if MIME type is "text/plain", false
+    # @return [Bool] true if MIME type is "text/XXX", false
     #   otherwise.
     def text?
       (mime_type || "").start_with?("text/")
