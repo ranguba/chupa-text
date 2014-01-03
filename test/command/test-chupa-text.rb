@@ -97,4 +97,21 @@ class TestCommandChupaText < Test::Unit::TestCase
       end
     end
   end
+
+  sub_test_case("configuration") do
+    def test_no_decomposer
+      conf = fixture_path("no-decomposer.conf")
+      gz = fixture_path("hello.txt.gz")
+      assert_equal([
+                     true,
+                     {
+                       "path"  => gz.to_s,
+                       "size"  => gz.stat.size,
+                       "texts" => [],
+                     },
+                   ],
+                   run_command("--configuration", conf.to_s,
+                               gz.to_s))
+    end
+  end
 end

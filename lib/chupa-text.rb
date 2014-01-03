@@ -21,5 +21,6 @@ require "chupa-text/decomposer"
 require "chupa-text/decomposers"
 require "chupa-text/formatters"
 require "chupa-text/configuration"
+require "chupa-text/configuration-loader"
 
 require "chupa-text/command"
