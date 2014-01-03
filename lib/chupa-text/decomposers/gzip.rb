@@ -22,7 +22,7 @@ require "chupa-text"
 module ChupaText
   module Decomposers
     class Gzip < Decomposer
-      registry.register(self)
+      registry.register("gzip", self)
 
       TARGET_EXTENSIONS = ["gz", "tgz"]
       TARGET_CONTENT_TYPES = [

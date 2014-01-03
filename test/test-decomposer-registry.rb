@@ -24,12 +24,12 @@ class TestDecomposerRegistry < Test::Unit::TestCase
 
   def test_register
     assert_equal([], @registry.to_a)
-    @registry.register(CSVDecomposer)
-    assert_equal([CSVDecomposer], @registry.to_a)
+    @registry.register("csv", CSVDecomposer)
+    assert_equal([["csv", CSVDecomposer]], @registry.to_a)
   end
 
   def test_decomposers
-    @registry.register(CSVDecomposer)
+    @registry.register("csv", CSVDecomposer)
     assert_equal([CSVDecomposer], @registry.decomposers.collect(&:class))
   end
 end

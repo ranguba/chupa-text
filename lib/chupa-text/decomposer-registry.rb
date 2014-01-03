@@ -19,11 +19,11 @@ module ChupaText
     include Enumerable
 
     def initialize
-      @decomposer_classes = []
+      @decomposer_classes = {}
     end
 
-    def register(decomposer_class)
-      @decomposer_classes << decomposer_class
+    def register(name, decomposer_class)
+      @decomposer_classes[name] = decomposer_class
     end
 
     def each(&block)
@@ -31,7 +31,7 @@ module ChupaText
     end
 
     def decomposers
-      collect do |decomposer_class|
+      collect do |name, decomposer_class|
         decomposer_class.new({})
       end
     end

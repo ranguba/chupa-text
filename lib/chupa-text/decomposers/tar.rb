@@ -22,7 +22,7 @@ require "chupa-text"
 module ChupaText
   module Decomposers
     class Tar < Decomposer
-      registry.register(self)
+      registry.register("tar", self)
 
       def target?(data)
         data.extension == "tar" or
