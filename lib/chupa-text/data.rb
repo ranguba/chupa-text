@@ -22,6 +22,9 @@ module ChupaText
   class Data
     attr_writer :body
     attr_accessor :attributes
+
+    # @return [Pathname, nil] The path of the data if the data is for local
+    #   file, `nil` if the data isn't associated with any paths.
     attr_reader :path
 
     # @return [Data, nil] The source of the data. For example, text
@@ -46,6 +49,11 @@ module ChupaText
       @body ||= read_body
     end
 
+    # @path [String, Pathname, nil] path The path for the data. If
+    #   `path` is `nil`, it means that the data isn't associated with
+    #   any paths.
+    #
+    # @return [void]
     def path=(path)
       path = Pathname(path) if path.is_a?(String)
       @path = path
