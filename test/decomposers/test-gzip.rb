@@ -14,11 +14,11 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-class TestGzipDecomposer < Test::Unit::TestCase
+class TestDecomposersGzip < Test::Unit::TestCase
   include Helper
 
   def setup
-    @decomposer = ChupaText::GzipDecomposer.new
+    @decomposer = ChupaText::Decomposers::Gzip.new
   end
 
   private

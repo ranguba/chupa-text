@@ -27,8 +27,8 @@ module ChupaText
         $LOAD_PATH.each do |load_path|
           next unless File.directory?(load_path)
           Dir.chdir(load_path) do
-            Dir.glob("chupa-text/plugin/decomposer/*.rb") do |plugin_path|
-              require plugin_path.gsub(/\.rb\z/, "")
+            Dir.glob("chupa-text/decomposers/*.rb") do |decomposer_path|
+              require decomposer_path.gsub(/\.rb\z/, "")
             end
           end
         end

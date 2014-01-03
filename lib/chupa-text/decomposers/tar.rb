@@ -20,7 +20,8 @@ require "rubygems/package"
 require "chupa-text"
 
 module ChupaText
-  class TarDecomposer < Decomposer
+  module Decomposers
+  class Tar < Decomposer
     registry.register(self)
 
     def target?(data)
@@ -40,5 +41,6 @@ module ChupaText
         end
       end
     end
+  end
   end
 end

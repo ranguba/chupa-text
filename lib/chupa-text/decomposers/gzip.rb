@@ -20,7 +20,8 @@ require "zlib"
 require "chupa-text"
 
 module ChupaText
-  class GzipDecomposer < Decomposer
+  module Decomposers
+  class Gzip < Decomposer
     registry.register(self)
 
     TARGET_EXTENSIONS = ["gz", "tgz"]
@@ -47,5 +48,6 @@ module ChupaText
       extracted.source = data
       yield(extracted)
     end
+  end
   end
 end
