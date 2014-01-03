@@ -15,6 +15,8 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 require "optparse"
+require "uri"
+require "open-uri"
 
 module ChupaText
   module Command
@@ -27,7 +29,7 @@ module ChupaText
       end
 
       def initialize
-        @path = nil
+        @input = nil
         @configuration = Configuration.new
       end
 
@@ -35,12 +37,7 @@ module ChupaText
         return false unless parse_arguments(arguments)
 
         extractor = create_extractor
-        data = Data.new
-        if @path.nil?
-          data.body = $stdin.read
-        else
-          data.path = @path
-        end
+        data = create_data
         formatter = create_formatter
         formatter.format_start(data)
         extractor.extract(data) do |extracted|
@@ -64,13 +61,13 @@ module ChupaText
           puts(parser.help)
           return false
         end
-        @path, = rest
+        @input, = rest
         true
       end
 
       def create_option_parser
         parser = OptionParser.new
-        parser.banner += " [FILE]"
+        parser.banner += " [FILE_OR_URI]"
         parser.version = VERSION
         parser.on("--configuration=FILE",
                   "Read configuration from FILE.") do |path|
@@ -89,6 +86,25 @@ module ChupaText
           extractor.add_decomposer(decomposer)
         end
         extractor
+      end
+
+      def create_data
+        data = Data.new
+        if @input.nil?
+          data.body = $stdin.read
+        else
+          uri = URI.parse(@input)
+          if uri.is_a?(URI::HTTP)
+            open(uri) do |input|
+              data.body = input.read
+              data.content_type = input.content_type
+            end
+            data["uri"] = @input
+          else
+            data.path = @input
+          end
+        end
+        data
       end
 
       def create_formatter

@@ -14,6 +14,8 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
+require "socket"
+
 class TestCommandChupaText < Test::Unit::TestCase
   include Helper
 
@@ -21,27 +23,29 @@ class TestCommandChupaText < Test::Unit::TestCase
     setup_io
   end
 
-  def teardown
-    teardown_io
-  end
-
   def setup_io
-    @original_stdin  = $stdin
-    @original_stdout = $stdout
     @stdin  = StringIO.new
     @stdout = StringIO.new
-    $stdin  = @stdin
-    $stdout = @stdout
-  end
-
-  def teardown_io
-    $stdin  = @original_stdin
-    $stdout = @original_stdout
   end
 
   private
+  def wrap_io
+    @original_stdin  = $stdin
+    @original_stdout = $stdout
+    $stdin  = @stdin
+    $stdout = @stdout
+    begin
+      yield
+    ensure
+      $stdin  = @original_stdin
+      $stdout = @original_stdout
+    end
+  end
+
   def run_command(*arguments)
-    succeeded = ChupaText::Command::ChupaText.run(*arguments)
+    succeeded = wrap_io do
+      ChupaText::Command::ChupaText.run(*arguments)
+    end
     [succeeded, JSON.parse(@stdout.string)]
   end
 
@@ -71,6 +75,56 @@ class TestCommandChupaText < Test::Unit::TestCase
                        },
                      ],
                      run_command(path))
+      end
+    end
+
+    sub_test_case("URI") do
+      def setup
+        super
+        setup_www_server
+      end
+
+      def teardown
+        super
+        teardown_www_server
+      end
+
+      def setup_www_server
+        @www_server = TCPServer.new("127.0.0.1", 0)
+        _, port, host, = @www_server.addr
+        @uri = "http://#{host}:#{port}/"
+        @www_server_thread = Thread.new do
+          client = @www_server.accept
+          loop do
+            line = client.gets
+            break if line.chomp.empty?
+          end
+          client.print("HTTP/1.1 200 OK\r\n")
+          client.print("Content-Type: text/html\r\n")
+          client.print("\r\n")
+          client.print(@html)
+          client.close
+        end
+      end
+
+      def teardown_www_server
+        @www_server.close
+        @www_server_thread.kill
+      end
+
+      def test_single
+        @html = "<html><body>Hello</body></html>"
+        assert_equal([
+                       true,
+                       {
+                         "content-type" => "text/html",
+                         "size"         => @html.bytesize,
+                         "uri"          => @uri,
+                         "texts"        => [
+                         ],
+                       },
+                     ],
+                     run_command(@uri))
       end
     end
 
