@@ -14,35 +14,28 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-class TestContentTypeRegistry < Test::Unit::TestCase
-  def setup
-    @registry = ChupaText::ContentTypeRegistry.new
-  end
-
-  sub_test_case("register") do
-    def test_multiple
-      @registry.register("csv", "text/csv")
-      @registry.register("txt", "text/plain")
-      assert_equal("text/csv", @registry.find("csv"))
-    end
-  end
-
-  sub_test_case("find") do
-    def setup
-      super
-      @registry.register("csv", "text/csv")
+module ChupaText
+  class MIMETypeRegistry
+    def initialize
+      @from_extension_map = {}
     end
 
-    def test_nil
-      assert_nil(@registry.find(nil))
+    def register(extension, mime_type)
+      @from_extension_map[normalize_extension(extension)] = mime_type
     end
 
-    def test_nonexistent
-      assert_nil(@registry.find("txt"))
+    def find(extension)
+      @from_extension_map[normalize_extension(extension)]
     end
 
-    def test_existent
-      assert_equal("text/csv", @registry.find("csv"))
+    def clear
+      @from_extension_map.clear
+    end
+
+    private
+    def normalize_extension(extension)
+      return nil if extension.nil?
+      extension.to_s.downcase.gsub(/\A\./, "")
     end
   end
 end

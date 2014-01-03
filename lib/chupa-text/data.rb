@@ -17,7 +17,7 @@
 require "uri"
 require "open-uri"
 
-require "chupa-text/content-type"
+require "chupa-text/mime-type"
 
 module ChupaText
   class Data
@@ -74,12 +74,12 @@ module ChupaText
       @attributes[name] = value
     end
 
-    def content_type
-      self["content-type"] || guess_content_type
+    def mime_type
+      self["mime-type"] || guess_mime_type
     end
 
-    def content_type=(type)
-      self["content-type"] = type
+    def mime_type=(type)
+      self["mime-type"] = type
     end
 
     # @return [String, nil] Normalized extension as String if {#uri}
@@ -90,10 +90,10 @@ module ChupaText
       File.extname(@uri.path).downcase.gsub(/\A\./, "")
     end
 
-    # @return [Bool] true if content-type is "text/plain", false
+    # @return [Bool] true if MIME type is "text/plain", false
     #   otherwise.
     def text?
-      (content_type || "").start_with?("text/")
+      (mime_type || "").start_with?("text/")
     end
 
     private
@@ -102,7 +102,7 @@ module ChupaText
         uri.open("rb") do |input|
           @body = input.read
           if input.respond_to?(:content_type)
-            self.content_type = input.content_type
+            self.mime_type = input.content_type.split(/;/).first
           end
         end
       else
@@ -112,21 +112,21 @@ module ChupaText
       end
     end
 
-    def guess_content_type
-      guess_content_type_from_uri or
-        guess_content_type_from_body
+    def guess_mime_type
+      guess_mime_type_from_uri or
+        guess_mime_type_from_body
     end
 
-    def guess_content_type_from_uri
-      ContentType.registry.find(extension)
+    def guess_mime_type_from_uri
+      MIMEType.registry.find(extension)
     end
 
-    def guess_content_type_from_body
-      content_type = nil
+    def guess_mime_type_from_body
+      mime_type = nil
       change_encoding(body, "UTF-8") do |_body|
-        content_type = "text/plain" if _body.valid_encoding?
+        mime_type = "text/plain" if _body.valid_encoding?
       end
-      content_type
+      mime_type
     end
 
     def change_encoding(string, encoding)

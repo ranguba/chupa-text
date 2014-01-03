@@ -17,20 +17,20 @@
 class TestData < Test::Unit::TestCase
   def setup
     @data = ChupaText::Data.new
-    @registry = ChupaText::ContentTypeRegistry.new
-    @original_registry = ChupaText::ContentType.registry
-    ChupaText::ContentType.registry = @registry
+    @registry = ChupaText::MIMETypeRegistry.new
+    @original_registry = ChupaText::MIMEType.registry
+    ChupaText::MIMEType.registry = @registry
   end
 
   def teardown
-    ChupaText::ContentType.registry = @original_registry
+    ChupaText::MIMEType.registry = @original_registry
   end
 
-  sub_test_case("content-type") do
+  sub_test_case("mime-type") do
     sub_test_case("guess") do
       sub_test_case("extension") do
         def test_txt
-          ChupaText::ContentType.registry.register("txt", "text/plain")
+          ChupaText::MIMEType.registry.register("txt", "text/plain")
           assert_equal("text/plain", guess("README.txt"))
         end
 
@@ -38,7 +38,7 @@ class TestData < Test::Unit::TestCase
         def guess(uri)
           @data.body = "dummy"
           @data.uri = uri
-          @data.content_type
+          @data.mime_type
         end
       end
 
@@ -52,7 +52,7 @@ class TestData < Test::Unit::TestCase
         private
         def guess(body)
           @data.body = body
-          @data.content_type
+          @data.mime_type
         end
       end
     end

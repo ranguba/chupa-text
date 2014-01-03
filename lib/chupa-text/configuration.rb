@@ -14,13 +14,15 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
+require "chupa-text/mime-type"
+
 module ChupaText
   class Configuration
     attr_reader :decomposer
-    attr_accessor :content_type_registry
+    attr_accessor :mime_type_registry
     def initialize
       @decomposer = DecomposerConfiguration.new
-      @content_type_registry = ContentType.registry
+      @mime_type_registry = MIMEType.registry
     end
 
     class DecomposerConfiguration

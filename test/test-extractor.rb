@@ -32,14 +32,14 @@ class TestExtractor < Test::Unit::TestCase
     sub_test_case("no decomposers") do
       def test_text
         data = ChupaText::Data.new
-        data.content_type = "text/plain"
+        data.mime_type = "text/plain"
         data.body = "Hello"
         assert_equal(["Hello"], extract(data))
       end
 
       def test_not_text
         data = ChupaText::Data.new
-        data.content_type = "application/x-javascript"
+        data.mime_type = "application/x-javascript"
         data.body = "alert('Hello');"
         assert_equal([], extract(data))
       end
@@ -48,12 +48,12 @@ class TestExtractor < Test::Unit::TestCase
     sub_test_case("use decomposer") do
       class HTMLDecomposer < ChupaText::Decomposer
         def target?(data)
-          data.content_type == "text/html"
+          data.mime_type == "text/html"
         end
 
         def decompose(data)
           extracted = ChupaText::Data.new
-          extracted.content_type = "text/plain"
+          extracted.mime_type = "text/plain"
           extracted.body = data.body.gsub(/<.+?>/, "")
           yield(extracted)
         end
@@ -67,7 +67,7 @@ class TestExtractor < Test::Unit::TestCase
 
       def test_decompose
         data = ChupaText::Data.new
-        data.content_type = "text/html"
+        data.mime_type = "text/html"
         data.body = "<html><body>Hello</body></html>"
         assert_equal(["Hello"], extract(data))
       end
@@ -95,7 +95,7 @@ class TestExtractor < Test::Unit::TestCase
 
       def test_decompose
         data = ChupaText::Data.new
-        data.content_type = "text/plain"
+        data.mime_type = "text/plain"
         data.body = "Hello"
         assert_equal(["Hello", "Hello"], extract(data))
       end

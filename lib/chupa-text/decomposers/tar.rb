@@ -26,7 +26,7 @@ module ChupaText
 
       def target?(data)
         data.extension == "tar" or
-          data.content_type == "application/x-tar"
+          data.mime_type == "application/x-tar"
       end
 
       def decompose(data)

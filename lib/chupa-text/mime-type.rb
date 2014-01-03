@@ -14,21 +14,21 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-require "chupa-text/content-type-registry"
+require "chupa-text/mime-type-registry"
 
 module ChupaText
-  module ContentType
+  module MIMEType
     class << self
-      # @return [ContentTypeRegistry] The content-type registry for
-      #   this process.
+      # @return [MIMETypeRegistry] The MIME type registry for this
+      #   process.
       def registry
-        @@registry ||= ContentTypeRegistry.new
+        @@registry ||= MIMETypeRegistry.new
       end
 
       # Normally, this method should not be used. It is just for test.
       #
-      # @param [ContenTypeRegistry, nil] registry
-      #   The new content-type registry for this process.
+      # @param [MIMETypeRegistry, nil] registry
+      #   The new MIME type registry for this process.
       #   If you specify `nil`, reset the registry.
       def registry=(registry)
         @@registry = registry

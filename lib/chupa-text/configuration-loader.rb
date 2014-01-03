@@ -21,11 +21,11 @@ require "chupa-text/configuration"
 module ChupaText
   class ConfigurationLoader
     attr_reader :decomposer
-    attr_reader :content_type
+    attr_reader :mime_type
     def initialize(configuration)
       @configuration = configuration
       @decomposer = DecomposerLoader.new(@configuration.decomposer)
-      @content_type = ContentTypeLoader.new(@configuration.content_type_registry)
+      @mime_type = MIMETypeLoader.new(@configuration.mime_type_registry)
       @load_paths = []
       data_dir = File.join(File.dirname(__FILE__), "..", "..", "data")
       @load_paths << File.expand_path(data_dir)
@@ -84,13 +84,13 @@ module ChupaText
       end
     end
 
-    class ContentTypeLoader
+    class MIMETypeLoader
       def initialize(registry)
         @registry = registry
       end
 
-      def []=(extension, content_type)
-        @registry.register(extension, content_type)
+      def []=(extension, mime_type)
+        @registry.register(extension, mime_type)
       end
     end
   end

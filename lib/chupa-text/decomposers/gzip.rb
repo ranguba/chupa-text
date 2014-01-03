@@ -25,14 +25,14 @@ module ChupaText
       registry.register("gzip", self)
 
       TARGET_EXTENSIONS = ["gz", "tgz"]
-      TARGET_CONTENT_TYPES = [
+      TARGET_MIME_TYPES = [
         "application/gzip",
         "application/x-gzip",
         "application/x-gtar-compressed",
       ]
       def target?(data)
         TARGET_EXTENSIONS.include?(data.extension) or
-          TARGET_CONTENT_TYPES.include?(data.content_type)
+          TARGET_MIME_TYPES.include?(data.mime_type)
       end
 
       def decompose(data)

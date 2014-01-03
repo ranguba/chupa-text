@@ -61,15 +61,15 @@ class TestCommandChupaText < Test::Unit::TestCase
         assert_equal([
                        true,
                        {
-                         "content-type" => "text/plain",
-                         "uri"          => path,
-                         "size"         => body.bytesize,
-                         "texts"        => [
+                         "mime-type" => "text/plain",
+                         "uri"       => path,
+                         "size"      => body.bytesize,
+                         "texts"     => [
                            {
-                             "content-type" => "text/plain",
-                             "uri"          => path,
-                             "size"         => body.bytesize,
-                             "body"         => body,
+                             "mime-type" => "text/plain",
+                             "uri"       => path,
+                             "size"      => body.bytesize,
+                             "body"      => body,
                            },
                          ],
                        },
@@ -117,15 +117,15 @@ class TestCommandChupaText < Test::Unit::TestCase
         assert_equal([
                        true,
                        {
-                         "content-type" => "text/html",
-                         "size"         => @html.bytesize,
-                         "uri"          => @uri,
-                         "texts"        => [
+                         "mime-type" => "text/html",
+                         "size"      => @html.bytesize,
+                         "uri"       => @uri,
+                         "texts"     => [
                            {
-                             "content-type" => "text/html",
-                             "size"         => @html.bytesize,
-                             "uri"          => @uri,
-                             "body"         => @html,
+                             "mime-type" => "text/html",
+                             "size"      => @html.bytesize,
+                             "uri"       => @uri,
+                             "body"      => @html,
                            },
                          ],
                        },
@@ -142,13 +142,13 @@ class TestCommandChupaText < Test::Unit::TestCase
         assert_equal([
                        true,
                        {
-                         "content-type" => "text/plain",
-                         "size"         => body.bytesize,
-                         "texts"        => [
+                         "mime-type" => "text/plain",
+                         "size"      => body.bytesize,
+                         "texts"     => [
                            {
-                             "content-type" => "text/plain",
-                             "size"         => body.bytesize,
-                             "body"         => body,
+                             "mime-type" => "text/plain",
+                             "size"      => body.bytesize,
+                             "body"      => body,
                            },
                          ],
                        },
@@ -165,10 +165,10 @@ class TestCommandChupaText < Test::Unit::TestCase
       assert_equal([
                      true,
                      {
-                       "uri"   => gz.to_s,
-                       "content-type" => "application/x-gzip",
-                       "size"  => gz.stat.size,
-                       "texts" => [],
+                       "uri"       => gz.to_s,
+                       "mime-type" => "application/x-gzip",
+                       "size"      => gz.stat.size,
+                       "texts"     => [],
                      },
                    ],
                    run_command("--configuration", conf.to_s,

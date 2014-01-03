@@ -43,9 +43,9 @@ module ChupaText
 
       private
       def format_headers(data, target)
-        format_header("content-type", data.content_type, target)
-        format_header("uri",          data.uri,          target)
-        format_header("size",         data.size,         target)
+        format_header("mime-type", data.mime_type, target)
+        format_header("uri",       data.uri,          target)
+        format_header("size",      data.size,         target)
         data.attributes.each do |name, value|
           format_header(name, value, target)
         end
