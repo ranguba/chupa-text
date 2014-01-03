@@ -18,8 +18,8 @@ require "chupa-text/configuration"
 
 module ChupaText
   class ConfigurationLoader
-    def initialize(configuration=nil)
-      @configuration = configuration || Configuration.new
+    def initialize(configuration)
+      @configuration = configuration
       @load_paths = []
       data_dir = File.join(File.dirname(__FILE__), "..", "..", "data")
       @load_paths << File.expand_path(data_dir)
