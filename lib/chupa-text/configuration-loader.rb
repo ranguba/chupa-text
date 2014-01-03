@@ -18,8 +18,10 @@ require "chupa-text/configuration"
 
 module ChupaText
   class ConfigurationLoader
+    attr_reader :decomposer
     def initialize(configuration)
       @configuration = configuration
+      @decomposer = DecomposerLoader.new(@configuration.decomposer)
       @load_paths = []
       data_dir = File.join(File.dirname(__FILE__), "..", "..", "data")
       @load_paths << File.expand_path(data_dir)
@@ -30,10 +32,6 @@ module ChupaText
       File.open(path) do |file|
         instance_eval(file.read, path, 1)
       end
-    end
-
-    def decomposer
-      DecomposerLoader.new(@configuration.decomposer)
     end
 
     private
