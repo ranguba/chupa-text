@@ -20,7 +20,7 @@ class TestDecomposer < Test::Unit::TestCase
     end
 
     def setup
-      @decomposer = NotImplementedDecomposer.new
+      @decomposer = NotImplementedDecomposer.new({})
       @data = ChupaText::Data.new
     end
 

@@ -18,7 +18,7 @@ class TestDecomposersGzip < Test::Unit::TestCase
   include Helper
 
   def setup
-    @decomposer = ChupaText::Decomposers::Gzip.new
+    @decomposer = ChupaText::Decomposers::Gzip.new({})
   end
 
   private

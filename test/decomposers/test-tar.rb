@@ -18,7 +18,7 @@ class TestDecomposersTar < Test::Unit::TestCase
   include Helper
 
   def setup
-    @decomposer = ChupaText::Decomposers::Tar.new
+    @decomposer = ChupaText::Decomposers::Tar.new({})
   end
 
   private

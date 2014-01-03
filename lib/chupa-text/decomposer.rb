@@ -35,6 +35,10 @@ module ChupaText
       end
     end
 
+    def initialize(options)
+      @options = options
+    end
+
     def target?(data)
       raise NotImplementedError, "must implement #{self.class}\##{__method__}"
     end

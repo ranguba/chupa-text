@@ -32,7 +32,7 @@ module ChupaText
 
     def decomposers
       collect do |decomposer_class|
-        decomposer_class.new
+        decomposer_class.new({})
       end
     end
   end

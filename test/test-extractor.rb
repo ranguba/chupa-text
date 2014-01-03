@@ -61,7 +61,7 @@ class TestExtractor < Test::Unit::TestCase
 
       def setup
         super
-        decomposer = HTMLDecomposer.new
+        decomposer = HTMLDecomposer.new({})
         @extractor.add_decomposer(decomposer)
       end
 
@@ -89,7 +89,7 @@ class TestExtractor < Test::Unit::TestCase
 
       def setup
         super
-        decomposer = CopyDecomposer.new
+        decomposer = CopyDecomposer.new({})
         @extractor.add_decomposer(decomposer)
       end
 
