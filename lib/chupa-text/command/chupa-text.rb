@@ -32,6 +32,8 @@ module ChupaText
       end
 
       def run(*arguments)
+        load_configuration("chupa-text.conf")
+
         return false unless parse_arguments(arguments)
 
         extractor = create_extractor
@@ -46,6 +48,11 @@ module ChupaText
       end
 
       private
+      def load_configuration(path)
+        loader = ConfigurationLoader.new(@configuration)
+        loader.load(path)
+      end
+
       def parse_arguments(arguments)
         parser = create_option_parser
         rest = nil
@@ -69,8 +76,7 @@ module ChupaText
         parser.version = VERSION
         parser.on("--configuration=FILE",
                   "Read configuration from FILE.") do |path|
-          loader = ConfigurationLoader.new(@configuration)
-          loader.load(path)
+          load_configuration(path)
         end
         parser
       end
