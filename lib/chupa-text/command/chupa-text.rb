@@ -36,6 +36,7 @@ module ChupaText
 
         return false unless parse_arguments(arguments)
 
+        Decomposers.load
         extractor = create_extractor
         data = create_data
         formatter = create_formatter
@@ -82,7 +83,6 @@ module ChupaText
       end
 
       def create_extractor
-        Decomposers.load
         extractor = Extractor.new
         extractor.apply_configuration(@configuration)
         extractor
