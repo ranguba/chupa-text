@@ -14,18 +14,20 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-require "pathname"
+require "uri"
+require "open-uri"
 
 require "chupa-text/content-type"
 
 module ChupaText
   class Data
-    attr_writer :body
+    attr_accessor :body
     attr_accessor :attributes
 
-    # @return [Pathname, nil] The path of the data if the data is for local
-    #   file, `nil` if the data isn't associated with any paths.
-    attr_reader :path
+    # @return [URI, nil] The URI of the data if the data is for remote
+    #   or local file, `nil` if the data isn't associated with any
+    #   URIs.
+    attr_reader :uri
 
     # @return [Data, nil] The source of the data. For example, text
     #   data (`hello.txt`) in archive data (`hello.tar`) have the
@@ -35,7 +37,7 @@ module ChupaText
     def initialize
       @body = nil
       @attributes = {}
-      @path = nil
+      @uri = nil
       @source = nil
     end
 
@@ -45,18 +47,17 @@ module ChupaText
       self
     end
 
-    def body
-      @body ||= read_body
-    end
-
-    # @path [String, Pathname, nil] path The path for the data. If
-    #   `path` is `nil`, it means that the data isn't associated with
-    #   any paths.
-    #
-    # @return [void]
-    def path=(path)
-      path = Pathname(path) if path.is_a?(String)
-      @path = path
+    # @param [String, URI, nil] uri The URI for the data. If `uri` is
+    #   `nil`, it means that the data isn't associated with any URIs.
+    def uri=(uri)
+      case uri
+      when String, Pathname
+        uri = URI.parse(uri.to_s)
+      end
+      @uri = uri
+      if @uri and @body.nil?
+        retrieve_info(@uri)
+      end
     end
 
     def size
@@ -81,12 +82,12 @@ module ChupaText
       self["content-type"] = type
     end
 
-    # @return [String, nil] Normalized extension as String if {#path}
+    # @return [String, nil] Normalized extension as String if {#uri}
     #   is not `nil`, `nil` otherwise. The normalized extension uses
     #   lower case like `pdf` not `PDF`.
     def extension
-      return nil if @path.nil?
-      @path.extname.downcase.gsub(/\A\./, "")
+      return nil if @uri.nil?
+      File.extname(@uri.path).downcase.gsub(/\A\./, "")
     end
 
     # @return [Bool] true if content-type is "text/plain", false
@@ -96,19 +97,27 @@ module ChupaText
     end
 
     private
-    def read_body
-      return nil if @path.nil?
-      @path.open("rb") do |file|
-        file.read
+    def retrieve_info(uri)
+      if uri.respond_to?(:open)
+        uri.open("rb") do |input|
+          @body = input.read
+          if input.respond_to?(:content_type)
+            self.content_type = input.content_type
+          end
+        end
+      else
+        File.open(uri.path, "rb") do |file|
+          @body = file.read
+        end
       end
     end
 
     def guess_content_type
-      guess_content_type_from_path or
+      guess_content_type_from_uri or
         guess_content_type_from_body
     end
 
-    def guess_content_type_from_path
+    def guess_content_type_from_uri
       ContentType.registry.find(extension)
     end
 

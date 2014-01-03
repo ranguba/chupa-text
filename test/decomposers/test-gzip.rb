@@ -39,12 +39,12 @@ class TestDecomposersGzip < Test::Unit::TestCase
       def setup
         super
         @data = ChupaText::Data.new
-        @data.path = fixture_path("hello.txt.gz")
+        @data.uri = fixture_path("hello.txt.gz")
       end
 
       def test_path
-        assert_equal([fixture_path("hello.txt")],
-                     decompose(@data).collect(&:path))
+        assert_equal([URI.parse(fixture_path("hello.txt").to_s)],
+                     decompose(@data).collect(&:uri))
       end
 
       def test_body
@@ -62,12 +62,12 @@ class TestDecomposersGzip < Test::Unit::TestCase
       def setup
         super
         @data = ChupaText::Data.new
-        @data.path = fixture_path("hello.tar.gz")
+        @data.uri = fixture_path("hello.tar.gz")
       end
 
-      def test_path
-        assert_equal([fixture_path("hello.tar")],
-                     decompose(@data).collect(&:path))
+      def test_uri
+        assert_equal([URI.parse(fixture_path("hello.tar").to_s)],
+                     decompose(@data).collect(&:uri))
       end
 
       def test_body
@@ -90,12 +90,12 @@ class TestDecomposersGzip < Test::Unit::TestCase
       def setup
         super
         @data = ChupaText::Data.new
-        @data.path = fixture_path("hello.tgz")
+        @data.uri = fixture_path("hello.tgz")
       end
 
-      def test_path
-        assert_equal([fixture_path("hello.tar")],
-                     decompose(@data).collect(&:path))
+      def test_uri
+        assert_equal([URI.parse(fixture_path("hello.tar").to_s)],
+                     decompose(@data).collect(&:uri))
       end
 
       def test_body

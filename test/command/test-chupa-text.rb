@@ -62,12 +62,12 @@ class TestCommandChupaText < Test::Unit::TestCase
                        true,
                        {
                          "content-type" => "text/plain",
-                         "path"         => path,
+                         "uri"          => path,
                          "size"         => body.bytesize,
                          "texts"        => [
                            {
                              "content-type" => "text/plain",
-                             "path"         => path,
+                             "uri"          => path,
                              "size"         => body.bytesize,
                              "body"         => body,
                            },
@@ -159,7 +159,7 @@ class TestCommandChupaText < Test::Unit::TestCase
       assert_equal([
                      true,
                      {
-                       "path"  => gz.to_s,
+                       "uri"   => gz.to_s,
                        "size"  => gz.stat.size,
                        "texts" => [],
                      },

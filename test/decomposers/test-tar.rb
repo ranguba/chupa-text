@@ -31,9 +31,9 @@ class TestDecomposersTar < Test::Unit::TestCase
       decomposed = []
       @decomposer.decompose(data) do |decomposed_data|
         decomposed << {
-          :path   => decomposed_data.path.to_s,
+          :uri    => decomposed_data.uri.to_s,
           :body   => decomposed_data.body,
-          :source => decomposed_data.source.path.to_s,
+          :source => decomposed_data.source.uri.to_s,
         }
       end
       decomposed
@@ -43,15 +43,15 @@ class TestDecomposersTar < Test::Unit::TestCase
       def setup
         super
         @data = ChupaText::Data.new
-        @data.path = fixture_path("top-level.tar")
+        @data.uri = fixture_path("top-level.tar")
       end
 
       def test_decompose
         assert_equal([
                        {
-                         :path   => "top-level.txt",
+                         :uri    => "top-level.txt",
                          :body   => "top level\n",
-                         :source => @data.path.to_s,
+                         :source => @data.uri.to_s,
                        },
                      ],
                      decompose(@data))
@@ -62,15 +62,15 @@ class TestDecomposersTar < Test::Unit::TestCase
       def setup
         super
         @data = ChupaText::Data.new
-        @data.path = fixture_path("directory.tar")
+        @data.uri = fixture_path("directory.tar")
       end
 
       def test_decompose
         assert_equal([
                        {
-                         :path   => "directory/hello.txt",
+                         :uri    => "directory/hello.txt",
                          :body   => "Hello in directory\n",
-                         :source => @data.path.to_s,
+                         :source => @data.uri.to_s,
                        },
                      ],
                      decompose(@data))

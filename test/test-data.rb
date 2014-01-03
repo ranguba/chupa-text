@@ -35,8 +35,9 @@ class TestData < Test::Unit::TestCase
         end
 
         private
-        def guess(path)
-          @data.path = path
+        def guess(uri)
+          @data.body = "dummy"
+          @data.uri = uri
           @data.content_type
         end
       end
@@ -58,7 +59,7 @@ class TestData < Test::Unit::TestCase
   end
 
   sub_test_case("extension") do
-    def test_no_path
+    def test_no_uri
       assert_nil(extension(nil))
     end
 
@@ -75,8 +76,9 @@ class TestData < Test::Unit::TestCase
     end
 
     private
-    def extension(path)
-      @data.path = path
+    def extension(uri)
+      @data.body = "dummy"
+      @data.uri = uri
       @data.extension
     end
   end

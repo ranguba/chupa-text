@@ -93,16 +93,7 @@ module ChupaText
         if @input.nil?
           data.body = $stdin.read
         else
-          uri = URI.parse(@input)
-          if uri.is_a?(URI::HTTP)
-            open(uri) do |input|
-              data.body = input.read
-              data.content_type = input.content_type
-            end
-            data["uri"] = @input
-          else
-            data.path = @input
-          end
+          data.uri = @input
         end
         data
       end
