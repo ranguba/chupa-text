@@ -121,6 +121,12 @@ class TestCommandChupaText < Test::Unit::TestCase
                          "size"         => @html.bytesize,
                          "uri"          => @uri,
                          "texts"        => [
+                           {
+                             "content-type" => "text/html",
+                             "size"         => @html.bytesize,
+                             "uri"          => @uri,
+                             "body"         => @html,
+                           },
                          ],
                        },
                      ],

@@ -93,7 +93,7 @@ module ChupaText
     # @return [Bool] true if content-type is "text/plain", false
     #   otherwise.
     def text?
-      content_type == "text/plain"
+      (content_type || "").start_with?("text/")
     end
 
     private

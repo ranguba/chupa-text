@@ -39,8 +39,8 @@ class TestExtractor < Test::Unit::TestCase
 
       def test_not_text
         data = ChupaText::Data.new
-        data.content_type = "text/html"
-        data.body = "<html><body>Hello</body></html>"
+        data.content_type = "application/x-javascript"
+        data.body = "alert('Hello');"
         assert_equal([], extract(data))
       end
     end
