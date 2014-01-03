@@ -16,6 +16,20 @@
 
 module ChupaText
   class Configuration
+    class << self
+      def default
+        @default ||= create_default
+      end
+
+      private
+      def create_default
+        configuration = new
+        loader = ConfigurationLoader.new(configuration)
+        loader.load("chupa-text.conf")
+        configuration
+      end
+    end
+
     attr_reader :decomposer
     attr_accessor :mime_type_registry
     def initialize

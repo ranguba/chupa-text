@@ -28,12 +28,10 @@ module ChupaText
 
       def initialize
         @input = nil
-        @configuration = Configuration.new
+        @configuration = Configuration.default
       end
 
       def run(*arguments)
-        load_configuration("chupa-text.conf")
-
         return false unless parse_arguments(arguments)
 
         Decomposers.load
