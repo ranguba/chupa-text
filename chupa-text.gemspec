@@ -45,7 +45,7 @@ Gem::Specification.new do |spec|
   spec.files += Dir.glob("data/*.conf")
   spec.files += Dir.glob("lib/**/*.rb")
   spec.files += Dir.glob("doc/text/*")
-  spec.test_files += Dir.glob("test/**/*")
+  spec.files += Dir.glob("test/**/*")
   Dir.chdir("bin") do
     spec.executables = Dir.glob("*")
   end
