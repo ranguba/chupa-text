@@ -229,7 +229,7 @@ module ChupaText
           #{@mime_types.inspect}.include?(data.mime_type)
       end
 
-      def decomposer(data)
+      def decompose(data)
         raise NotImplementedError, "\#{self.class}\#\#{__method__} isn't implemented yet."
         text = "IMPLEMENTED ME"
         text_data = TextData.new(text)
