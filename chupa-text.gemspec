@@ -39,7 +39,8 @@ Gem::Specification.new do |spec|
   description = clean_white_space.call(entries[entries.index("Description") + 1])
   spec.summary, spec.description, = description.split(/\n\n+/, 3)
   spec.license = "LGPLv2.1 or later"
-  spec.files = ["README.md", "Rakefile", "Gemfile", "#{spec.name}.gemspec"]
+  spec.files = ["#{spec.name}.gemspec"]
+  spec.files += ["README.md", "LICENSE.txt", "Rakefile", "Gemfile"]
   spec.files += [".yardopts"]
   spec.files += Dir.glob("data/*.conf")
   spec.files += Dir.glob("lib/**/*.rb")
