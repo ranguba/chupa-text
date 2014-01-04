@@ -81,7 +81,6 @@ module ChupaText
 
       def create_option_parser
         parser = OptionParser.new
-        parser.banner += " [OPTIONS]"
         parser.version = VERSION
         parser.on("--name=NAME",
                   "Decomposer name",
