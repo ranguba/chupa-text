@@ -14,18 +14,39 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-require "chupa-text/version"
+class TestFileContent < Test::Unit::TestCase
+  def setup
+    @file = Tempfile.new(["test-file-content", ".txt"])
+  end
 
-require "chupa-text/configuration"
-require "chupa-text/configuration-loader"
-require "chupa-text/data"
-require "chupa-text/decomposer"
-require "chupa-text/decomposer-registry"
-require "chupa-text/decomposers"
-require "chupa-text/extractor"
-require "chupa-text/formatters"
-require "chupa-text/mime-type"
-require "chupa-text/mime-type-registry"
+  def write(string)
+    @file.write(string)
+    @file.flush
+  end
 
-require "chupa-text/file-content"
-require "chupa-text/command"
+  def test_size
+    body = "Hello"
+    write(body)
+    content = ChupaText::FileContent.new(@file.path)
+    assert_equal(body.bytesize, content.size)
+  end
+
+  def test_path
+    content = ChupaText::FileContent.new(@file.path)
+    assert_equal(@file.path, content.path)
+  end
+
+  def test_body
+    body = "Hello"
+    write(body)
+    content = ChupaText::FileContent.new(@file.path)
+    assert_equal(body, content.body)
+  end
+
+  def test_open
+    body = "Hello"
+    write(body)
+    content = ChupaText::FileContent.new(@file.path)
+    assert_equal(body, content.open {|file| file.read})
+  end
+end

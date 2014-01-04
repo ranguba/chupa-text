@@ -14,18 +14,22 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-require "chupa-text/version"
+module ChupaText
+  class FileContent
+    attr_reader :size
+    attr_reader :path
 
-require "chupa-text/configuration"
-require "chupa-text/configuration-loader"
-require "chupa-text/data"
-require "chupa-text/decomposer"
-require "chupa-text/decomposer-registry"
-require "chupa-text/decomposers"
-require "chupa-text/extractor"
-require "chupa-text/formatters"
-require "chupa-text/mime-type"
-require "chupa-text/mime-type-registry"
+    def initialize(path)
+      @path = path
+      @size = File.size(@path)
+    end
 
-require "chupa-text/file-content"
-require "chupa-text/command"
+    def open(&block)
+      File.open(@path, "rb", &block)
+    end
+
+    def body
+      @body ||= open {|file| file.read}
+    end
+  end
+end
