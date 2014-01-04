@@ -28,4 +28,5 @@ require "chupa-text/mime-type"
 require "chupa-text/mime-type-registry"
 
 require "chupa-text/file-content"
+require "chupa-text/virtual-content"
 require "chupa-text/command"
