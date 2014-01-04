@@ -266,8 +266,8 @@ class Test#{@name.capitalize} < Test::Unit::TestCase
     end
 
     def test_body
-      input_body = "TODO"
-      expected_text = "TODO"
+      input_body = "TODO (input)"
+      expected_text = "TODO (extracted)"
       assert_equal([expected_text],
                    decompose(input_body).collect(&:body))
     end
