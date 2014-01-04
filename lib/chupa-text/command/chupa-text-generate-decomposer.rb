@@ -113,7 +113,7 @@ module ChupaText
         parser.on("--license=LICENSE",
                   "License",
                   "(e.g.: MIT)",
-                  "(default: #{@licene})") do |license|
+                  "(default: #{@license})") do |license|
           @license = license
         end
         parser
