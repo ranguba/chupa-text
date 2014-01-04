@@ -19,16 +19,6 @@ class TestFileContent < Test::Unit::TestCase
     @file = Tempfile.new(["test-file-content", ".txt"])
   end
 
-  def write(string)
-    @file.write(string)
-    @file.flush
-  end
-
-  def content(string=nil)
-    write(string) if string
-    ChupaText::FileContent.new(@file.path)
-  end
-
   def test_size
     body = "Hello"
     assert_equal(body.bytesize, content(body).size)
@@ -46,5 +36,16 @@ class TestFileContent < Test::Unit::TestCase
   def test_open
     body = "Hello"
     assert_equal(body, content(body).open {|file| file.read})
+  end
+
+  private
+  def write(string)
+    @file.write(string)
+    @file.flush
+  end
+
+  def content(string=nil)
+    write(string) if string
+    ChupaText::FileContent.new(@file.path)
   end
 end
