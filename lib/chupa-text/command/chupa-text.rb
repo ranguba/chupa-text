@@ -87,13 +87,11 @@ module ChupaText
       end
 
       def create_data
-        data = Data.new
         if @input.nil?
-          data.body = $stdin.read
+          VirtualFileData.new(nil, $stdin)
         else
-          data.uri = @input
+          InputData.new(@input)
         end
-        data
       end
 
       def create_formatter

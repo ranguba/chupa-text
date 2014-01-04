@@ -37,14 +37,14 @@ module ChupaText
 
       def decompose(data)
         reader = Zlib::GzipReader.new(StringIO.new(data.body))
-        extracted = Data.new
-        extracted.body   = reader.read
+        uri = nil
         case data.extension
         when "gz"
-          extracted.uri  = data.uri.to_s.gsub(/\.gz\z/i, "")
+          uri = data.uri.to_s.gsub(/\.gz\z/i, "")
         when "tgz"
-          extracted.uri  = data.uri.to_s.gsub(/\.tgz\z/i, ".tar")
+          uri = data.uri.to_s.gsub(/\.tgz\z/i, ".tar")
         end
+        extracted = VirtualFileData.new(uri, reader)
         extracted.source = data
         yield(extracted)
       end

@@ -14,30 +14,44 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-require "stringio"
-require "rubygems/package"
-
-require "chupa-text"
+require "uri"
+require "open-uri"
 
 module ChupaText
-  module Decomposers
-    class Tar < Decomposer
-      registry.register("tar", self)
-
-      def target?(data)
-        data.extension == "tar" or
-          data.mime_type == "application/x-tar"
+  class InputData < Data
+    def initialize(uri)
+      super()
+      self.uri = uri
+      if @uri.class == URI::Generic
+        @content = FileContent.new(@uri.path)
+      else
+        @content = download
       end
+    end
 
-      def decompose(data)
-        Gem::Package::TarReader.new(StringIO.new(data.body)) do |reader|
-          reader.each do |entry|
-            next unless entry.file?
-            extracted = VirtualFileData.new(entry.full_name, entry)
-            extracted.source = data
-            yield(extracted)
-          end
-        end
+    def body
+      @content.body
+    end
+
+    def size
+      @content.size
+    end
+
+    def path
+      @content.path
+    end
+
+    def open(&block)
+      @content.open(&block)
+    end
+
+    private
+    def download
+      path = @uri.path
+      path += "index.html" if path.end_with?("/")
+      @uri.open("rb") do |input|
+        self.mime_type = input.content_type.split(/;/).first
+        VirtualContent.new(input, path)
       end
     end
   end

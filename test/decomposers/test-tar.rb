@@ -42,8 +42,7 @@ class TestDecomposersTar < Test::Unit::TestCase
     sub_test_case("top-level") do
       def setup
         super
-        @data = ChupaText::Data.new
-        @data.uri = fixture_path("top-level.tar")
+        @data = ChupaText::InputData.new(fixture_path("top-level.tar"))
       end
 
       def test_decompose
@@ -61,8 +60,7 @@ class TestDecomposersTar < Test::Unit::TestCase
     sub_test_case("directory") do
       def setup
         super
-        @data = ChupaText::Data.new
-        @data.uri = fixture_path("directory.tar")
+        @data = ChupaText::InputData.new(fixture_path("directory.tar"))
       end
 
       def test_decompose

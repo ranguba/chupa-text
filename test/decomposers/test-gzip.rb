@@ -38,8 +38,7 @@ class TestDecomposersGzip < Test::Unit::TestCase
     sub_test_case("gz") do
       def setup
         super
-        @data = ChupaText::Data.new
-        @data.uri = fixture_path("hello.txt.gz")
+        @data = ChupaText::InputData.new(fixture_path("hello.txt.gz"))
       end
 
       def test_path
@@ -61,8 +60,7 @@ class TestDecomposersGzip < Test::Unit::TestCase
     sub_test_case("tar.gz") do
       def setup
         super
-        @data = ChupaText::Data.new
-        @data.uri = fixture_path("hello.tar.gz")
+        @data = ChupaText::InputData.new(fixture_path("hello.tar.gz"))
       end
 
       def test_uri
@@ -89,8 +87,7 @@ class TestDecomposersGzip < Test::Unit::TestCase
     sub_test_case("tgz") do
       def setup
         super
-        @data = ChupaText::Data.new
-        @data.uri = fixture_path("hello.tgz")
+        @data = ChupaText::InputData.new(fixture_path("hello.tgz"))
       end
 
       def test_uri

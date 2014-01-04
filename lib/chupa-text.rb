@@ -18,7 +18,6 @@ require "chupa-text/version"
 
 require "chupa-text/configuration"
 require "chupa-text/configuration-loader"
-require "chupa-text/data"
 require "chupa-text/decomposer"
 require "chupa-text/decomposer-registry"
 require "chupa-text/decomposers"
@@ -29,4 +28,9 @@ require "chupa-text/mime-type-registry"
 
 require "chupa-text/file-content"
 require "chupa-text/virtual-content"
+
+require "chupa-text/data"
+require "chupa-text/input-data"
+require "chupa-text/virtual-file-data"
+
 require "chupa-text/command"

@@ -19,13 +19,31 @@ require "open-uri"
 
 module ChupaText
   class Data
-    attr_accessor :body
-    attr_accessor :attributes
-
     # @return [URI, nil] The URI of the data if the data is for remote
     #   or local file, `nil` if the data isn't associated with any
     #   URIs.
     attr_reader :uri
+
+    # @return [String, nil] The content of the data, `nil` if the data
+    #   doesn't have any content.
+    attr_accessor :body
+
+    # @return [Integer, nil] The byte size of the data, `nil` if the data
+    #   doesn't have any content.
+    attr_accessor :size
+
+    # @return [String, nil] The path associated with the content of
+    #   the data, `nil` if the data doesn't associated with any file.
+    #
+    #   The path may not be related with the original content. For
+    #   example, `"/tmp/XXX.txt"` may be returned for the data of
+    #   `"http://example.com/XXX.txt"`.
+    #
+    #   This value is useful to use an external command to extract
+    #   text and meta-data.
+    attr_accessor :path
+
+    attr_accessor :attributes
 
     # @return [Data, nil] The source of the data. For example, text
     #   data (`hello.txt`) in archive data (`hello.tar`) have the
@@ -33,10 +51,12 @@ module ChupaText
     attr_accessor :source
 
     def initialize
+      @uri = nil
       @body = nil
+      @size = nil
+      @path = nil
       @mime_type = nil
       @attributes = {}
-      @uri = nil
       @source = nil
     end
 
@@ -54,15 +74,10 @@ module ChupaText
         uri = URI.parse(uri.to_s)
       end
       @uri = uri
-      if @uri and @body.nil?
-        retrieve_info(@uri)
-      end
     end
 
-    def size
-      _body = body
-      return 0 if _body.nil?
-      _body.bytesize
+    def open
+      yield(StringIO.new(body))
     end
 
     def [](name)
@@ -103,21 +118,6 @@ module ChupaText
     end
 
     private
-    def retrieve_info(uri)
-      if uri.respond_to?(:open)
-        uri.open("rb") do |input|
-          @body = input.read
-          if input.respond_to?(:content_type)
-            self.mime_type = input.content_type.split(/;/).first
-          end
-        end
-      else
-        File.open(uri.path, "rb") do |file|
-          @body = file.read
-        end
-      end
-    end
-
     def guess_mime_type
       guess_mime_type_from_uri or
         guess_mime_type_from_body
@@ -129,8 +129,8 @@ module ChupaText
 
     def guess_mime_type_from_body
       mime_type = nil
-      change_encoding(body, "UTF-8") do |_body|
-        mime_type = "text/plain" if _body.valid_encoding?
+      change_encoding(body, "UTF-8") do |utf8_body|
+        mime_type = "text/plain" if utf8_body.valid_encoding?
       end
       mime_type
     end
