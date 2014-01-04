@@ -107,13 +107,13 @@ module ChupaText
         parser.on("--email=EMAIL",
                   "Author E-mail",
                   "(e.g.: your@email.address)",
-                  "(default: #{@email}") do |email|
+                  "(default: #{@email})") do |email|
           @email = email
         end
         parser.on("--license=LICENSE",
                   "License",
                   "(e.g.: MIT)",
-                  "(default: #{@licene}") do |license|
+                  "(default: #{@licene})") do |license|
           @license = license
         end
         parser
