@@ -24,29 +24,27 @@ class TestFileContent < Test::Unit::TestCase
     @file.flush
   end
 
+  def content(string=nil)
+    write(string) if string
+    ChupaText::FileContent.new(@file.path)
+  end
+
   def test_size
     body = "Hello"
-    write(body)
-    content = ChupaText::FileContent.new(@file.path)
-    assert_equal(body.bytesize, content.size)
+    assert_equal(body.bytesize, content(body).size)
   end
 
   def test_path
-    content = ChupaText::FileContent.new(@file.path)
     assert_equal(@file.path, content.path)
   end
 
   def test_body
     body = "Hello"
-    write(body)
-    content = ChupaText::FileContent.new(@file.path)
-    assert_equal(body, content.body)
+    assert_equal(body, content(body).body)
   end
 
   def test_open
     body = "Hello"
-    write(body)
-    content = ChupaText::FileContent.new(@file.path)
-    assert_equal(body, content.open {|file| file.read})
+    assert_equal(body, content(body).open {|file| file.read})
   end
 end
