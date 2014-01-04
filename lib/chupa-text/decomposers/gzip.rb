@@ -17,8 +17,6 @@
 require "stringio"
 require "zlib"
 
-require "chupa-text"
-
 module ChupaText
   module Decomposers
     class Gzip < Decomposer

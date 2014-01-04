@@ -17,8 +17,6 @@
 require "stringio"
 require "rubygems/package"
 
-require "chupa-text"
-
 module ChupaText
   module Decomposers
     class Tar < Decomposer
