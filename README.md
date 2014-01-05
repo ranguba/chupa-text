@@ -79,6 +79,11 @@ See
 [doc/text/decomposer.md](http://rubydoc.info/gems/chupa-text/file/doc/text/decomposer.md)
 how to write a decomposer.
 
+## Available plugins
+
+Search by `chupa-text-decomposer-` on https://rubygems.org/:
+http://rubygems.org/search?query=chupa-text-decomposer-
+
 ## Author
 
   * Kouhei Sutou `<kou@clear-code.com>`
