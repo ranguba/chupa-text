@@ -89,7 +89,45 @@ module ChupaText
                   "Appends PATH to decomposer load path.") do |path|
           $LOAD_PATH << path
         end
+
+        parser.separator("")
+        parser.separator("Log related options:")
+        parser.on("--log-output=OUTPUT",
+                  "Sets log output.",
+                  "[-(stdout), +(stderr), PATH]",
+                  "(default: +(stderr))") do |output|
+          ENV["CHUPA_TEXT_LOG_OUTPUT"] = output
+          ::ChupaText.logger = nil
+        end
+        parser.on("--log-level=LEVEL", available_log_levels,
+                  "Sets log level.",
+                  "[#{available_log_levels.join(', ')}]",
+                  "(default: #{current_log_level_name})") do |level|
+          ENV["CHUPA_TEXT_LOG_LEVEL"] = level
+          ::ChupaText.logger = nil
+        end
+
         parser
+      end
+
+      def available_log_levels
+        [
+          "debug",
+          "info",
+          "warn",
+          "error",
+          "fatal",
+          "unknown",
+        ]
+      end
+
+      def current_log_level_name
+        level = ::ChupaText.logger.level
+        Logger::Severity.constants.each do |name|
+          next if Logger::Severity.const_get(name) != level
+          return name.to_s.downcase
+        end
+        "info"
       end
 
       def load_decomposers
