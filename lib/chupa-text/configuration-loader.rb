@@ -19,11 +19,11 @@ require "pathname"
 module ChupaText
   class ConfigurationLoader
     attr_reader :decomposer
-    attr_reader :mime_type
+    attr_reader :mime_types
     def initialize(configuration)
       @configuration = configuration
       @decomposer = DecomposerLoader.new(@configuration.decomposer)
-      @mime_type = MIMETypeLoader.new(@configuration.mime_type_registry)
+      @mime_types = MIMETypesLoader.new(@configuration.mime_type_registry)
       @load_paths = []
       data_dir = File.join(File.dirname(__FILE__), "..", "..", "data")
       @load_paths << File.expand_path(data_dir)
@@ -82,7 +82,7 @@ module ChupaText
       end
     end
 
-    class MIMETypeLoader
+    class MIMETypesLoader
       def initialize(registry)
         @registry = registry
       end

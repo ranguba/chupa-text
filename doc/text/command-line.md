@@ -123,14 +123,14 @@ command. You can use glob pattern for decomposer name such as
 The default is `["*"]`. It means that all installed decomposers are
 used.
 
-`mime_type["<extension>"] = "<MIME type>"`
+`mime_types["<extension>"] = "<MIME type>"`
 
 It specifies a map to a MIME type from path extension.
 
 Here is an example that maps `"html"` to `"text/html"`:
 
 ```
-mime_type["html"] = "text/html"
+mime_types["html"] = "text/html"
 ```
 
 Th default configuration file registers popular MIME types.
