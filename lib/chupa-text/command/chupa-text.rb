@@ -74,6 +74,9 @@ module ChupaText
         parser = OptionParser.new
         parser.banner += " [FILE_OR_URI]"
         parser.version = VERSION
+
+        parser.separator("")
+        parser.separator("Generic options")
         parser.on("--configuration=FILE",
                   "Reads configuration from FILE.") do |path|
           load_configuration(path)
