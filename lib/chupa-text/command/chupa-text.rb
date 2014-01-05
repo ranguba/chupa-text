@@ -75,15 +75,15 @@ module ChupaText
         parser.banner += " [FILE_OR_URI]"
         parser.version = VERSION
         parser.on("--configuration=FILE",
-                  "Read configuration from FILE.") do |path|
+                  "Reads configuration from FILE.") do |path|
           load_configuration(path)
         end
         parser.on("--disable-gems",
-                  "Disable decomposers installed by RubyGems.") do
+                  "Disables decomposers installed by RubyGems.") do
           @enable_gems = false
         end
         parser.on("-I=PATH",
-                  "Append PATH to decomposer load path.") do |path|
+                  "Appends PATH to decomposer load path.") do |path|
           $LOAD_PATH << path
         end
         parser
