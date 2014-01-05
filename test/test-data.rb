@@ -56,6 +56,40 @@ class TestData < Test::Unit::TestCase
         end
       end
     end
+
+    sub_test_case("text?") do
+      def test_text_plain
+        @data.mime_type = "text/plain"
+        assert_true(@data.text?)
+      end
+
+      def test_text_html
+        @data.mime_type = "text/html"
+        assert_true(@data.text?)
+      end
+
+      def test_application_xhtml_xml
+        @data.mime_type = "application/xhtml+xml"
+        assert_false(@data.text?)
+      end
+    end
+
+    sub_test_case("text_plain?") do
+      def test_text_plain
+        @data.mime_type = "text/plain"
+        assert_true(@data.text_plain?)
+      end
+
+      def test_text_html
+        @data.mime_type = "text/html"
+        assert_false(@data.text_plain?)
+      end
+
+      def test_application_xhtml_xml
+        @data.mime_type = "application/xhtml+xml"
+        assert_false(@data.text_plain?)
+      end
+    end
   end
 
   sub_test_case("extension") do

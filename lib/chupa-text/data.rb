@@ -117,6 +117,12 @@ module ChupaText
       (mime_type || "").start_with?("text/")
     end
 
+    # @return [Bool] true if MIME type is "text/plain", false
+    #   otherwise.
+    def text_plain?
+      mime_type == "text/plain"
+    end
+
     private
     def guess_mime_type
       guess_mime_type_from_uri or
