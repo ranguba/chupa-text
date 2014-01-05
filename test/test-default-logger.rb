@@ -16,7 +16,10 @@
 
 class TestDefaultLogger < Test::Unit::TestCase
   def setup
-    @env = ENV.to_h
+    @env = {}
+    ENV.each do |key, value|
+      @env[key] = value
+    end
   end
 
   def teardown
