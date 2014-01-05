@@ -72,13 +72,10 @@ module ChupaText
 
     private
     def ensure_data(input)
-      case input
-      when String, Pathname, URI::Generic
-        data = Data.new
-        data.uri = input.to_s
-        data
-      else
+      if input.is_a?(Data)
         input
+      else
+        InputData.new(input)
       end
     end
 
