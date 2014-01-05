@@ -29,12 +29,13 @@ module ChupaText
       def initialize
         @input = nil
         @configuration = Configuration.default
+        @enable_gems = true
       end
 
       def run(*arguments)
         return false unless parse_arguments(arguments)
 
-        Decomposers.load
+        load_decomposers
         extractor = create_extractor
         data = create_data
         formatter = create_formatter
@@ -77,7 +78,16 @@ module ChupaText
                   "Read configuration from FILE.") do |path|
           load_configuration(path)
         end
+        parser.on("--disable-gems",
+                  "Disable decomposers installed by RubyGems.") do
+          @enable_gems = false
+        end
         parser
+      end
+
+      def load_decomposers
+        Decomposers.enable_all_gems if @enable_gems
+        Decomposers.load
       end
 
       def create_extractor

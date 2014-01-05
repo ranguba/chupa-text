@@ -17,6 +17,20 @@
 module ChupaText
   module Decomposers
     class << self
+      def enable_all_gems
+        decomposer_specs = Gem::Specification.find_all do |spec|
+          spec.name.start_with?("chupa-text-decomposer-")
+        end
+        grouped_decomposer_specs = decomposer_specs.group_by(&:name)
+        latest_decomposer_specs = []
+        grouped_decomposer_specs.each do |name, specs|
+          latest_decomposer_specs << specs.sort_by(&:version).last
+        end
+        latest_decomposer_specs.each do |spec|
+          gem(spec.name, spec.version)
+        end
+      end
+
       def load
         paths = []
         $LOAD_PATH.each do |load_path|

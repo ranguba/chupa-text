@@ -44,7 +44,7 @@ class TestCommandChupaText < Test::Unit::TestCase
 
   def run_command(*arguments)
     succeeded = wrap_io do
-      ChupaText::Command::ChupaText.run(*arguments)
+      ChupaText::Command::ChupaText.run("--disable-gems", *arguments)
     end
     [succeeded, JSON.parse(@stdout.string)]
   end
