@@ -54,7 +54,7 @@ class TestDefaultLogger < Test::Unit::TestCase
     end
 
     def test_default
-      assert_equal(STDOUT, output(nil))
+      assert_equal(STDERR, output(nil))
     end
   end
 

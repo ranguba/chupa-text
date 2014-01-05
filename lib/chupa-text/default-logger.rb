@@ -26,9 +26,11 @@ module ChupaText
   #
   # It specifies log output.
   #
-  #   * `-`: ChupaText outputs to the standard output. It is the default.
+  #   * `-`: ChupaText outputs to the standard output.
   #   * `+`: ChupaText outputs to the standard error output.
   #   * Others: It is used as file name. ChupaText outputs to the file.
+  #
+  # The default is `+` (the standard error).
   #
   # ## `CHUPA_TEXT_LOG_ROTATION_PERIOD`
   #
@@ -76,7 +78,7 @@ module ChupaText
 
     private
     def output_device
-      output = ENV["CHUPA_TEXT_LOG_OUTPUT"] || "-"
+      output = ENV["CHUPA_TEXT_LOG_OUTPUT"] || "+"
       case output
       when "-"
         STDOUT
