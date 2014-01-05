@@ -74,6 +74,7 @@ module ChupaText
     def initialize
       super(output_device, default_shift_age, default_shift_size)
       self.level = default_level
+      self.formatter = Formatter.new
     end
 
     private
@@ -119,6 +120,30 @@ module ChupaText
         Logger::Severity.const_get(level_name)
       else
         Logger::Severity::INFO
+      end
+    end
+
+    class Formatter
+      def call(severity, time, program_name, message)
+        "%s: [%d] %s: %s" % [
+          time.iso8601(6),
+          Process.pid,
+          severity[0, 1],
+          format_message(message),
+        ]
+      end
+
+      private
+      def format_message(message)
+        case message
+        when String
+          message
+        when Exception
+          "#{message.message}(#{message.class})\n" +
+            (message.backtrace || []).join("\n")
+        else
+          message.inpsect
+        end
       end
     end
   end
