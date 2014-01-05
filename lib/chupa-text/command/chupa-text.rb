@@ -82,6 +82,10 @@ module ChupaText
                   "Disable decomposers installed by RubyGems.") do
           @enable_gems = false
         end
+        parser.on("-I=PATH",
+                  "Append PATH to decomposer load path.") do |path|
+          $LOAD_PATH << path
+        end
         parser
       end
 
