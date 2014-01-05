@@ -97,12 +97,12 @@ class TestExtractor < Test::Unit::TestCase
     sub_test_case("multi decomposed") do
       class CopyDecomposer < ChupaText::Decomposer
         def target?(data)
-          data["copied"].nil?
+          data.mime_type == "text/x-plain"
         end
 
         def decompose(data)
           copied_data = data.dup
-          copied_data["copied"] = true
+          copied_data.mime_type = "text/plain"
           yield(copied_data.dup)
           yield(copied_data.dup)
         end
@@ -116,7 +116,7 @@ class TestExtractor < Test::Unit::TestCase
 
       def test_decompose
         data = ChupaText::Data.new
-        data.mime_type = "text/plain"
+        data.mime_type = "text/x-plain"
         data.body = "Hello"
         assert_equal(["Hello", "Hello"], extract(data))
       end
