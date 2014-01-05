@@ -14,32 +14,36 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-require "chupa-text/version"
+module ChupaText
+  # Adds shortcut methods for easy to log.
+  module Loggable
+    private
+    def logger
+      ChupaText.logger
+    end
 
-require "chupa-text/error"
+    def debug(*arguments, &block)
+      logger.debug(*arguments, &block)
+    end
 
-require "chupa-text/size-parser"
-require "chupa-text/default-logger"
-require "chupa-text/logger"
+    def info(*arguments, &block)
+      logger.info(*arguments, &block)
+    end
 
-require "chupa-text/loggable"
+    def warn(*arguments, &block)
+      logger.warn(*arguments, &block)
+    end
 
-require "chupa-text/configuration"
-require "chupa-text/configuration-loader"
-require "chupa-text/decomposer"
-require "chupa-text/decomposer-registry"
-require "chupa-text/decomposers"
-require "chupa-text/extractor"
-require "chupa-text/formatters"
-require "chupa-text/mime-type"
-require "chupa-text/mime-type-registry"
+    def error(*arguments, &block)
+      logger.error(*arguments, &block)
+    end
 
-require "chupa-text/file-content"
-require "chupa-text/virtual-content"
+    def fatal(*arguments, &block)
+      logger.fatal(*arguments, &block)
+    end
 
-require "chupa-text/data"
-require "chupa-text/input-data"
-require "chupa-text/virtual-file-data"
-require "chupa-text/text-data"
-
-require "chupa-text/command"
+    def unknown(*arguments, &block)
+      logger.unknown(*arguments, &block)
+    end
+  end
+end

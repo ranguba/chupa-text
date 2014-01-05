@@ -19,6 +19,8 @@ require "uri"
 
 module ChupaText
   class Extractor
+    include Loggable
+
     def initialize
       @decomposers = []
     end
@@ -59,16 +61,27 @@ module ChupaText
       targets = [ensure_data(input)]
       until targets.empty?
         target = targets.pop
+        debug do
+          "#{log_tag}[extract][target] <#{target.path}>:<#{target.mime_type}>"
+        end
         if target.text_plain?
           yield(target)
           next
         end
         decomposer = find_decomposer(target)
         if decomposer.nil?
+          debug {"#{log_tag}[extract][decomposer] not found"}
           yield(target) if target.text?
           next
         end
+        debug {"#{log_tag}[extract][decomposer] #{decomposer.class}"}
         decomposer.decompose(target) do |decomposed|
+          debug do
+            "#{log_tag}[extract][decomposed] " +
+              "#{decomposer.class}: " +
+              "<#{target.path}>:<#{target.mime_type}> -> " +
+              "<#{decomposed.mime_type}>"
+          end
           targets.push(decomposed)
         end
       end
@@ -87,6 +100,10 @@ module ChupaText
       @decomposers.find do |decomposer|
         decomposer.target?(data)
       end
+    end
+
+    def log_tag
+      "[extractor]"
     end
   end
 end

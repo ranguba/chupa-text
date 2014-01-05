@@ -14,32 +14,17 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-require "chupa-text/version"
+module ChupaText
+  class << self
+    # @return [Logger] The logger of ChupaText.
+    #   {ChupaText::DefaultLogger} is used by default.
+    def logger
+      @@logger ||= DefaultLogger.new
+    end
 
-require "chupa-text/error"
-
-require "chupa-text/size-parser"
-require "chupa-text/default-logger"
-require "chupa-text/logger"
-
-require "chupa-text/loggable"
-
-require "chupa-text/configuration"
-require "chupa-text/configuration-loader"
-require "chupa-text/decomposer"
-require "chupa-text/decomposer-registry"
-require "chupa-text/decomposers"
-require "chupa-text/extractor"
-require "chupa-text/formatters"
-require "chupa-text/mime-type"
-require "chupa-text/mime-type-registry"
-
-require "chupa-text/file-content"
-require "chupa-text/virtual-content"
-
-require "chupa-text/data"
-require "chupa-text/input-data"
-require "chupa-text/virtual-file-data"
-require "chupa-text/text-data"
-
-require "chupa-text/command"
+    # @param [Logger] logger The logger of ChupaText.
+    def logger=(logger)
+      @@logger = logger
+    end
+  end
+end
