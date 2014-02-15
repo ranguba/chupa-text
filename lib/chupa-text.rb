@@ -26,13 +26,17 @@ require "chupa-text/loggable"
 
 require "chupa-text/configuration"
 require "chupa-text/configuration-loader"
+require "chupa-text/mime-type"
+require "chupa-text/mime-type-registry"
+
+require "chupa-text/external-command"
+
 require "chupa-text/decomposer"
 require "chupa-text/decomposer-registry"
 require "chupa-text/decomposers"
+
 require "chupa-text/extractor"
 require "chupa-text/formatters"
-require "chupa-text/mime-type"
-require "chupa-text/mime-type-registry"
 
 require "chupa-text/file-content"
 require "chupa-text/virtual-content"
