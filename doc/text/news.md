@@ -1,5 +1,14 @@
 # News
 
+## 1.0.2: 2014-02-15
+
+  * Added `ChupaText::SizeParser`.
+  * Added `ChupaText::DefaultLogger`.
+  * chupa-text: Added `--log-output` option.
+  * chupa-text: Added `--log-level` option.
+  * Added `ChupaText::ExternalCommand`.
+  * Added MIME types for office files.
+
 ## 1.0.1: 2014-01-05
 
   * chupa-text: Supported loading decomposers installed by RubyGems.
