@@ -1,5 +1,13 @@
 # News
 
+## 1.0.3: 2014-02-17
+
+  * Added `ChupaText::EncryptedError`.
+  * Added `ChupaText::InvalidDataError`.
+  * Added `ChupaText::Attributes`.
+  * `ChupaText::Data#attributes` returns `ChupaText::Attributes` instead
+    of `Hash`.
+
 ## 1.0.2: 2014-02-15
 
   * Added `ChupaText::SizeParser`.
