@@ -43,7 +43,8 @@ module ChupaText
     #   text and meta-data.
     attr_accessor :path
 
-    attr_accessor :attributes
+    # @return [Attributes] The attributes of the data.
+    attr_reader :attributes
 
     # @return [Data, nil] The source of the data. For example, text
     #   data (`hello.txt`) in archive data (`hello.tar`) have the
@@ -56,7 +57,7 @@ module ChupaText
       @size = nil
       @path = nil
       @mime_type = nil
-      @attributes = {}
+      @attributes = Attributes.new
       @source = nil
     end
 

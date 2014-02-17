@@ -41,6 +41,7 @@ require "chupa-text/formatters"
 require "chupa-text/file-content"
 require "chupa-text/virtual-content"
 
+require "chupa-text/attributes"
 require "chupa-text/data"
 require "chupa-text/input-data"
 require "chupa-text/virtual-file-data"
