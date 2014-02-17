@@ -25,7 +25,6 @@ module ChupaText
 
     def initialize
       super
-      @members = members
       @extra_data = {}
     end
 
@@ -57,7 +56,7 @@ module ChupaText
     # @return [Object] The attribute value.
     def [](name)
       name = normalize_name(name)
-      if @members.key?(name)
+      if members.include?(name)
         super
       else
         @extra_data[name]
@@ -70,7 +69,7 @@ module ChupaText
     # @param [Object] value The attribute value.
     def []=(name, value)
       name = normalize_name(name)
-      if @members.key?(name)
+      if members.include?(name)
         send("#{name}=", value)
       else
         @extra_data[name] = value
