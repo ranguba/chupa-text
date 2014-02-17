@@ -1,4 +1,4 @@
-# Copyright (C) 2013  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2014  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -16,5 +16,22 @@
 
 module ChupaText
   class Error < StandardError
+  end
+
+  class EncryptedError < Error
+    attr_reader :data
+    def initialize(data)
+      @data = data
+      super("Encrypted data: <#{data.path}>(#{data.mime_type})")
+    end
+  end
+
+  class InvalidDataError < Error
+    attr_reader :data, :detail
+    def initialize(data, detail)
+      @data = data
+      @detail = detail
+      super("Invalid data: <#{data.path}>(#{data.mime_type}): <#{detail}>")
+    end
   end
 end
