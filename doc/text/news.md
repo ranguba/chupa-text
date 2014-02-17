@@ -1,5 +1,9 @@
 # News
 
+## 1.0.4: 2014-02-17
+
+  * Removed a needless optimization.
+
 ## 1.0.3: 2014-02-17
 
   * Added `ChupaText::EncryptedError`.
