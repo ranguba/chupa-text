@@ -32,7 +32,7 @@ module ChupaText
       def format_extracted(data)
         text = {}
         format_headers(data, text)
-        text["body"] = data.body
+        text["body"] = data.body.force_encoding(Encoding.default_external)
         @formatted["texts"] << text
       end
 
