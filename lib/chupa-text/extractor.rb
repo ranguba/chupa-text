@@ -64,6 +64,7 @@ module ChupaText
         debug do
           "#{log_tag}[extract][target] <#{target.path}>:<#{target.mime_type}>"
         end
+        specify_encoding(target.body) if target.text?
         if target.text_plain?
           yield(target)
           next
@@ -94,6 +95,12 @@ module ChupaText
       else
         InputData.new(input)
       end
+    end
+
+    def specify_encoding(body)
+      return unless body.encoding == Encoding::ASCII_8BIT
+      body.force_encoding(Encoding.default_external)
+      body.force_encoding("UTF-8") unless body.valid_encoding?
     end
 
     def find_decomposer(data)

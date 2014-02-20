@@ -121,5 +121,15 @@ class TestExtractor < Test::Unit::TestCase
         assert_equal(["Hello", "Hello"], extract(data))
       end
     end
+
+    sub_test_case("encoding") do
+      def test_ascii8bit_to_default_external
+        data = ChupaText::Data.new
+        data.mime_type = "text/plain"
+        data.body = "Hello".force_encoding("ASCII-8BIT")
+        assert_equal(Encoding.default_external,
+                     extract(data).first.encoding)
+      end
+    end
   end
 end

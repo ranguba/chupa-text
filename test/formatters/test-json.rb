@@ -48,7 +48,9 @@ class TestFormattersJSON < Test::Unit::TestCase
       @stdin.rewind
       @data = ChupaText::VirtualFileData.new(nil, @stdin)
       @formatter.format_start(@data)
-      @formatter.format_extracted(@data)
+      ChupaText::Extractor.new.extract(@data) do |extracted|
+        @formatter.format_extracted(extracted)
+      end
       @formatter.format_finish(@data)
     end
 
