@@ -76,7 +76,7 @@ module ChupaText
       end
 
       def lgplv2_1_or_later_license
-        "LGPLv2.1 or later"
+        "LGPL-2.1+"
       end
 
       def create_option_parser
