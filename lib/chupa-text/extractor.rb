@@ -67,6 +67,7 @@ module ChupaText
         decomposer = find_decomposer(target)
         if decomposer.nil?
           if target.text_plain?
+            debug {"#{log_tag}[extract][text-plain]"}
             yield(target)
             next
           else
