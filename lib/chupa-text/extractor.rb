@@ -62,7 +62,7 @@ module ChupaText
       until targets.empty?
         target = targets.pop
         debug do
-          "#{log_tag}[extract][target] <#{target.path}>:<#{target.mime_type}>"
+          "#{log_tag}[extract][target] <#{target.uri}>:<#{target.mime_type}>"
         end
         decomposer = find_decomposer(target)
         if decomposer.nil?
@@ -80,7 +80,7 @@ module ChupaText
           debug do
             "#{log_tag}[extract][decomposed] " +
               "#{decomposer.class}: " +
-              "<#{target.path}>:<#{target.mime_type}> -> " +
+              "<#{target.uri}>:<#{target.mime_type}> -> " +
               "<#{decomposed.mime_type}>"
           end
           targets.push(decomposed)
