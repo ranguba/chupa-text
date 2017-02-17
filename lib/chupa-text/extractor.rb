@@ -64,15 +64,16 @@ module ChupaText
         debug do
           "#{log_tag}[extract][target] <#{target.path}>:<#{target.mime_type}>"
         end
-        if target.text_plain?
-          yield(target)
-          next
-        end
         decomposer = find_decomposer(target)
         if decomposer.nil?
-          debug {"#{log_tag}[extract][decomposer] not found"}
-          yield(target) if target.text?
-          next
+          if target.text_plain?
+            yield(target)
+            next
+          else
+            debug {"#{log_tag}[extract][decomposer] not found"}
+            yield(target) if target.text?
+            next
+          end
         end
         debug {"#{log_tag}[extract][decomposer] #{decomposer.class}"}
         decomposer.decompose(target) do |decomposed|
