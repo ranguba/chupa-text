@@ -1,4 +1,4 @@
-# Copyright (C) 2013  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2017  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -154,7 +154,7 @@ module ChupaText
       def generate_gemspec
         create_file("#{gem_name}.gemspec") do |file|
           file.puts(<<-GEMSPEC)
-# -*- mode: ruby; coding: utf-8 -*-
+# -*- ruby -*-
 
 Gem::Specification.new do |spec|
   spec.name = "#{gem_name}"
@@ -183,7 +183,7 @@ end
       def generate_gemfile
         create_file("Gemfile") do |file|
           file.puts(<<-Gemfile)
-# -*- mode: ruby; coding: utf-8 -*-
+# -*- ruby -*-
 
 source "https://rubygems.org/"
 
@@ -195,7 +195,7 @@ gemspec
       def generate_rakefile
         create_file("Rakefile") do |file|
           file.puts(<<-RAKEFILE)
-# -*- mode: ruby; coding: utf-8 -*-
+# -*- ruby -*-
 
 require "bundler/gem_tasks"
 
