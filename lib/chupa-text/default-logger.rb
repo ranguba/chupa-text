@@ -137,7 +137,11 @@ module ChupaText
       def format_message(message)
         case message
         when String
-          message
+          if message.end_with?("\n")
+            message
+          else
+            "#{message}\n"
+          end
         when Exception
           "#{message.message}(#{message.class})\n" +
             (message.backtrace || []).join("\n")
