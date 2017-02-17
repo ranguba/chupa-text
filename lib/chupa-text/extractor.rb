@@ -1,4 +1,4 @@
-# Copyright (C) 2013  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2017  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -60,7 +60,7 @@ module ChupaText
     def extract(input)
       targets = [ensure_data(input)]
       until targets.empty?
-        target = targets.pop
+        target = targets.shift
         debug do
           "#{log_tag}[extract][target] <#{target.uri}>:<#{target.mime_type}>"
         end
