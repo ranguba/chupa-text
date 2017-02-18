@@ -82,8 +82,8 @@ module ChupaText
         self[name] = value
       end
       if data.mime_type
-        self["original-mime-types"] ||= []
-        self["original-mime-types"].unshift(data.mime_type)
+        self["source-mime-types"] ||= []
+        self["source-mime-types"].unshift(data.mime_type)
       end
     end
 
