@@ -1,4 +1,4 @@
-# Copyright (C) 2013  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2017  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -21,23 +21,24 @@ module ChupaText
     class JSON
       def initialize(output)
         @output = output
-        @formatted = {}
+        @texts = []
       end
 
       def format_start(data)
-        format_headers(data, @formatted)
-        @formatted["texts"] = []
       end
 
       def format_extracted(data)
         text = {}
         format_headers(data, text)
         text["body"] = data.body
-        @formatted["texts"] << text
+        @texts << text
       end
 
       def format_finish(data)
-        @output << ::JSON.pretty_generate(@formatted)
+        formatted = {}
+        format_headers(data, formatted)
+        formatted["texts"] = @texts
+        @output << ::JSON.pretty_generate(formatted)
         @output << "\n"
       end
 
