@@ -1,4 +1,4 @@
-# Copyright (C) 2013  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2017  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -16,8 +16,8 @@
 
 module ChupaText
   class VirtualFileData < Data
-    def initialize(uri, input)
-      super()
+    def initialize(uri, input, options={})
+      super(options)
       self.uri = uri
       if @uri
         path = @uri.path

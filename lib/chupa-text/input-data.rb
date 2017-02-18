@@ -1,4 +1,4 @@
-# Copyright (C) 2013  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2017  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -19,8 +19,8 @@ require "open-uri"
 
 module ChupaText
   class InputData < Data
-    def initialize(uri)
-      super()
+    def initialize(uri, options={})
+      super(options)
       self.uri = uri
       if @uri.class == URI::Generic
         @content = FileContent.new(@uri.path)

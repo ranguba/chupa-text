@@ -1,4 +1,4 @@
-# Copyright (C) 2013  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2017  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -16,8 +16,8 @@
 
 module ChupaText
   class TextData < Data
-    def initialize(text)
-      super()
+    def initialize(text, options={})
+      super(options)
       self.mime_type = "text/plain"
       self.body = text
       self.size = text.bytesize

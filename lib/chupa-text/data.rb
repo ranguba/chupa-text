@@ -1,4 +1,4 @@
-# Copyright (C) 2013  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2017  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -51,7 +51,7 @@ module ChupaText
     #   archive data in {#source}.
     attr_accessor :source
 
-    def initialize
+    def initialize(options={})
       @uri = nil
       @body = nil
       @size = nil
@@ -59,12 +59,32 @@ module ChupaText
       @mime_type = nil
       @attributes = Attributes.new
       @source = nil
+      @options = options || {}
+      source_data = @options[:source_data]
+      merge!(source_data) if source_data
     end
 
     def initialize_copy(object)
       super
       @attributes = @attributes.dup
       self
+    end
+
+    # Merges metadata from data.
+    #
+    # @param [Data] data The data to be merged.
+    #
+    # @return [void]
+    def merge!(data)
+      self.uri = data.uri
+      self.path = data.path
+      data.attributes.each do |name, value|
+        self[name] = value
+      end
+      if data.mime_type
+        self["original-mime-types"] ||= []
+        self["original-mime-types"].unshift(data.mime_type)
+      end
     end
 
     # @param [String, URI, nil] uri The URI for the data. If `uri` is
