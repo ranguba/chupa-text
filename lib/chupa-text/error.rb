@@ -22,7 +22,7 @@ module ChupaText
     attr_reader :data
     def initialize(data)
       @data = data
-      super("Encrypted data: <#{data.path}>(#{data.mime_type})")
+      super("Encrypted data: <#{data.uri}>(#{data.mime_type})")
     end
   end
 
@@ -31,7 +31,16 @@ module ChupaText
     def initialize(data, detail)
       @data = data
       @detail = detail
-      super("Invalid data: <#{data.path}>(#{data.mime_type}): <#{detail}>")
+      super("Invalid data: <#{data.uri}>(#{data.mime_type}): <#{detail}>")
+    end
+  end
+
+  class UnknownEncodingError < Error
+    attr_reader :data, :encoding
+    def initialize(data, encoding)
+      @data = data
+      @encoding = encoding
+      super("Unknown encoding data: <#{data.uri}>(#{data.mime_type}): <#{encoding}>")
     end
   end
 end
