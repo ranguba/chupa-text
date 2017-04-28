@@ -92,7 +92,10 @@ module ChupaText
                   "Appends PATH to decomposer load path.") do |path|
           $LOAD_PATH << path
         end
-        parser.on("--format=FORMAT", "Output FORMAT (#{AVAILABLE_FORMATS.join(',')})") do |format|
+        parser.on("--format=FORMAT", AVAILABLE_FORMATS,
+                  "Output FORMAT.",
+                  "[#{AVAILABLE_FORMATS.join(', ')}]",
+                  "(default: json)") do |format|
           format = format.to_sym
           raise ArgumentError, "Unknown format: #{format}" unless AVAILABLE_FORMATS.include?(format)
           @format = format
