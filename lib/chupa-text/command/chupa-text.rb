@@ -96,7 +96,6 @@ module ChupaText
                   "Output FORMAT.",
                   "[#{AVAILABLE_FORMATS.join(', ')}]",
                   "(default: json)") do |format|
-          format = format.to_sym
           @format = format
         end
 
