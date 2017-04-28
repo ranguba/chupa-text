@@ -26,10 +26,13 @@ module ChupaText
         end
       end
 
+      AVAILABLE_FORMATS = [:json, :text]
+
       def initialize
         @input = nil
         @configuration = Configuration.default
         @enable_gems = true
+        @format = :json
       end
 
       def run(*arguments)
@@ -88,6 +91,11 @@ module ChupaText
         parser.on("-I=PATH",
                   "Appends PATH to decomposer load path.") do |path|
           $LOAD_PATH << path
+        end
+        parser.on("--format=FORMAT", "Output FORMAT (#{AVAILABLE_FORMATS.join(',')})") do |format|
+          format = format.to_sym
+          raise ArgumentError, "Unknown format: #{format}" unless AVAILABLE_FORMATS.include?(format)
+          @format = format
         end
 
         parser.separator("")
@@ -150,7 +158,12 @@ module ChupaText
       end
 
       def create_formatter
-        Formatters::JSON.new($stdout)
+        case @format
+        when :json
+          Formatters::JSON.new($stdout)
+        when :text
+          Formatters::Text.new($stdout)
+        end
       end
     end
   end
