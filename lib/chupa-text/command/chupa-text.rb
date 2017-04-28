@@ -97,7 +97,6 @@ module ChupaText
                   "[#{AVAILABLE_FORMATS.join(', ')}]",
                   "(default: json)") do |format|
           format = format.to_sym
-          raise ArgumentError, "Unknown format: #{format}" unless AVAILABLE_FORMATS.include?(format)
           @format = format
         end
 
