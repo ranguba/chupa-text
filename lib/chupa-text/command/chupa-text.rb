@@ -26,7 +26,7 @@ module ChupaText
         end
       end
 
-      AVAILABLE_FORMATS = [:json, :text]
+      AVAILABLE_FORMATS = [:json, :text, :mime]
 
       def initialize
         @input = nil
@@ -164,6 +164,8 @@ module ChupaText
           Formatters::JSON.new($stdout)
         when :text
           Formatters::Text.new($stdout)
+        when :mime
+          Formatters::MIME.new($stdout)
         end
       end
     end
