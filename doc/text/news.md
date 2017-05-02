@@ -1,5 +1,20 @@
 # News
 
+## 1.0.5: 2017-05-02
+
+### Improvements
+
+  * Added `message/rfc822` MIME type association with `.eml` and
+    `.mew` into the default MIME type list.
+
+  * Searched decomposer even if MIME type is `text/plain`.
+
+  * `ChupaText::Data#initialize`: Accepted source data.
+
+  * `ChupaText::UnknownEncodingError`: Added.
+
+  * Added plain text formatter.
+
 ## 1.0.4: 2014-02-17
 
   * Removed a needless optimization.
