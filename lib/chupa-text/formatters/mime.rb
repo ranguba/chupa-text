@@ -1,3 +1,5 @@
+require "digest/sha1"
+
 module ChupaText
   module Formatters
     class MIME
@@ -7,6 +9,8 @@ module ChupaText
       end
 
       def format_start(data)
+        @output << "Original-URI: #{data.uri}\n"
+        @output << "Content-Size: #{data.size}\n"
       end
 
       def format_extracted(data)
@@ -17,8 +21,16 @@ module ChupaText
       end
 
       def format_finish(data)
-        @output << @texts.join("\n\x0c\n")
-        @output << "\n"
+        if @texts.size > 1
+          boundary = Digest::SHA1.hexdigest(data.uri.to_s)
+          @output << "Content-Type: multipart/mixed; boundary=#{boundary}\n\n"
+          @output << "--#{boundary}\n"
+          @output << @texts.join("\n\n--#{boundary}\n")
+          @output << "\n--#{boundary}--\n"
+        else
+          @output << @texts.first
+          @output << "\n"
+        end
       end
 
       private
