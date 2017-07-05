@@ -69,8 +69,8 @@ module ChupaText
   <text
     x="0"
     y="10"
-    xml:space="preserve"
-    style="font-size: 10px;">#{CGI.escapeHTML(target_text)}</text>
+    style="font-size: 10px; white-space: pre-wrap;"
+    xml:space="preserve">#{CGI.escapeHTML(target_text)}</text>
 </svg>
         SVG
         Screenshot.new(mime_type, data)

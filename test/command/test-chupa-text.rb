@@ -215,8 +215,8 @@ class TestCommandChupaText < Test::Unit::TestCase
   <text
     x="0"
     y="10"
-    xml:space="preserve"
-    style="font-size: 10px;">1 2 3
+    style="font-size: 10px; white-space: pre-wrap;"
+    xml:space="preserve">1 2 3
 4 5 6
 7 8 9
 </text>
