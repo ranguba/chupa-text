@@ -182,4 +182,32 @@ class TestCommandChupaText < Test::Unit::TestCase
                                path.to_s))
     end
   end
+
+  sub_test_case("extract") do
+    def test_csv
+      fixture_name = "numbers.csv"
+      uri = fixture_uri(fixture_name)
+      path = fixture_path(fixture_name)
+      assert_equal([
+                     true,
+                     {
+                       "uri"       => uri.to_s,
+                       "path"      => path.to_s,
+                       "mime-type" => "text/csv",
+                       "size"      => path.stat.size,
+                       "texts"     => [
+                         {
+                           "uri"       => uri.to_s,
+                           "path"      => path.to_s,
+                           "mime-type" => "text/plain",
+                           "source-mime-types" => ["text/csv"],
+                           "body"      => "1 2 3\n4 5 6\n7 8 9\n",
+                           "size"      => 18,
+                         },
+                       ],
+                     },
+                   ],
+                   run_command(path.to_s))
+    end
+  end
 end

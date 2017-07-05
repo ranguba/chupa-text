@@ -62,7 +62,10 @@ module ChupaText
       @source = nil
       @options = options || {}
       source_data = @options[:source_data]
-      merge!(source_data) if source_data
+      if source_data
+        merge!(source_data)
+        @source = source_data
+      end
     end
 
     def initialize_copy(object)

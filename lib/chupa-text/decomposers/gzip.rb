@@ -42,8 +42,7 @@ module ChupaText
         when "tgz"
           uri = data.uri.to_s.gsub(/\.tgz\z/i, ".tar")
         end
-        extracted = VirtualFileData.new(uri, reader)
-        extracted.source = data
+        extracted = VirtualFileData.new(uri, reader, :source_data => data)
         yield(extracted)
       end
     end

@@ -22,8 +22,14 @@ module ChupaText
       registry.register("csv", self)
 
       def target?(data)
-        data.extension == "csv" or
-          data.mime_type == "text/csv"
+        return true if data.mime_type == "text/csv"
+
+        if data.text_plain? and
+            (data["source-mime-types"] || []).include?("text/csv")
+          return false
+        end
+
+        data.extension == "csv"
       end
 
       def decompose(data)
@@ -35,8 +41,7 @@ module ChupaText
             text << "\n"
           end
         end
-        text_data = TextData.new(text)
-        text_data.uri = data.uri
+        text_data = TextData.new(text, :source_data => data)
         yield(text_data)
       end
     end

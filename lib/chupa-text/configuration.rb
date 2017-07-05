@@ -18,11 +18,10 @@ module ChupaText
   class Configuration
     class << self
       def default
-        @default ||= create_default
+        @default ||= load_default
       end
 
-      private
-      def create_default
+      def load_default
         configuration = new
         loader = ConfigurationLoader.new(configuration)
         loader.load("chupa-text.conf")

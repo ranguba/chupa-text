@@ -30,7 +30,7 @@ module ChupaText
 
       def initialize
         @input = nil
-        @configuration = Configuration.default
+        @configuration = Configuration.load_default
         @enable_gems = true
         @format = :json
       end

@@ -32,8 +32,8 @@ module ChupaText
           reader.each do |entry|
             next unless entry.file?
             entry.extend(CopyStreamable)
-            extracted = VirtualFileData.new(entry.full_name, entry)
-            extracted.source = data
+            extracted = VirtualFileData.new(entry.full_name, entry,
+                                            :source_data => data)
             yield(extracted)
           end
         end

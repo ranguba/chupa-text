@@ -34,8 +34,7 @@ module ChupaText
           parser = REXML::Parsers::StreamParser.new(input, listener)
           parser.parse
         end
-        text_data = TextData.new(text)
-        text_data.uri = data.uri
+        text_data = TextData.new(text, :source_data => data)
         yield(text_data)
       end
 
