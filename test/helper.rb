@@ -1,4 +1,4 @@
-# Copyright (C) 2013  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2017  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -16,10 +16,16 @@
 
 require "pathname"
 require "tempfile"
+require "uri"
 
 module Helper
   def fixture_path(*components)
     base_path = Pathname(__FILE__).dirname + "fixture"
     base_path.join(*components)
+  end
+
+  def fixture_uri(*components)
+    path = fixture_path(*components)
+    URI.parse("file://#{path}")
   end
 end

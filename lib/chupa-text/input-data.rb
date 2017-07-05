@@ -24,12 +24,10 @@ module ChupaText
       super(options)
       self.uri = uri
       if @uri.class == URI::Generic
-        unescaped_components = @uri.path.split("/").collect do |component|
-          CGI.unescape(component)
-        end
-        @content = FileContent.new(unescaped_components.join("/"))
+        @content = FileContent.new(path)
       else
         @content = download
+        self.path = @content.path
       end
     end
 
@@ -39,10 +37,6 @@ module ChupaText
 
     def size
       @content.size
-    end
-
-    def path
-      @content.path
     end
 
     def open(&block)

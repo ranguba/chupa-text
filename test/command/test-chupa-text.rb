@@ -1,4 +1,4 @@
-# Copyright (C) 2013  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2017  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -57,17 +57,19 @@ class TestCommandChupaText < Test::Unit::TestCase
     sub_test_case("file") do
       def test_single
         body = "Hello\n"
-        path = fixture_path("hello.txt").to_s
+        fixture_name = "hello.txt"
+        uri = fixture_uri(fixture_name).to_s
+        path = fixture_path(fixture_name).to_s
         assert_equal([
                        true,
                        {
                          "mime-type" => "text/plain",
-                         "uri"       => path,
+                         "uri"       => uri,
                          "size"      => body.bytesize,
                          "texts"     => [
                            {
                              "mime-type" => "text/plain",
-                             "uri"       => path,
+                             "uri"       => uri,
                              "size"      => body.bytesize,
                              "body"      => body,
                            },
@@ -161,18 +163,20 @@ class TestCommandChupaText < Test::Unit::TestCase
   sub_test_case("configuration") do
     def test_no_decomposer
       conf = fixture_path("no-decomposer.conf")
-      gz = fixture_path("hello.txt.gz")
+      fixture_name = "hello.txt.gz"
+      uri = fixture_uri(fixture_name)
+      path = fixture_path(fixture_name)
       assert_equal([
                      true,
                      {
-                       "uri"       => gz.to_s,
+                       "uri"       => uri.to_s,
                        "mime-type" => "application/x-gzip",
-                       "size"      => gz.stat.size,
+                       "size"      => path.stat.size,
                        "texts"     => [],
                      },
                    ],
                    run_command("--configuration", conf.to_s,
-                               gz.to_s))
+                               path.to_s))
     end
   end
 end

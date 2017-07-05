@@ -154,7 +154,13 @@ module ChupaText
         if @input.nil?
           VirtualFileData.new(nil, $stdin)
         else
-          InputData.new(Pathname(@input))
+          case @input
+          when /\A[a-z]+:\/\//i
+            input = URI.parse(@input)
+          else
+            input = Pathname(@input)
+          end
+          InputData.new(input)
         end
       end
 

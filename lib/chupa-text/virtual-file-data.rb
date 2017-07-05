@@ -19,11 +19,6 @@ module ChupaText
     def initialize(uri, input, options={})
       super(options)
       self.uri = uri
-      if @uri
-        path = @uri.path
-      else
-        path = nil
-      end
       @content = VirtualContent.new(input, path)
     end
 
@@ -33,10 +28,6 @@ module ChupaText
 
     def size
       @content.size
-    end
-
-    def path
-      @content.path
     end
 
     def open(&block)

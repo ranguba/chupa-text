@@ -1,4 +1,4 @@
-# Copyright (C) 2013  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2017  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -41,8 +41,8 @@ class TestDecomposersGzip < Test::Unit::TestCase
         @data = ChupaText::InputData.new(fixture_path("hello.txt.gz"))
       end
 
-      def test_path
-        assert_equal([URI.parse(fixture_path("hello.txt").to_s)],
+      def test_uri
+        assert_equal([fixture_uri("hello.txt")],
                      decompose(@data).collect(&:uri))
       end
 
@@ -64,7 +64,7 @@ class TestDecomposersGzip < Test::Unit::TestCase
       end
 
       def test_uri
-        assert_equal([URI.parse(fixture_path("hello.tar").to_s)],
+        assert_equal([fixture_uri("hello.tar")],
                      decompose(@data).collect(&:uri))
       end
 
@@ -91,7 +91,7 @@ class TestDecomposersGzip < Test::Unit::TestCase
       end
 
       def test_uri
-        assert_equal([URI.parse(fixture_path("hello.tar").to_s)],
+        assert_equal([fixture_uri("hello.tar")],
                      decompose(@data).collect(&:uri))
       end
 

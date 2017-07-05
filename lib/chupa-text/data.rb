@@ -92,8 +92,6 @@ module ChupaText
     #   `nil`, it means that the data isn't associated with any URIs.
     def uri=(uri)
       case uri
-      when String
-        uri = URI.parse(uri)
       when Pathname
         file_uri = ""
         target = uri.expand_path
@@ -103,10 +101,18 @@ module ChupaText
           break if target.root?
         end
         file_uri = "file://#{file_uri}"
-        uri = URI.parse(file_uri)
-        p uri
+        @uri = URI.parse(file_uri)
+        self.path ||= uri
+      when NilClass
+        @uri = nil
+        self.path = nil
+      else
+        unless uri.is_a?(URI)
+          uri = URI.parse(uri)
+        end
+        @uri = uri
+        self.path ||= @uri.path
       end
-      @uri = uri
     end
 
     def open
