@@ -1,4 +1,4 @@
-# Copyright (C) 2013  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2017  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -31,9 +31,32 @@ module ChupaText
         Gem::Package::TarReader.new(StringIO.new(data.body)) do |reader|
           reader.each do |entry|
             next unless entry.file?
+            entry.extend(CopyStreamable)
             extracted = VirtualFileData.new(entry.full_name, entry)
             extracted.source = data
             yield(extracted)
+          end
+        end
+      end
+
+      # TODO: Supporting output buffer in #read and #readpartial
+      # should be done in RubyGems' tar implementation.
+      module CopyStreamable
+        def readpartial(max_length, buffer=nil)
+          data = super(max_length)
+          if data.nil?
+            if max_length.zero?
+              return ""
+            else
+              raise EOFError
+            end
+          end
+
+          if buffer.nil?
+            data
+          else
+            buffer.replace(data)
+            buffer
           end
         end
       end

@@ -26,30 +26,14 @@ module ChupaText
     def initialize(input, original_path=nil)
       @file = nil
       @base_name = compute_base_name(original_path)
-      chunk = input.read(BUFFER_SIZE) || ""
-      if chunk.bytesize != BUFFER_SIZE
-        @path = nil
-        @body = chunk
-        @size = @body.bytesize
-      else
-        @body = nil
-        @size = chunk.bytesize
-        setup_file do |file|
-          file.write(chunk)
-          while (chunk = input.read(BUFFER_SIZE))
-            @size += chunk.bytesize
-            file.write(chunk)
-          end
-        end
+      @body = nil
+      setup_file do |file|
+        @size = IO.copy_stream(input, file)
       end
     end
 
     def open(&block)
-      if @body
-        yield(StringIO.new(@body))
-      else
-        File.open(path, "rb", &block)
-      end
+      File.open(path, "rb", &block)
     end
 
     def body
@@ -57,9 +41,6 @@ module ChupaText
     end
 
     def path
-      ensure_setup_file do |file|
-        file.write(@body)
-      end
       @path
     end
 
@@ -75,10 +56,6 @@ module ChupaText
       else
         "chupa-text-virtual-content"
       end
-    end
-
-    def ensure_setup_file(&block)
-      setup_file(&block) unless @file
     end
 
     def setup_file
