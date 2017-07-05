@@ -16,45 +16,20 @@
 
 require "json"
 
+require "chupa-text/formatters/hash"
+
 module ChupaText
   module Formatters
-    class JSON
+    class JSON < Hash
       def initialize(output)
+        super()
         @output = output
-        @texts = []
-      end
-
-      def format_start(data)
-      end
-
-      def format_extracted(data)
-        text = {}
-        format_headers(data, text)
-        text["body"] = data.body
-        @texts << text
       end
 
       def format_finish(data)
-        formatted = {}
-        format_headers(data, formatted)
-        formatted["texts"] = @texts
+        formatted = super
         @output << ::JSON.pretty_generate(formatted)
         @output << "\n"
-      end
-
-      private
-      def format_headers(data, target)
-        format_header("mime-type", data.mime_type, target)
-        format_header("uri",       data.uri,       target)
-        format_header("size",      data.size,      target)
-        data.attributes.each do |name, value|
-          format_header(name, value, target)
-        end
-      end
-
-      def format_header(name, value, target)
-        return if value.nil?
-        target[name] = value
       end
     end
   end

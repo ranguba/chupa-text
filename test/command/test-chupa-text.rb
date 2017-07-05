@@ -65,11 +65,13 @@ class TestCommandChupaText < Test::Unit::TestCase
                        {
                          "mime-type" => "text/plain",
                          "uri"       => uri,
+                         "path"      => path,
                          "size"      => body.bytesize,
                          "texts"     => [
                            {
                              "mime-type" => "text/plain",
                              "uri"       => uri,
+                             "path"      => path,
                              "size"      => body.bytesize,
                              "body"      => body,
                            },
@@ -170,6 +172,7 @@ class TestCommandChupaText < Test::Unit::TestCase
                      true,
                      {
                        "uri"       => uri.to_s,
+                       "path"      => path.to_s,
                        "mime-type" => "application/x-gzip",
                        "size"      => path.stat.size,
                        "texts"     => [],
