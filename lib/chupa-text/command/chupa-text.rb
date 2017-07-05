@@ -33,6 +33,7 @@ module ChupaText
         @configuration = Configuration.load_default
         @enable_gems = true
         @format = :json
+        @need_screenshot = true
       end
 
       def run(*arguments)
@@ -92,11 +93,19 @@ module ChupaText
                   "Appends PATH to decomposer load path.") do |path|
           $LOAD_PATH << path
         end
+
+        parser.separator("")
+        parser.separator("Output related options")
         parser.on("--format=FORMAT", AVAILABLE_FORMATS,
                   "Output FORMAT.",
                   "[#{AVAILABLE_FORMATS.join(', ')}]",
-                  "(default: json)") do |format|
+                  "(default: #{@format})") do |format|
           @format = format
+        end
+        parser.on("--[no-]need-screenshot",
+                  "Generate screenshot if available.",
+                  "(default: #{@need_screenshot})") do |boolean|
+          @need_screenshot = boolean
         end
 
         parser.separator("")
@@ -152,7 +161,7 @@ module ChupaText
 
       def create_data
         if @input.nil?
-          VirtualFileData.new(nil, $stdin)
+          data = VirtualFileData.new(nil, $stdin)
         else
           case @input
           when /\A[a-z]+:\/\//i
@@ -160,8 +169,10 @@ module ChupaText
           else
             input = Pathname(@input)
           end
-          InputData.new(input)
+          data = InputData.new(input)
         end
+        data.need_screenshot = @need_screenshot
+        data
       end
 
       def create_formatter

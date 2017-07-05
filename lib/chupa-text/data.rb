@@ -52,6 +52,14 @@ module ChupaText
     #   archive data in {#source}.
     attr_accessor :source
 
+    # @return [Screenshot, nil] The screenshot of the data. For example,
+    #   the first page image for PDF file.text.
+    attr_accessor :screenshot
+
+    # @param [Bool] value `true` when screenshot is needed.
+    # @return [Bool] the specified value
+    attr_writer :need_screenshot
+
     def initialize(options={})
       @uri = nil
       @body = nil
@@ -60,6 +68,8 @@ module ChupaText
       @mime_type = nil
       @attributes = Attributes.new
       @source = nil
+      @screenshot = nil
+      @need_screenshot = true
       @options = options || {}
       source_data = @options[:source_data]
       if source_data
@@ -163,6 +173,11 @@ module ChupaText
     #   otherwise.
     def text_plain?
       mime_type == "text/plain"
+    end
+
+    # @return [Bool] `true` when screenshot is needed if available.
+    def need_screenshot?
+      @need_screenshot
     end
 
     private

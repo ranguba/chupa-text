@@ -28,6 +28,12 @@ module ChupaText
         text = {}
         format_headers(data, text)
         text["body"] = data.body
+        if data.screenshot
+          text["screenshot"] = {
+            "mime-type" => data.screenshot.mime_type,
+            "data" => data.screenshot.data,
+          }
+        end
         @texts << text
       end
 
