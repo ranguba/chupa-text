@@ -203,6 +203,26 @@ class TestCommandChupaText < Test::Unit::TestCase
                            "source-mime-types" => ["text/csv"],
                            "body"      => "1 2 3\n4 5 6\n7 8 9\n",
                            "size"      => 18,
+                           "screenshot" => {
+                             "mime-type" => "image/svg+xml",
+                             "data" => <<-SVG
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="100"
+  height="100"
+  viewBox="0 0 100 100">
+  <text
+    x="0"
+    y="10"
+    xml:space="preserve"
+    style="font-size: 10px;">1 2 3
+4 5 6
+7 8 9
+</text>
+</svg>
+                             SVG
+                           },
                          },
                        ],
                      },
