@@ -1,5 +1,11 @@
 # News
 
+## 1.0.6: 2017-07-05
+
+### Improvements
+
+  * Supported non ASCII characters in file name.
+
 ## 1.0.5: 2017-05-02
 
 ### Improvements
