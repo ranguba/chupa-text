@@ -14,6 +14,7 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
+require "cgi/util"
 require "uri"
 require "open-uri"
 
@@ -91,8 +92,19 @@ module ChupaText
     #   `nil`, it means that the data isn't associated with any URIs.
     def uri=(uri)
       case uri
-      when String, Pathname
-        uri = URI.parse(uri.to_s)
+      when String
+        uri = URI.parse(uri)
+      when Pathname
+        file_uri = ""
+        target = uri.expand_path
+        loop do
+          target, base = target.split
+          file_uri = "/#{CGI.escape(base.to_s)}#{file_uri}"
+          break if target.root?
+        end
+        file_uri = "file://#{file_uri}"
+        uri = URI.parse(file_uri)
+        p uri
       end
       @uri = uri
     end

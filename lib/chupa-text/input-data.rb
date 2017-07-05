@@ -14,6 +14,7 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
+require "cgi/util"
 require "uri"
 require "open-uri"
 
@@ -23,7 +24,10 @@ module ChupaText
       super(options)
       self.uri = uri
       if @uri.class == URI::Generic
-        @content = FileContent.new(@uri.path)
+        unescaped_components = @uri.path.split("/").collect do |component|
+          CGI.unescape(component)
+        end
+        @content = FileContent.new(unescaped_components.join("/"))
       else
         @content = download
       end

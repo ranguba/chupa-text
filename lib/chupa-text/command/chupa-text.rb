@@ -1,4 +1,4 @@
-# Copyright (C) 2013  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2017  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -154,7 +154,7 @@ module ChupaText
         if @input.nil?
           VirtualFileData.new(nil, $stdin)
         else
-          InputData.new(@input)
+          InputData.new(Pathname(@input))
         end
       end
 
