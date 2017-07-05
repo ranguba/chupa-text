@@ -25,24 +25,25 @@ module ChupaText
       @decomposer = DecomposerLoader.new(@configuration.decomposer)
       @mime_types = MIMETypesLoader.new(@configuration.mime_type_registry)
       @load_paths = []
-      data_dir = File.join(File.dirname(__FILE__), "..", "..", "data")
-      @load_paths << File.expand_path(data_dir)
+      data_dir = Pathname(__dir__) + ".." + ".." + "data"
+      @load_paths << data_dir.expand_path
     end
 
     def load(path)
       path = resolve_path(path)
       File.open(path) do |file|
-        instance_eval(file.read, path, 1)
+        instance_eval(file.read, path.to_path, 1)
       end
     end
 
     private
     def resolve_path(path)
-      return path if File.exist?(path)
-      return path if Pathname(path).absolute?
+      path = Pathname(path) unless path.is_a?(Pathname)
+      return path if path.exist?
+      return path if path.absolute?
       @load_paths.each do |load_path|
-        resolved_path = File.join(load_path, path)
-        return resolved_path if File.exist?(resolved_path)
+        resolved_path = path.expand_path(load_path)
+        return resolved_path if resolved_path.exist?
       end
       path
     end
