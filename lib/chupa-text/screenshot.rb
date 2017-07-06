@@ -20,11 +20,27 @@ module ChupaText
     attr_reader :mime_type
 
     # @return [String] The data of the screenshot.
-    attr_accessor :data
+    attr_reader :data
 
-    def initialize(mime_type, data)
+    # @return [String, nil] The encoding of the screenshot data.
+    #   `nil` means that the data is raw data. It's used for SVG data
+    #   because it's text data. `"base64"` means that the data is encoded
+    #   by Base64. It's used for PNG data because it's binary data.
+    attr_reader :encoding
+
+    def initialize(mime_type, data, encoding=nil)
       @mime_type = mime_type
       @data = data
+      @encoding = encoding
+    end
+
+    def decoded_data
+      case @encoding
+      when "base64"
+        @data.unpack("m*")[0]
+      else
+        @data
+      end
     end
   end
 end
