@@ -99,6 +99,7 @@ module ChupaText
         self["source-mime-types"] ||= []
         self["source-mime-types"].unshift(data.mime_type)
       end
+      self.need_screenshot = data.need_screenshot?
     end
 
     # @param [String, URI, nil] uri The URI for the data. If `uri` is
