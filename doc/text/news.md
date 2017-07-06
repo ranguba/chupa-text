@@ -1,5 +1,21 @@
 # News
 
+## 1.0.7: 2017-07-06
+
+### Improvements
+
+  * Supported screenshot.
+
+  * `chupa-text`: Added new options:
+
+    * `--need-screenshot`
+
+    * `--expected-screenshot-size=WIDTHxHEIGHT`
+
+### Fixes
+
+  * CSV decomposer: Fixed a infinite loop bug.
+
 ## 1.0.6: 2017-07-05
 
 ### Improvements
