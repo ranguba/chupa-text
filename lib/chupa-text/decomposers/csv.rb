@@ -45,31 +45,34 @@ module ChupaText
 
         text_data = TextData.new(text, :source_data => data)
         if data.need_screenshot?
-          text_data.screenshot = create_screenshot(text)
+          text_data.screenshot = create_screenshot(data, text)
         end
 
         yield(text_data)
       end
 
       private
-      def create_screenshot(text)
+      def create_screenshot(data, text)
+        width, height = data.expected_screenshot_size
+        max_n_lines = 10
+        font_size = height / max_n_lines
         target_text = ""
         text.each_line.with_index do |line, i|
+          break if i == max_n_lines
           target_text << line
-          break if i == 4
         end
         mime_type = "image/svg+xml"
         data = <<-SVG
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
   xmlns="http://www.w3.org/2000/svg"
-  width="100"
-  height="100"
-  viewBox="0 0 100 100">
+  width="#{width}"
+  height="#{height}"
+  viewBox="0 0 #{width} #{height}">
   <text
     x="0"
-    y="10"
-    style="font-size: 10px; white-space: pre-wrap;"
+    y="#{font_size}"
+    style="font-size: #{font_size}px; white-space: pre-wrap;"
     xml:space="preserve">#{CGI.escapeHTML(target_text)}</text>
 </svg>
         SVG

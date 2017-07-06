@@ -60,6 +60,9 @@ module ChupaText
     # @return [Bool] the specified value
     attr_writer :need_screenshot
 
+    # @return [Array<Integer, Integer>] the expected screenshot size.
+    attr_accessor :expected_screenshot_size
+
     def initialize(options={})
       @uri = nil
       @body = nil
@@ -70,6 +73,7 @@ module ChupaText
       @source = nil
       @screenshot = nil
       @need_screenshot = true
+      @expected_screenshot_size = [200, 200]
       @options = options || {}
       source_data = @options[:source_data]
       if source_data
@@ -100,6 +104,7 @@ module ChupaText
         self["source-mime-types"].unshift(data.mime_type)
       end
       self.need_screenshot = data.need_screenshot?
+      self.expected_screenshot_size = data.expected_screenshot_size
     end
 
     # @param [String, URI, nil] uri The URI for the data. If `uri` is

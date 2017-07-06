@@ -209,13 +209,13 @@ class TestCommandChupaText < Test::Unit::TestCase
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
   xmlns="http://www.w3.org/2000/svg"
-  width="100"
-  height="100"
-  viewBox="0 0 100 100">
+  width="200"
+  height="200"
+  viewBox="0 0 200 200">
   <text
     x="0"
-    y="10"
-    style="font-size: 10px; white-space: pre-wrap;"
+    y="20"
+    style="font-size: 20px; white-space: pre-wrap;"
     xml:space="preserve">1 2 3
 4 5 6
 7 8 9

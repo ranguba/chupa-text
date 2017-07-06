@@ -28,12 +28,24 @@ module ChupaText
 
       AVAILABLE_FORMATS = [:json, :text]
 
+      SIZE = /\A\d+x\d+\z/o
+      OptionParser.accept(SIZE, SIZE) do |value|
+        if value
+           begin
+             value.split("x").collect {|number| Integer(number)}
+           rescue ArgumentError
+             raise OptionParser::InvalidArgument, value
+           end
+        end
+      end
+
       def initialize
         @input = nil
         @configuration = Configuration.load_default
         @enable_gems = true
         @format = :json
         @need_screenshot = true
+        @expected_screenshot_size = [200, 200]
       end
 
       def run(*arguments)
@@ -107,6 +119,11 @@ module ChupaText
                   "(default: #{@need_screenshot})") do |boolean|
           @need_screenshot = boolean
         end
+        parser.on("--expected-screenshot-size=WIDTHxHEIGHT", SIZE,
+                  "Expected screenshot size.",
+                  "(default: #{@expected_screenshot_size.join("x")})") do |size|
+          @expected_screenshot_size = size
+        end
 
         parser.separator("")
         parser.separator("Log related options:")
@@ -172,6 +189,7 @@ module ChupaText
           data = InputData.new(input)
         end
         data.need_screenshot = @need_screenshot
+        data.expected_screenshot_size = @expected_screenshot_size
         data
       end
 
