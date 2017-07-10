@@ -197,8 +197,8 @@ class TestCommandChupaText < Test::Unit::TestCase
                        "size"      => path.stat.size,
                        "texts"     => [
                          {
-                           "uri"       => uri.to_s,
-                           "path"      => path.to_s,
+                           "uri"       => uri.to_s.gsub(/\.csv\z/, ".txt"),
+                           "path"      => path.sub_ext(".txt").to_s,
                            "mime-type" => "text/plain",
                            "source-mime-types" => ["text/csv"],
                            "body"      => "1 2 3\n4 5 6\n7 8 9\n",
