@@ -20,6 +20,7 @@ module ChupaText
       super(options)
       self.uri = uri
       @content = VirtualContent.new(input, path)
+      self.path = @content.path
     end
 
     def body

@@ -121,7 +121,7 @@ module ChupaText
         end
         file_uri = "file://#{file_uri}"
         @uri = URI.parse(file_uri)
-        self.path ||= uri
+        self.path = uri
       when NilClass
         @uri = nil
         self.path = nil
@@ -130,7 +130,7 @@ module ChupaText
           uri = URI.parse(uri)
         end
         @uri = uri
-        self.path ||= @uri.path
+        self.path = @uri.path
       end
     end
 
