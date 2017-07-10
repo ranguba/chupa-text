@@ -14,6 +14,7 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
+require "pathname"
 require "stringio"
 require "tempfile"
 
@@ -25,6 +26,13 @@ module ChupaText
     attr_reader :size
     def initialize(input, original_path=nil)
       @file = nil
+      if original_path.is_a?(String)
+        if original_path.empty?
+          original_path = nil
+        else
+          original_path = Pathname.new(original_path)
+        end
+      end
       @base_name = compute_base_name(original_path)
       @body = nil
       setup_file do |file|
@@ -47,7 +55,7 @@ module ChupaText
     private
     def compute_base_name(original_path)
       if original_path
-        prefix, suffix = File.basename(original_path).split(/(\.[^.]+\z)/)
+        prefix, suffix = original_path.basename.to_s.split(/(\.[^.]+\z)/)
         if suffix
           [prefix, suffix]
         else
