@@ -81,8 +81,8 @@ module ChupaText
           debug do
             "#{log_tag}[extract][decomposed] " +
               "#{decomposer.class}: " +
-              "<#{target.uri}>:<#{target.mime_type}> -> " +
-              "<#{decomposed.mime_type}>"
+              "<#{target.uri}>: " +
+              "<#{target.mime_type}> -> <#{decomposed.mime_type}>"
           end
           targets.push(decomposed)
         end
