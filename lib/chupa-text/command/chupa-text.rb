@@ -44,6 +44,7 @@ module ChupaText
         @configuration = Configuration.load_default
         @enable_gems = true
         @uri = nil
+        @mime_type = nil
         @format = :json
         @need_screenshot = true
         @expected_screenshot_size = [200, 200]
@@ -112,6 +113,10 @@ module ChupaText
         parser.on("--uri=URI",
                   "Input data URI.") do |uri|
           @uri = URI.parse(uri)
+        end
+        parser.on("--mime-type=MIME_TYPE",
+                  "Input data MIME type.") do |mime_type|
+          @mime_type = mime_type
         end
 
         parser.separator("")
@@ -185,6 +190,7 @@ module ChupaText
       end
 
       def create_data
+        options = {mime_type: @mime_type}
         if @input.nil?
           data = VirtualFileData.new(@uri, $stdin)
         else
@@ -202,6 +208,7 @@ module ChupaText
             data = InputData.new(input)
           end
         end
+        data.mime_type = @mime_type if @mime_type
         data.need_screenshot = @need_screenshot
         data.expected_screenshot_size = @expected_screenshot_size
         data

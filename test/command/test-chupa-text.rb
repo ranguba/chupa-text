@@ -158,6 +158,27 @@ class TestCommandChupaText < Test::Unit::TestCase
                      ],
                      run_command(@uri, "--uri", virtual_uri))
       end
+
+      test("--mime-type") do
+        @html = "<html><body>Hello</body></html>"
+        assert_equal([
+                       true,
+                       {
+                         "mime-type" => "text/plain",
+                         "size"      => @html.bytesize,
+                         "uri"       => @uri,
+                         "texts"     => [
+                           {
+                             "mime-type" => "text/plain",
+                             "size"      => @html.bytesize,
+                             "uri"       => @uri,
+                             "body"      => @html,
+                           },
+                         ],
+                       },
+                     ],
+                     run_command(@uri, "--mime-type", "text/plain"))
+      end
     end
 
     sub_test_case("standard input") do
@@ -204,6 +225,27 @@ class TestCommandChupaText < Test::Unit::TestCase
                        },
                      ],
                      run_command("--uri", "http://127.0.0.1/hello.txt"))
+      end
+
+      test("--mime-type") do
+        body = "Hello\n"
+        @stdin << "Hello\n"
+        @stdin.rewind
+        assert_equal([
+                       true,
+                       {
+                         "mime-type" => "text/html",
+                         "size"      => body.bytesize,
+                         "texts"     => [
+                           {
+                             "mime-type" => "text/html",
+                             "size"      => body.bytesize,
+                             "body"      => body,
+                           },
+                         ],
+                       },
+                     ],
+                     run_command("--mime-type", "text/html"))
       end
     end
   end
