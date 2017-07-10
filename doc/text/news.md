@@ -1,5 +1,16 @@
 # News
 
+## 1.0.8: 2017-07-10
+
+### Improvements
+
+  * `ChupaText::VirtualContent`: Accepted `Pathname`.
+
+### Fixes
+
+  * `ChupaText::VirtualFileData#path`: Fixed a bug that it doesn't
+    return real path.
+
 ## 1.0.7: 2017-07-06
 
 ### Improvements
