@@ -34,7 +34,7 @@ module ChupaText
       pid = spawn(options[:env] || {},
                   @command.to_s,
                   *arguments,
-                  spawn_options.merge(default_spawn_options))
+                  default_spawn_options.merge(spawn_options))
       pid, status = Process.waitpid2(pid)
       status.success?
     end
