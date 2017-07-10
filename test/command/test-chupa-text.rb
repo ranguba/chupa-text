@@ -116,7 +116,7 @@ class TestCommandChupaText < Test::Unit::TestCase
         @www_server_thread.kill
       end
 
-      def test_single
+      test("default") do
         @html = "<html><body>Hello</body></html>"
         assert_equal([
                        true,
@@ -136,10 +136,32 @@ class TestCommandChupaText < Test::Unit::TestCase
                      ],
                      run_command(@uri))
       end
+
+      test("--uri") do
+        virtual_uri = "http://127.0.0.1/hello.html"
+        @html = "<html><body>Hello</body></html>"
+        assert_equal([
+                       true,
+                       {
+                         "mime-type" => "text/html",
+                         "size"      => @html.bytesize,
+                         "uri"       => virtual_uri,
+                         "texts"     => [
+                           {
+                             "mime-type" => "text/html",
+                             "size"      => @html.bytesize,
+                             "uri"       => virtual_uri,
+                             "body"      => @html,
+                           },
+                         ],
+                       },
+                     ],
+                     run_command(@uri, "--uri", virtual_uri))
+      end
     end
 
     sub_test_case("standard input") do
-      def test_single
+      test("default") do
         body = "Hello\n"
         @stdin << "Hello\n"
         @stdin.rewind
@@ -158,6 +180,30 @@ class TestCommandChupaText < Test::Unit::TestCase
                        },
                      ],
                      run_command)
+      end
+
+      test("--uri") do
+        body = "Hello\n"
+        uri = "http://127.0.0.1/hello.txt"
+        @stdin << "Hello\n"
+        @stdin.rewind
+        assert_equal([
+                       true,
+                       {
+                         "mime-type" => "text/plain",
+                         "size"      => body.bytesize,
+                         "uri"       => uri,
+                         "texts"     => [
+                           {
+                             "mime-type" => "text/plain",
+                             "size"      => body.bytesize,
+                             "body"      => body,
+                             "uri"       => uri,
+                           },
+                         ],
+                       },
+                     ],
+                     run_command("--uri", "http://127.0.0.1/hello.txt"))
       end
     end
   end

@@ -43,6 +43,7 @@ module ChupaText
         @input = nil
         @configuration = Configuration.load_default
         @enable_gems = true
+        @uri = nil
         @format = :json
         @need_screenshot = true
         @expected_screenshot_size = [200, 200]
@@ -104,6 +105,13 @@ module ChupaText
         parser.on("-I=PATH",
                   "Appends PATH to decomposer load path.") do |path|
           $LOAD_PATH << path
+        end
+
+        parser.separator("")
+        parser.separator("Input related options")
+        parser.on("--uri=URI",
+                  "Input data URI.") do |uri|
+          @uri = URI.parse(uri)
         end
 
         parser.separator("")
@@ -178,7 +186,7 @@ module ChupaText
 
       def create_data
         if @input.nil?
-          data = VirtualFileData.new(nil, $stdin)
+          data = VirtualFileData.new(@uri, $stdin)
         else
           case @input
           when /\A[a-z]+:\/\//i
@@ -186,7 +194,13 @@ module ChupaText
           else
             input = Pathname(@input)
           end
-          data = InputData.new(input)
+          if @uri
+            input.open("rb") do |io|
+              data = VirtualFileData.new(@uri, io)
+            end
+          else
+            data = InputData.new(input)
+          end
         end
         data.need_screenshot = @need_screenshot
         data.expected_screenshot_size = @expected_screenshot_size
