@@ -1,5 +1,21 @@
 # News
 
+## 1.0.9: 2017-07-11
+
+### Improvements
+
+  * `ChupaText::TextData`: Changed extension to ".txt".
+
+  * `chupa-text`: Added `--uri` option.
+
+  * `chupa-text`: Added `--mime-type` option.
+
+  * `ChupaText::DownloadError`: Added.
+
+  * Supported zip.
+
+  * `ChupaText::ExternalCommand#path`: Added.
+
 ## 1.0.8: 2017-07-10
 
 ### Improvements
