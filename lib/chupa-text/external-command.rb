@@ -20,8 +20,9 @@ require "pathname"
 
 module ChupaText
   class ExternalCommand
-    def initialize(command)
-      @command = Pathname.new(command)
+    attr_reader :path
+    def initialize(path)
+      @path = Pathname.new(path)
     end
 
     def run(*arguments)
@@ -32,7 +33,7 @@ module ChupaText
       end
       spawn_options = options[:spawn_options] || {}
       pid = spawn(options[:env] || {},
-                  @command.to_s,
+                  @path.to_s,
                   *arguments,
                   default_spawn_options.merge(spawn_options))
       pid, status = Process.waitpid2(pid)
@@ -40,11 +41,11 @@ module ChupaText
     end
 
     def exist?
-      if @command.absolute?
-        @command.file? and @command.executable?
+      if @path.absolute?
+        @path.file? and @path.executable?
       else
         (ENV['PATH'] || "").split(File::PATH_SEPARATOR).any? do |path|
-          (Pathname.new(path) + @command).expand_path.exist?
+          (Pathname.new(path) + @path).expand_path.exist?
         end
       end
     end
