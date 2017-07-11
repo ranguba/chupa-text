@@ -166,7 +166,11 @@ module ChupaText
     #   lower case like `pdf` not `PDF`.
     def extension
       return nil if @uri.nil?
-      File.extname(@uri.path).downcase.gsub(/\A\./, "")
+      if @uri.is_a?(URI::HTTP) and @uri.path.end_with?("/")
+        "html"
+      else
+        File.extname(@uri.path).downcase.gsub(/\A\./, "")
+      end
     end
 
     # @return [Bool] true if MIME type is "text/XXX", false
