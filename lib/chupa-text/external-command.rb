@@ -70,7 +70,10 @@ module ChupaText
       end
 
       def set_option(key, type)
-        value = ENV["CHUPA_EXTERNAL_COMMAND_LIMIT_#{key.to_s.upcase}"]
+        value =
+          ENV["CHUPA_TEXT_EXTERNAL_COMMAND_LIMIT_#{key.to_s.upcase}"] ||
+          # For backward compatibility
+          ENV["CHUPA_EXTERNAL_COMMAND_LIMIT_#{key.to_s.upcase}"]
         return if value.nil?
         value = send("parse_#{type}", key, value)
         return if value.nil?
