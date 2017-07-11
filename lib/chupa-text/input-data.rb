@@ -47,9 +47,13 @@ module ChupaText
     def download
       path = @uri.path
       path += "index.html" if path.end_with?("/")
-      @uri.open("rb") do |input|
-        self.mime_type = input.content_type.split(/;/).first
-        VirtualContent.new(input, path)
+      begin
+        @uri.open("rb") do |input|
+          self.mime_type = input.content_type.split(/;/).first
+          VirtualContent.new(input, path)
+        end
+      rescue OpenURI::HTTPError => error
+        raise DownloadError.new(@uri, error.message.strip)
       end
     end
   end

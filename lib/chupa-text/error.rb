@@ -18,6 +18,16 @@ module ChupaText
   class Error < StandardError
   end
 
+  class DownloadError < Error
+    attr_reader :uri
+    attr_reader :reason
+    def initialize(uri, reason)
+      @uri = uri
+      @reason = reason
+      super("Download error: <#{uri}>: #{reason}")
+    end
+  end
+
   class EncryptedError < Error
     attr_reader :data
     def initialize(data)
