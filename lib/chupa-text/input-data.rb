@@ -54,6 +54,8 @@ module ChupaText
         end
       rescue OpenURI::HTTPError => error
         raise DownloadError.new(@uri, error.message.strip)
+      rescue => error
+        raise DownloadError.new(@uri, "#{error.class}: #{error.message}")
       end
     end
   end
