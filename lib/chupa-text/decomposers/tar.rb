@@ -31,8 +31,13 @@ module ChupaText
         Gem::Package::TarReader.new(StringIO.new(data.body)) do |reader|
           reader.each do |entry|
             next unless entry.file?
+
             entry.extend(CopyStreamable)
-            extracted = VirtualFileData.new(entry.full_name, entry,
+            entry_uri = data.uri.dup
+            base_path = entry_uri.path.gsub(/\.tar\z/i, "")
+            entry_uri.path = "#{base_path}/#{entry.full_name}"
+            extracted = VirtualFileData.new(entry_uri,
+                                            entry,
                                             :source_data => data)
             yield(extracted)
           end

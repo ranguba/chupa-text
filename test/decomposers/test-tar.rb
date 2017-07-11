@@ -1,4 +1,4 @@
-# Copyright (C) 2013  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2017  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -40,38 +40,34 @@ class TestDecomposersTar < Test::Unit::TestCase
     end
 
     sub_test_case("top-level") do
-      def setup
-        super
-        @data = ChupaText::InputData.new(fixture_path("top-level.tar"))
-      end
-
       def test_decompose
+        data_path = Pathname.new(fixture_path("top-level.tar"))
+        base_path = data_path.sub_ext("")
+        data = ChupaText::InputData.new(data_path)
         assert_equal([
                        {
-                         :uri    => "top-level.txt",
+                         :uri    => "file:#{base_path}/top-level.txt",
                          :body   => "top level\n",
-                         :source => @data.uri.to_s,
+                         :source => data.uri.to_s,
                        },
                      ],
-                     decompose(@data))
+                     decompose(data))
       end
     end
 
     sub_test_case("directory") do
-      def setup
-        super
-        @data = ChupaText::InputData.new(fixture_path("directory.tar"))
-      end
-
       def test_decompose
+        data_path = Pathname.new(fixture_path("directory.tar"))
+        base_path = data_path.sub_ext("")
+        data = ChupaText::InputData.new(data_path)
         assert_equal([
                        {
-                         :uri    => "directory/hello.txt",
+                         :uri    => "file:#{base_path}/directory/hello.txt",
                          :body   => "Hello in directory\n",
-                         :source => @data.uri.to_s,
+                         :source => data.uri.to_s,
                        },
                      ],
-                     decompose(@data))
+                     decompose(data))
       end
     end
   end
