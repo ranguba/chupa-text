@@ -190,7 +190,6 @@ module ChupaText
       end
 
       def create_data
-        options = {mime_type: @mime_type}
         if @input.nil?
           data = VirtualFileData.new(@uri, $stdin)
         else
