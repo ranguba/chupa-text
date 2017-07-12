@@ -56,6 +56,8 @@ module ChupaText
     end
 
     class SpawnLimitOptions
+      include Loggable
+
       attr_reader :options
       def initialize
         @options = {}
@@ -84,7 +86,7 @@ module ChupaText
           return nil
         end
         limit_info = "soft-limit:#{soft_limit}, hard-limit:#{hard_limit}"
-        log(:info, "[#{key}][set] <#{value}>(#{limit_info})")
+        info("#{log_tag}[#{key}][set] <#{value}>(#{limit_info})")
         @options[:"rlimit_#{key}"] = value
       end
 
@@ -125,15 +127,15 @@ module ChupaText
       end
 
       def log_hard_limit_over_value(key, value, hard_limit)
-        log(:warning, "[#{key}][large] <#{value}>(hard-limit:#{hard_limit})")
+        warn("#{log_tag}[#{key}][large] <#{value}>(hard-limit:#{hard_limit})")
       end
 
       def log_invalid_value(key, value, type)
-        log(:warning, "[#{key}][invalid] <#{value}>(#{type})")
+        warn("#{log_tag}[#{key}][invalid] <#{value}>(#{type})")
       end
 
-      def log(level, message)
-        ChupaText.logger.send(level, "[external-command][limit]#{message}")
+      def log_tag
+        "[external-command][limit]"
       end
     end
   end
