@@ -87,7 +87,18 @@ module ChupaText
         end
         limit_info = "soft-limit:#{soft_limit}, hard-limit:#{hard_limit}"
         info("#{log_tag}[#{key}][set] <#{value}>(#{limit_info})")
-        @options[:"rlimit_#{key}"] = value
+
+        # TODO: Workaround for Ruby 2.3.3p222
+        case key
+        when :cpu
+          @options[:rlimit_cpu] = value
+        when :rss
+          @options[:rlimit_rss] = value
+        when :as
+          @options[:rlimit_as] = value
+        else
+          @options[:"rlimit_#{key}"] = value
+        end
       end
 
       def parse_int(key, value)
