@@ -77,6 +77,7 @@ module ChupaText
           # For backward compatibility
           ENV["CHUPA_EXTERNAL_COMMAND_LIMIT_#{key.to_s.upcase}"]
         return if value.nil?
+        return if value.empty?
         value = send("parse_#{type}", key, value)
         return if value.nil?
         rlimit_number = Process.const_get("RLIMIT_#{key.to_s.upcase}")
