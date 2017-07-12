@@ -67,7 +67,6 @@ module ChupaText
       private
       def set_default_options
         set_option(:cpu, :int)
-        set_option(:rss, :size)
         set_option(:as, :size)
       end
 
@@ -93,8 +92,6 @@ module ChupaText
         case key
         when :cpu
           @options[:rlimit_cpu] = value
-        when :rss
-          @options[:rlimit_rss] = value
         when :as
           @options[:rlimit_as] = value
         else
