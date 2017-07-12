@@ -1,5 +1,20 @@
 # News
 
+## 1.1.0: 2017-07-12
+
+### Improvements
+
+  * Supported external command limitation by the following environment
+    variables:
+
+    * `CHUPA_TEXT_EXTERNAL_COMMAND_LIMIT_CPU`
+
+    * `CHUPA_TEXT_EXTERNAL_COMMAND_LIMIT_AS`
+
+  * Handled more download errors.
+
+  * Improved extension detection.
+
 ## 1.0.9: 2017-07-11
 
 ### Improvements
