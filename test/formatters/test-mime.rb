@@ -15,6 +15,8 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 class TestMIMEFormatter < Test::Unit::TestCase
+  include Helper
+
   def setup
     @output = StringIO.new
     @formatter = ChupaText::Formatters::MIME.new(@output)
@@ -31,55 +33,50 @@ class TestMIMEFormatter < Test::Unit::TestCase
 
   def test_text
     data = ChupaText::TextData.new("Hello")
-    data.uri = URI.parse("file:///tmp/hello.txt")
+    data.uri = URI.parse("http://example.com/hello.txt")
     assert_equal(<<-MIME.gsub(/\n/, "\r\n"), format(data, [data]))
 MIME-Version: 1.0
 mime-type: text/plain
-uri: file:///tmp/hello.txt
-path: /tmp/hello.txt
+uri: http://example.com/hello.txt
 size: 5
-Content-Type: multipart/mixed; boundary=a21ff2fc51d8d8c8af3e7ccb974e34b0368e2891
+Content-Type: multipart/mixed; boundary=e37eebaf33e7c817702a3ceb4b86260a936b2503
 
---a21ff2fc51d8d8c8af3e7ccb974e34b0368e2891
+--e37eebaf33e7c817702a3ceb4b86260a936b2503
 mime-type: text/plain
-uri: file:///tmp/hello.txt
-path: /tmp/hello.txt
+uri: http://example.com/hello.txt
 size: 5
 
 Hello
---a21ff2fc51d8d8c8af3e7ccb974e34b0368e2891--
+--e37eebaf33e7c817702a3ceb4b86260a936b2503--
     MIME
   end
 
   def test_texts
     data = ChupaText::Data.new
-    data.uri = URI.parse("file:///tmp/hello-world.zip")
+    data.uri = URI.parse("http://example.com/hello-world.zip")
     data1 = ChupaText::TextData.new("Hello")
-    data1.uri = URI.parse("file:///tmp/hello.txt")
+    data1.uri = URI.parse("http://example.com/hello-world.zip/hello.txt")
     data2 = ChupaText::TextData.new("World")
-    data2.uri = URI.parse("file:///tmp/world.txt")
+    data2.uri = URI.parse("http://example.com/hello-world.zip/world.txt")
     assert_equal(<<-MIME.gsub(/\n/, "\r\n"), format(data, [data1, data2]))
 MIME-Version: 1.0
 mime-type: application/zip
-uri: file:///tmp/hello-world.zip
-path: /tmp/hello-world.zip
-Content-Type: multipart/mixed; boundary=e53a82b45aee7c6a07ea51dcf930118dedf7da4d
+uri: http://example.com/hello-world.zip
+Content-Type: multipart/mixed; boundary=2982df00a82c74bdb9d9c6dd5bf007d435c352c9
 
---e53a82b45aee7c6a07ea51dcf930118dedf7da4d
+--2982df00a82c74bdb9d9c6dd5bf007d435c352c9
 mime-type: text/plain
-uri: file:///tmp/hello.txt
-path: /tmp/hello.txt
+uri: http://example.com/hello-world.zip/hello.txt
 size: 5
 
 Hello
---e53a82b45aee7c6a07ea51dcf930118dedf7da4d
+--2982df00a82c74bdb9d9c6dd5bf007d435c352c9
 mime-type: text/plain
-uri: file:///tmp/world.txt
-path: /tmp/world.txt
+uri: http://example.com/hello-world.zip/world.txt
 size: 5
 
 World
---e53a82b45aee7c6a07ea51dcf930118dedf7da4d--
+--2982df00a82c74bdb9d9c6dd5bf007d435c352c9--
     MIME
   end
 end
