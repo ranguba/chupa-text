@@ -1,5 +1,16 @@
 # News
 
+## 1.1.1: 2017-12-13
+
+### Improvements
+
+  * Added MIME formatter.
+    [GitHub#4][Patch by okkez]
+
+### Thanks
+
+  * okkez
+
 ## 1.1.0: 2017-07-12
 
 ### Improvements
