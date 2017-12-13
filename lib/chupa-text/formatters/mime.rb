@@ -1,50 +1,62 @@
+# Copyright (C) 2017  Kenji Okimoto <okimoto@clear-code.com>
+# Copyright (C) 2017  Kouhei Sutou <kou@clear-code.com>
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License, or (at your option) any later version.
+#
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+
 require "digest/sha1"
+
+require "chupa-text/formatters/hash"
 
 module ChupaText
   module Formatters
-    class MIME
+    class MIME < Hash
       def initialize(output)
+        super()
         @output = output
-        @texts = []
-      end
-
-      def format_start(data)
-        @output << "Original-URI: #{data.uri}\n"
-        @output << "Content-Size: #{data.size}\n"
-      end
-
-      def format_extracted(data)
-        text = format_headers(data)
-        text << "\n\n"
-        text << data.body
-        @texts << text
       end
 
       def format_finish(data)
-        if @texts.size > 1
-          boundary = Digest::SHA1.hexdigest(data.uri.to_s)
-          @output << "Content-Type: multipart/mixed; boundary=#{boundary}\n\n"
-          @output << "--#{boundary}\n"
-          @output << @texts.join("\n\n--#{boundary}\n")
-          @output << "\n--#{boundary}--\n"
-        else
-          @output << @texts.first
-          @output << "\n"
+        formatted = super
+
+        @output << "MIME-Version: 1.0\r\n"
+        format_hash(formatted, ["texts"])
+        texts = formatted["texts"]
+        boundary = Digest::SHA1.hexdigest(data.uri.to_s)
+        @output << "Content-Type: multipart/mixed; boundary=#{boundary}\r\n"
+        texts.each do |text|
+          @output << "\r\n--#{boundary}\r\n"
+          format_text(text)
         end
+        @output << "\r\n--#{boundary}--\r\n"
       end
 
       private
-      def format_headers(data)
-        headers = {}
-        headers["mime-type"] = data.mime_type
-        headers["uri"] =  data.uri
-        headers["size"] = data.size
-        data.attributes.each do |name, value|
-          headers[name] = value
+      def format_hash(hash, ignore_keys)
+        hash.each do |key, value|
+          next if ignore_keys.include?(key)
+          @output << "#{key}: #{value}\r\n"
         end
-        headers.map do |name, value|
-          "#{name}: #{value}"
-        end.join("\n")
+      end
+
+      def format_text(hash)
+        format_hash(hash, ["body"])
+        body = hash["body"]
+        if body
+          @output << "\r\n"
+          @output << body
+        end
       end
     end
   end
