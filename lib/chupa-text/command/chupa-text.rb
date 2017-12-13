@@ -31,11 +31,11 @@ module ChupaText
       SIZE = /\A\d+x\d+\z/o
       OptionParser.accept(SIZE, SIZE) do |value|
         if value
-           begin
-             value.split("x").collect {|number| Integer(number)}
-           rescue ArgumentError
-             raise OptionParser::InvalidArgument, value
-           end
+          begin
+            value.split("x").collect {|number| Integer(number)}
+          rescue ArgumentError
+            raise OptionParser::InvalidArgument, value
+          end
         end
       end
 
