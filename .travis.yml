@@ -4,5 +4,6 @@ notifications:
       - groonga-commit@lists.osdn.me
 rvm:
   - 2.2
-  - 2.3.3
-  - 2.4.0
+  - 2.3.4
+  - 2.4.2
+  - ruby-head
