@@ -45,19 +45,19 @@ class TestDecomposersZip < Test::Unit::TestCase
       base_path = data_path.sub_ext("")
       assert_equal([
                      {
-                       :uri    => "file:#{base_path}/hello.txt",
+                       :uri    => file_uri("#{base_path}/hello.txt").to_s,
                        :body   => "Hello!\n",
-                       :source => "file:#{data_path}",
+                       :source => file_uri(data_path).to_s,
                      },
                      {
-                       :uri    => "file:#{base_path}/hello.csv",
+                       :uri    => file_uri("#{base_path}/hello.csv").to_s,
                        :body   => "Hello,World\n",
-                       :source => "file:#{data_path}",
+                       :source => file_uri(data_path).to_s,
                      },
                      {
-                       :uri    => "file:#{base_path}/hello/world.txt",
+                       :uri    => file_uri("#{base_path}/hello/world.txt").to_s,
                        :body   => "World!\n",
-                       :source => "file:#{data_path}",
+                       :source => file_uri(data_path).to_s,
                      },
                    ],
                    decompose(data_path))

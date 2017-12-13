@@ -46,7 +46,7 @@ class TestDecomposersTar < Test::Unit::TestCase
         data = ChupaText::InputData.new(data_path)
         assert_equal([
                        {
-                         :uri    => "file:#{base_path}/top-level.txt",
+                         :uri    => file_uri("#{base_path}/top-level.txt").to_s,
                          :body   => "top level\n",
                          :source => data.uri.to_s,
                        },
@@ -62,7 +62,7 @@ class TestDecomposersTar < Test::Unit::TestCase
         data = ChupaText::InputData.new(data_path)
         assert_equal([
                        {
-                         :uri    => "file:#{base_path}/directory/hello.txt",
+                         :uri    => file_uri("#{base_path}/directory/hello.txt").to_s,
                          :body   => "Hello in directory\n",
                          :source => data.uri.to_s,
                        },

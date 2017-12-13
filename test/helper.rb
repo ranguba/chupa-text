@@ -26,6 +26,10 @@ module Helper
 
   def fixture_uri(*components)
     path = fixture_path(*components)
+    file_uri(path)
+  end
+
+  def file_uri(path)
     URI.parse("file://#{path}")
   end
 end
