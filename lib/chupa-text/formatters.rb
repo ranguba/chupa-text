@@ -17,3 +17,4 @@
 require "chupa-text/formatters/hash"
 require "chupa-text/formatters/json"
 require "chupa-text/formatters/text"
+require "chupa-text/formatters/mime"
