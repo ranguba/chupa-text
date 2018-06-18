@@ -1,5 +1,11 @@
 # News
 
+## 1.1.2: 2018-06-18
+
+### Improvements
+
+  * Added support for Ruby 2.6.
+
 ## 1.1.1: 2017-12-13
 
 ### Improvements
