@@ -23,11 +23,12 @@ module ChupaText
     def initialize(uri, options={})
       super(options)
       self.uri = uri
-      if @uri.class == URI::Generic
-        @content = FileContent.new(path)
-      else
+      case @uri
+      when URI::HTTP, URI::FTP
         @content = download
         self.path = @content.path
+      else
+        @content = FileContent.new(path)
       end
     end
 
