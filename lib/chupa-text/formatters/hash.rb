@@ -52,8 +52,11 @@ module ChupaText
       def format_headers(data, target)
         format_header("mime-type", data.mime_type, target)
         format_header("uri",       data.uri,       target)
-        if data.uri.class == URI::Generic
-          format_header("path",      data.path,      target)
+        case data.uri
+        when URI::HTTP, URI::FTP, nil
+          # No path
+        else
+          format_header("path",    data.path,      target)
         end
         format_header("size",      data.size,      target)
         data.attributes.each do |name, value|
