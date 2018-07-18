@@ -1,5 +1,11 @@
 # News
 
+## 1.1.3: 2018-07-18
+
+### Improvements
+
+  * Added support for long base name file.
+
 ## 1.1.2: 2018-06-18
 
 ### Improvements
