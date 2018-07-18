@@ -33,7 +33,7 @@ module ChupaText
           original_path = Pathname.new(original_path)
         end
       end
-      @base_name = compute_base_name(original_path)
+      @original_path = original_path
       @body = nil
       setup_file do |file|
         @size = IO.copy_stream(input, file)
@@ -53,9 +53,10 @@ module ChupaText
     end
 
     private
-    def compute_base_name(original_path)
-      if original_path
-        prefix, suffix = original_path.basename.to_s.split(/(\.[^.]+\z)/)
+    def compute_tempfile_basename
+      if @original_path
+        prefix, suffix = @original_path.basename.to_s.split(/(\.[^.]+\z)/)
+        prefix = prefix[0, 20]
         if suffix
           [prefix, suffix]
         else
@@ -67,7 +68,8 @@ module ChupaText
     end
 
     def setup_file
-      @file = Tempfile.new(@base_name)
+      basename = compute_tempfile_basename
+      @file = Tempfile.new(basename)
       @path = @file.path
       yield(@file)
       @file.close
