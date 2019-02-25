@@ -125,5 +125,20 @@ Page2
         BODY
       end
     end
+
+    sub_test_case("special characters") do
+      def decompose
+        super(fixture_path("docx", "special-characters.docx"))
+      end
+
+      def test_body
+        assert_equal([<<-BODY], decompose.collect(&:body))
+Ampersand: &
+Reference: &amp;
+HTML: <a href="">
+Single quote: ''
+        BODY
+      end
+    end
   end
 end

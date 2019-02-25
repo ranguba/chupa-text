@@ -14,6 +14,7 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
+require "cgi/util"
 require "rexml/parsers/sax2parser"
 require "rexml/sax2listener"
 
@@ -65,7 +66,7 @@ module ChupaText
 
       private
       def parse(io, listener)
-        source = REXML::IOSource.new(io)
+        source = REXML::Source.new(io.read)
         parser = REXML::Parsers::SAX2Parser.new(source)
         parser.listen(listener)
         parser.parse
@@ -99,11 +100,17 @@ module ChupaText
         end
 
         def characters(text)
-          @output << text if @in_target
+          add_text(text)
         end
 
         def cdata(content)
-          @output << content if @in_target
+          add_text(content)
+        end
+
+        private
+        def add_text(text)
+          return unless @in_target
+          @output << CGI.unescapeHTML(text)
         end
       end
 
@@ -164,6 +171,8 @@ module ChupaText
 
         def set_attribute(value)
           return if @name.nil?
+
+          value = CGI.unescapeHTML(value)
           case @type
           when :w3cdtf
             value = Time.xmlschema(value)
