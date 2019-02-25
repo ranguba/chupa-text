@@ -33,7 +33,7 @@ module ChupaText
       MIME_TYPES = [
         "application/vnd.oasis.opendocument.text",
         "application/vnd.oasis.opendocument.spreadsheet",
-        "application/vnd.oasis.opendocument.presentation ",
+        "application/vnd.oasis.opendocument.presentation",
       ]
       def target?(data)
         EXTENSIONS.include?(data.extension) or
