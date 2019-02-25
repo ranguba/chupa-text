@@ -66,7 +66,7 @@ module ChupaText
         slides.each_with_index do |slide, i|
           text = slide[:text]
           text_data = TextData.new(text, source_data: data)
-          text_data["nth_slide"] = i
+          text_data["index"] = i
           yield(text_data)
         end
       end

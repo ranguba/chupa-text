@@ -94,11 +94,14 @@ class TestDecomposersOpenDocumentPresentation < Test::Unit::TestCase
 
       def test_body
         assert_equal([
-                       "",
-                       "Slide1 title\n" +
-                       "Slide1 content\n",
+                       [nil, ""],
+                       [
+                         0,
+                         "Slide1 title\n" +
+                         "Slide1 content\n",
+                       ],
                      ],
-                     decompose.collect(&:body))
+                     decompose.collect {|data| [data["index"], data.body]})
       end
     end
 
@@ -109,15 +112,24 @@ class TestDecomposersOpenDocumentPresentation < Test::Unit::TestCase
 
       def test_body
         assert_equal([
-                       "",
-                       "Slide1 title\n" +
-                       "Slide1 content\n",
-                       "Slide2 title\n" +
-                       "Slide2 content\n",
-                       "Slide3 title\n" +
-                       "Slide3 content\n",
+                       [nil, ""],
+                       [
+                         0,
+                         "Slide1 title\n" +
+                         "Slide1 content\n",
+                       ],
+                       [
+                         1,
+                         "Slide2 title\n" +
+                         "Slide2 content\n",
+                       ],
+                       [
+                         2,
+                         "Slide3 title\n" +
+                         "Slide3 content\n",
+                       ],
                      ],
-                     decompose.collect(&:body))
+                     decompose.collect {|data| [data["index"], data.body]})
       end
     end
   end
