@@ -23,10 +23,21 @@ module ChupaText
 
       def initialize(options={})
         super
-        @extension = "docx"
-        @mime_type = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        @extensions = [
+          "docx",
+          "docm",
+          "dotx",
+          "dotm",
+        ]
+        @mime_types = [
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+          "application/vnd.ms-word.document.macroEnabled.12",
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.template",
+          "application/vnd.ms-word.template.macroEnabled.12",
+        ]
         @path = "word/document.xml"
-        @namespace_uri = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+        @namespace_uri =
+          "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
       end
     end
   end

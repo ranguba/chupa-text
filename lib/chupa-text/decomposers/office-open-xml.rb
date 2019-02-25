@@ -24,7 +24,8 @@ module ChupaText
   module Decomposers
     class OfficeOpenXML < Decomposer
       def target?(data)
-        data.extension == @extension or data.mime_type == @mime_type
+        @extensions.include?(data.extension) or
+          @mime_types.include?(data.mime_type)
       end
 
       def target_score(data)
@@ -36,7 +37,7 @@ module ChupaText
       end
 
       def decompose(data)
-        text = nil
+        texts = []
         attributes = {}
         data.open do |input|
           Archive::Zip.open(input) do |zip|
@@ -44,9 +45,7 @@ module ChupaText
               next unless entry.file?
               case entry.zip_path
               when @path
-                text = ""
-                listener = TextListener.new(text, @namespace_uri)
-                parse(entry.file_data, listener)
+                extract_text(entry, texts)
               when "docProps/app.xml"
                 listener = AttributesListener.new(attributes)
                 parse(entry.file_data, listener)
@@ -57,6 +56,7 @@ module ChupaText
             end
           end
         end
+        text = accumulate_texts(texts)
         text_data = TextData.new(text, source_data: data)
         attributes.each do |name, value|
           text_data[name] = value
@@ -70,6 +70,15 @@ module ChupaText
         parser = REXML::Parsers::SAX2Parser.new(source)
         parser.listen(listener)
         parser.parse
+      end
+
+      def extract_text(entry, texts)
+        listener = TextListener.new(texts, @namespace_uri)
+        parse(entry.file_data, listener)
+      end
+
+      def accumulate_texts(texts)
+        texts.join("")
       end
 
       class TextListener
