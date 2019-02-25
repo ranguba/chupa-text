@@ -43,21 +43,24 @@ module ChupaText
           "application/vnd.openxmlformats-officedocument.presentationml.slide",
           "application/vnd.ms-powerpoint.slide.macroEnabled.12",
         ]
-        @path = /\Appt\/slides\/slide\d+\.xml/
         @namespace_uri =
           "http://schemas.openxmlformats.org/drawingml/2006/main"
       end
 
       private
-      def extract_text(entry, texts)
-        text = ""
-        super(entry, text)
-        nth_slide = Integer(entry.zip_path.scan(/(\d+)\.xml\z/)[0][0], 10)
-        texts << [nth_slide, text]
+      def process_entry(entry, context)
+        case entry.zip_path
+        when /\Appt\/slides\/slide(\d+)\.xml/
+          nth_slide = Integer($1, 10)
+          slide_text = ""
+          extract_text(entry, slide_text)
+          context[:slides] ||= []
+          context[:slides] << [nth_slide, slide_text]
+        end
       end
 
-      def accumulate_texts(texts)
-        texts.sort_by(&:first).collect(&:last).join("\n")
+      def accumulate_text(context)
+        context[:slides].sort_by(&:first).collect(&:last).join("\n")
       end
     end
   end

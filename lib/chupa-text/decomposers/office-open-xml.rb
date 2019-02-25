@@ -37,28 +37,30 @@ module ChupaText
       end
 
       def decompose(data)
-        texts = []
-        attributes = {}
+        context = {
+          text: "",
+          attributes: {},
+        }
         data.open do |input|
           Archive::Zip.open(input) do |zip|
             zip.each do |entry|
               next unless entry.file?
               case entry.zip_path
-              when @path
-                extract_text(entry, texts)
               when "docProps/app.xml"
-                listener = AttributesListener.new(attributes)
+                listener = AttributesListener.new(context[:attributes])
                 parse(entry.file_data, listener)
               when "docProps/core.xml"
-                listener = AttributesListener.new(attributes)
+                listener = AttributesListener.new(context[:attributes])
                 parse(entry.file_data, listener)
+              else
+                process_entry(entry, context)
               end
             end
           end
         end
-        text = accumulate_texts(texts)
+        text = accumulate_text(context)
         text_data = TextData.new(text, source_data: data)
-        attributes.each do |name, value|
+        context[:attributes].each do |name, value|
           text_data[name] = value
         end
         yield(text_data)
@@ -77,8 +79,8 @@ module ChupaText
         parse(entry.file_data, listener)
       end
 
-      def accumulate_texts(texts)
-        texts.join("")
+      def accumulate_text(context)
+        context[:text]
       end
 
       class TextListener
@@ -99,10 +101,10 @@ module ChupaText
         end
 
         def end_element(uri, local_name, qname)
+          @in_target = false
+
           return unless uri == @target_uri
           case local_name
-          when "t"
-            @in_target = false
           when "p", "br"
             @output << "\n"
           end

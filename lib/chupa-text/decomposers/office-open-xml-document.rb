@@ -35,9 +35,16 @@ module ChupaText
           "application/vnd.openxmlformats-officedocument.wordprocessingml.template",
           "application/vnd.ms-word.template.macroEnabled.12",
         ]
-        @path = "word/document.xml"
         @namespace_uri =
           "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+      end
+
+      private
+      def process_entry(entry, context)
+        case entry.zip_path
+        when "word/document.xml"
+          extract_text(entry, context[:text])
+        end
       end
     end
   end
