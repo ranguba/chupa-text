@@ -27,11 +27,9 @@ module ChupaText
 
       EXTENSIONS = [
         "odt",
-        "ods",
       ]
       MIME_TYPES = [
         "application/vnd.oasis.opendocument.text",
-        "application/vnd.oasis.opendocument.spreadsheet",
       ]
       def target?(data)
         EXTENSIONS.include?(data.extension) or

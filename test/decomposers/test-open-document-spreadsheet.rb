@@ -18,7 +18,7 @@ class TestDecomposersOpenDocumentSpreadsheet < Test::Unit::TestCase
   include Helper
 
   def setup
-    @decomposer = ChupaText::Decomposers::OpenDocument.new({})
+    @decomposer = ChupaText::Decomposers::OpenDocumentSpreadsheet.new({})
   end
 
   def decompose(path)
@@ -48,46 +48,34 @@ class TestDecomposersOpenDocumentSpreadsheet < Test::Unit::TestCase
   sub_test_case("#decompose") do
     sub_test_case("attributes") do
       def decompose(attribute_name)
-        super(fixture_path("ods", "attributes.ods")).collect do |data|
-          data[attribute_name]
-        end
+        super(fixture_path("ods", "attributes.ods")).first[attribute_name]
       end
 
       def test_title
-        assert_equal(["Title"], decompose("title"))
-      end
-
-      def test_author
-        assert_equal([nil], decompose("author"))
+        assert_equal("Title", decompose("title"))
       end
 
       def test_subject
-        assert_equal(["Subject"], decompose("subject"))
+        assert_equal("Subject", decompose("subject"))
       end
 
       def test_keywords
-        assert_equal([["Keyword1", "Keyword2"]], decompose("keywords"))
+        assert_equal(["Keyword1", "Keyword2"], decompose("keywords"))
       end
 
       def test_created_time
-        assert_equal([Time],
-                     decompose("created_time").collect(&:class))
+        assert_equal(Time,
+                     decompose("created_time").class)
       end
 
       def test_modified_time
-        assert_equal([Time],
-                     decompose("modified_time").collect(&:class))
+        assert_equal(Time,
+                     decompose("modified_time").class)
       end
 
       def test_generator
-        assert_equal(["LibreOffice"],
-                     normalize_generators(decompose("generator")))
-      end
-
-      def normalize_generators(generators)
-        generators.collect do |generator|
-          normalize_generator(generator)
-        end
+        assert_equal("LibreOffice",
+                     normalize_generator(decompose("generator")))
       end
 
       def normalize_generator(generator)
@@ -97,41 +85,67 @@ class TestDecomposersOpenDocumentSpreadsheet < Test::Unit::TestCase
           generator
         end
       end
-
-      def test_creation_date
-        assert_equal([nil], decompose("creation_date"))
-      end
     end
 
     sub_test_case("one sheet") do
       def decompose
-        super(fixture_path("ods", "one-sheet.ods"))
+        super(fixture_path("ods", "one-sheet.ods")).collect do |data|
+          [
+            data["index"],
+            data["name"],
+            data.body,
+          ]
+        end
       end
 
       def test_body
-        assert_equal([<<-BODY], decompose.collect(&:body))
-Sheet1 - A1\tSheet1 - B1
-Sheet1 - A2\tSheet1 - B2
-        BODY
+        assert_equal([
+                       [nil, nil, ""],
+                       [
+                         0,
+                         "Sheet1",
+                         "Sheet1 - A1\tSheet1 - B1\n" +
+                         "Sheet1 - A2\tSheet1 - B2\n",
+                       ],
+                     ],
+                     decompose)
       end
     end
 
     sub_test_case("multi sheets") do
       def decompose
-        super(fixture_path("ods", "multi-sheets.ods"))
+        super(fixture_path("ods", "multi-sheets.ods")).collect do |data|
+          [
+            data["index"],
+            data["name"],
+            data.body,
+          ]
+        end
       end
 
       def test_body
-        assert_equal([<<-BODY], decompose.collect(&:body))
-Sheet1 - A1\tSheet1 - B1
-Sheet1 - A2\tSheet1 - B2
-
-Sheet2 - A1\tSheet2 - B1
-Sheet2 - A2\tSheet2 - B2
-
-Sheet3 - A1\tSheet3 - B1
-Sheet3 - A2\tSheet3 - B2
-        BODY
+        assert_equal([
+                       [nil, nil, ""],
+                       [
+                         0,
+                         "Sheet1",
+                         "Sheet1 - A1\tSheet1 - B1\n" +
+                         "Sheet1 - A2\tSheet1 - B2\n",
+                       ],
+                       [
+                         1,
+                         "Sheet2",
+                         "Sheet2 - A1\tSheet2 - B1\n" +
+                         "Sheet2 - A2\tSheet2 - B2\n",
+                       ],
+                       [
+                         2,
+                         "Sheet3",
+                         "Sheet3 - A1\tSheet3 - B1\n" +
+                         "Sheet3 - A2\tSheet3 - B2\n",
+                       ],
+                     ],
+                     decompose)
       end
     end
   end
