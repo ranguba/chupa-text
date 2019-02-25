@@ -28,12 +28,10 @@ module ChupaText
       EXTENSIONS = [
         "odt",
         "ods",
-        "odp",
       ]
       MIME_TYPES = [
         "application/vnd.oasis.opendocument.text",
         "application/vnd.oasis.opendocument.spreadsheet",
-        "application/vnd.oasis.opendocument.presentation",
       ]
       def target?(data)
         EXTENSIONS.include?(data.extension) or
@@ -102,6 +100,8 @@ module ChupaText
         end
 
         def end_element(uri, local_name, qname)
+          @in_p = false
+
           return unless uri == TEXT_URI
           case local_name
           when "p"

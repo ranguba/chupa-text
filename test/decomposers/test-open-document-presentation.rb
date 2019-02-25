@@ -18,7 +18,7 @@ class TestDecomposersOpenDocumentPresentation < Test::Unit::TestCase
   include Helper
 
   def setup
-    @decomposer = ChupaText::Decomposers::OpenDocument.new({})
+    @decomposer = ChupaText::Decomposers::OpenDocumentPresentation.new({})
   end
 
   def decompose(path)
@@ -48,46 +48,34 @@ class TestDecomposersOpenDocumentPresentation < Test::Unit::TestCase
   sub_test_case("#decompose") do
     sub_test_case("attributes") do
       def decompose(attribute_name)
-        super(fixture_path("odp", "attributes.odp")).collect do |data|
-          data[attribute_name]
-        end
+        super(fixture_path("odp", "attributes.odp")).first[attribute_name]
       end
 
       def test_title
-        assert_equal(["Title"], decompose("title"))
-      end
-
-      def test_author
-        assert_equal([nil], decompose("author"))
+        assert_equal("Title", decompose("title"))
       end
 
       def test_subject
-        assert_equal(["Subject"], decompose("subject"))
+        assert_equal("Subject", decompose("subject"))
       end
 
       def test_keywords
-        assert_equal([["Keyword1", "Keyword2"]], decompose("keywords"))
+        assert_equal(["Keyword1", "Keyword2"], decompose("keywords"))
       end
 
       def test_created_time
-        assert_equal([Time],
-                     decompose("created_time").collect(&:class))
+        assert_equal(Time,
+                     decompose("created_time").class)
       end
 
       def test_modified_time
-        assert_equal([Time],
-                     decompose("modified_time").collect(&:class))
+        assert_equal(Time,
+                     decompose("modified_time").class)
       end
 
       def test_generator
-        assert_equal(["LibreOffice"],
-                     normalize_generators(decompose("generator")))
-      end
-
-      def normalize_generators(generators)
-        generators.collect do |generator|
-          normalize_generator(generator)
-        end
+        assert_equal("LibreOffice",
+                     normalize_generator(decompose("generator")))
       end
 
       def normalize_generator(generator)
@@ -97,10 +85,6 @@ class TestDecomposersOpenDocumentPresentation < Test::Unit::TestCase
           generator
         end
       end
-
-      def test_creation_date
-        assert_equal([nil], decompose("creation_date"))
-      end
     end
 
     sub_test_case("one slide") do
@@ -109,10 +93,12 @@ class TestDecomposersOpenDocumentPresentation < Test::Unit::TestCase
       end
 
       def test_body
-        assert_equal([<<-BODY], decompose.collect(&:body))
-Slide1 title
-Slide1 content
-        BODY
+        assert_equal([
+                       "",
+                       "Slide1 title\n" +
+                       "Slide1 content\n",
+                     ],
+                     decompose.collect(&:body))
       end
     end
 
@@ -122,16 +108,16 @@ Slide1 content
       end
 
       def test_body
-        assert_equal([<<-BODY], decompose.collect(&:body))
-Slide1 title
-Slide1 content
-
-Slide2 title
-Slide2 content
-
-Slide3 title
-Slide3 content
-        BODY
+        assert_equal([
+                       "",
+                       "Slide1 title\n" +
+                       "Slide1 content\n",
+                       "Slide2 title\n" +
+                       "Slide2 content\n",
+                       "Slide3 title\n" +
+                       "Slide3 content\n",
+                     ],
+                     decompose.collect(&:body))
       end
     end
   end
