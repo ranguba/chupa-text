@@ -30,6 +30,14 @@ module ChupaText
       raise NotImplementedError, "must implement #{self.class}\##{__method__}"
     end
 
+    def target_score(data)
+      if target?(data)
+        0
+      else
+        nil
+      end
+    end
+
     def decompose(data)
       raise NotImplementedError, "must implement #{self.class}\##{__method__}"
     end

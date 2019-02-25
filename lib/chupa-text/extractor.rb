@@ -99,9 +99,15 @@ module ChupaText
     end
 
     def find_decomposer(data)
-      @decomposers.find do |decomposer|
-        decomposer.target?(data)
+      candidates = []
+      @decomposers.each do |decomposer|
+        score = decomposer.target_score(data)
+        next if score.nil?
+        candidates << [score, decomposer]
       end
+      return nil if candidates.empty?
+      candidate = candidates.sort_by {|score, _| score}.first
+      candidate[1]
     end
 
     def log_tag
