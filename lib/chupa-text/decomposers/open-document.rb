@@ -23,17 +23,9 @@ require "archive/zip"
 module ChupaText
   module Decomposers
     class OpenDocument < Decomposer
-      registry.register("open-document", self)
-
-      EXTENSIONS = [
-        "odt",
-      ]
-      MIME_TYPES = [
-        "application/vnd.oasis.opendocument.text",
-      ]
       def target?(data)
-        EXTENSIONS.include?(data.extension) or
-          MIME_TYPES.include?(data.mime_type)
+        data.extension == @extension or
+          data.mime_type == @mime_type
       end
 
       def target_score(data)
@@ -44,9 +36,9 @@ module ChupaText
         end
       end
 
-      def decompose(data)
+      def decompose(data, &block)
         context = {
-          text: "",
+          data: data,
           attributes: {},
         }
         data.open do |input|
@@ -55,21 +47,14 @@ module ChupaText
               next unless entry.file?
               case entry.zip_path
               when "content.xml"
-                listener = TextListener.new(context[:text])
-                parse(entry.file_data, listener)
+                process_content(entry, context, &block)
               when "meta.xml"
-                listener = AttributesListener.new(context[:attributes])
-                parse(entry.file_data, listener)
+                process_meta(entry, context, &block)
               end
             end
           end
         end
-        text = context[:text]
-        text_data = TextData.new(text, source_data: data)
-        context[:attributes].each do |name, value|
-          text_data[name] = value
-        end
-        yield(text_data)
+        finish_decompose(context, &block)
       end
 
       private
@@ -80,46 +65,9 @@ module ChupaText
         parser.parse
       end
 
-      class TextListener
-        include REXML::SAX2Listener
-
-        TEXT_URI = "urn:oasis:names:tc:opendocument:xmlns:text:1.0"
-        def initialize(output)
-          @output = output
-          @in_p = false
-        end
-
-        def start_element(uri, local_name, qname, attributes)
-          return unless uri == TEXT_URI
-          case local_name
-          when "p"
-            @in_p = true
-          end
-        end
-
-        def end_element(uri, local_name, qname)
-          @in_p = false
-
-          return unless uri == TEXT_URI
-          case local_name
-          when "p"
-            @output << "\n"
-          end
-        end
-
-        def characters(text)
-          add_text(text)
-        end
-
-        def cdata(content)
-          add_text(content)
-        end
-
-        private
-        def add_text(text)
-          return unless @in_p
-          @output << CGI.unescapeHTML(text)
-        end
+      def process_meta(entry, context, &block)
+        listener = AttributesListener.new(context[:attributes])
+        parse(entry.file_data, listener)
       end
 
       class AttributesListener

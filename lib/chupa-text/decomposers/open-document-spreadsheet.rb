@@ -27,58 +27,28 @@ module ChupaText
         @mime_type = "application/vnd.oasis.opendocument.spreadsheet"
       end
 
-      def target?(data)
-        data.extension == @extension or
-          data.mime_type == @mime_type
+      private
+      def process_content(entry, context, &block)
+        context[:sheets] = []
+        listener = SheetsListener.new(context[:sheets])
+        parse(entry.file_data, listener)
       end
 
-      def target_score(data)
-        if target?(data)
-          -1
-        else
-          nil
+      def finish_decompose(context, &block)
+        metadata = TextData.new("", source_data: context[:data])
+        context[:attributes].each do |name, value|
+          metadata[name] = value
         end
-      end
+        yield(metadata)
 
-      def decompose(data)
-        sheets = []
-        data.open do |input|
-          Archive::Zip.open(input) do |zip|
-            zip.each do |entry|
-              next unless entry.file?
-              case entry.zip_path
-              when "content.xml"
-                listener = SheetsListener.new(sheets)
-                parse(entry.file_data, listener)
-              when "meta.xml"
-                attributes = {}
-                listener = AttributesListener.new(attributes)
-                parse(entry.file_data, listener)
-                metadata = TextData.new("", source_data: data)
-                attributes.each do |name, value|
-                  metadata[name] = value
-                end
-                yield(metadata)
-              end
-            end
-          end
-        end
-        sheets.each_with_index do |sheet, i|
+        (context[:sheets] || []).each_with_index do |sheet, i|
           text = sheet[:text]
-          text_data = TextData.new(text, source_data: data)
+          text_data = TextData.new(text, source_data: context[:data])
           text_data["index"] = i
           name = sheet[:name]
           text_data["name"] = name if name
           yield(text_data)
         end
-      end
-
-      private
-      def parse(io, listener)
-        source = REXML::Source.new(io.read)
-        parser = REXML::Parsers::SAX2Parser.new(source)
-        parser.listen(listener)
-        parser.parse
       end
 
       class SheetsListener

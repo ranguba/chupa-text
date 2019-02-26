@@ -18,7 +18,7 @@ class TestDecomposersOpenDocumentText < Test::Unit::TestCase
   include Helper
 
   def setup
-    @decomposer = ChupaText::Decomposers::OpenDocument.new({})
+    @decomposer = ChupaText::Decomposers::OpenDocumentText.new({})
   end
 
   def decompose(path)
