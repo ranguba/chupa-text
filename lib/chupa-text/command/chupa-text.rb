@@ -46,6 +46,7 @@ module ChupaText
         @uri = nil
         @mime_type = nil
         @format = :json
+        @mime_formatter_options = {}
         @need_screenshot = true
         @expected_screenshot_size = [200, 200]
       end
@@ -126,6 +127,11 @@ module ChupaText
                   "[#{AVAILABLE_FORMATS.join(', ')}]",
                   "(default: #{@format})") do |format|
           @format = format
+        end
+        parser.on("--mime-boundary=BOUNDARY",
+                  "Use BOUNDARY for MIME boundary.",
+                  "(default: Use SHA1 digest of URI)") do |boundary|
+          @mime_formatter_options[:boundary] = boundary
         end
         parser.on("--[no-]need-screenshot",
                   "Generate screenshot if available.",
@@ -220,7 +226,7 @@ module ChupaText
         when :text
           Formatters::Text.new($stdout)
         when :mime
-          Formatters::MIME.new($stdout)
+          Formatters::MIME.new($stdout, @mime_formatter_options)
         end
       end
     end

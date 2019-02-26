@@ -22,9 +22,10 @@ require "chupa-text/formatters/hash"
 module ChupaText
   module Formatters
     class MIME < Hash
-      def initialize(output)
+      def initialize(output, options={})
         super()
         @output = output
+        @boundary = options[:boundary]
       end
 
       def format_finish(data)
@@ -33,7 +34,7 @@ module ChupaText
         @output << "MIME-Version: 1.0\r\n"
         format_hash(formatted, ["texts"])
         texts = formatted["texts"]
-        boundary = Digest::SHA1.hexdigest(data.uri.to_s)
+        boundary = @boundary || Digest::SHA1.hexdigest(data.uri.to_s)
         @output << "Content-Type: multipart/mixed; boundary=#{boundary}\r\n"
         texts.each do |text|
           @output << "\r\n--#{boundary}\r\n"
