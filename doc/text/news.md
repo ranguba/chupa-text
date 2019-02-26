@@ -1,5 +1,17 @@
 # News
 
+## 1.1.4: 2019-02-26
+
+### Improvements
+
+  * Added support for decomposer selection by score.
+
+  * Added support for Office Open XML.
+
+  * Added support for OpenDocument.
+
+  * `chupa-text`: Added `--mime-boundary` option.
+
 ## 1.1.3: 2018-07-18
 
 ### Improvements
