@@ -14,59 +14,75 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-require "chupa-text/decomposers/open-document"
+require "chupa-text/decomposers/opendocument"
 
 module ChupaText
   module Decomposers
-    class OpenDocumentText < OpenDocument
-      registry.register("open-document-text", self)
+    class OpenDocumentPresentation < OpenDocument
+      registry.register("opendocument-presentation", self)
 
       def initialize(options={})
         super
-        @extension = "odt"
-        @mime_type = "application/vnd.oasis.opendocument.text"
+        @extension = "odp"
+        @mime_type = "application/vnd.oasis.opendocument.presentation"
       end
 
       private
       def process_content(entry, context, &block)
-        context[:text] = ""
-        listener = TextListener.new(context[:text])
+        context[:slides] = []
+        listener = SlidesListener.new(context[:slides])
         parse(entry.file_data, listener)
       end
 
       def finish_decompose(context, &block)
-        text_data = TextData.new(context[:text] || "",
-                                 source_data: context[:data])
+        metadata = TextData.new("", source_data: context[:data])
         context[:attributes].each do |name, value|
-          text_data[name] = value
+          metadata[name] = value
         end
-        yield(text_data)
+        yield(metadata)
+
+        (context[:slides] || []).each_with_index do |slide, i|
+          text = slide[:text]
+          text_data = TextData.new(text, source_data: context[:data])
+          text_data["index"] = i
+          yield(text_data)
+        end
       end
 
-      class TextListener
+      class SlidesListener
         include REXML::SAX2Listener
 
         TEXT_URI = "urn:oasis:names:tc:opendocument:xmlns:text:1.0"
-        def initialize(output)
-          @output = output
+        DRAW_URI = "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
+
+        def initialize(slides)
+          @slides = slides
           @in_p = false
         end
 
         def start_element(uri, local_name, qname, attributes)
-          return unless uri == TEXT_URI
-          case local_name
-          when "p"
-            @in_p = true
+          case uri
+          when TEXT_URI
+            case local_name
+            when "p"
+              @in_p = true
+            end
+          when DRAW_URI
+            case local_name
+            when "page"
+              @slides << {text: ""}
+            end
           end
         end
 
         def end_element(uri, local_name, qname)
           @in_p = false
-
-          return unless uri == TEXT_URI
-          case local_name
-          when "p"
-            @output << "\n"
+          case uri
+          when TEXT_URI
+            case local_name
+            when "p"
+              @slides.last[:text] << "\n"
+            end
           end
         end
 
@@ -81,7 +97,7 @@ module ChupaText
         private
         def add_text(text)
           return unless @in_p
-          @output << CGI.unescapeHTML(text)
+          @slides.last[:text] << CGI.unescapeHTML(text)
         end
       end
     end

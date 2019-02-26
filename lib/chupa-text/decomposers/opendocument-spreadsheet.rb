@@ -14,12 +14,12 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-require "chupa-text/decomposers/open-document"
+require "chupa-text/decomposers/opendocument"
 
 module ChupaText
   module Decomposers
     class OpenDocumentSpreadsheet < OpenDocument
-      registry.register("open-document-spreadsheet", self)
+      registry.register("opendocument-spreadsheet", self)
 
       def initialize(options={})
         super
