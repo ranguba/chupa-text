@@ -1,5 +1,11 @@
 # News
 
+## 1.1.5: 2019-02-28
+
+### Improvements
+
+  * Added support for Nokogiri as an alternative SAX parser.
+
 ## 1.1.4: 2019-02-26
 
 ### Improvements
