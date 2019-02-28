@@ -49,9 +49,7 @@ module ChupaText
         end
       end
 
-      class SlidesListener
-        include REXML::SAX2Listener
-
+      class SlidesListener < SAXListener
         TEXT_URI = "urn:oasis:names:tc:opendocument:xmlns:text:1.0"
         DRAW_URI = "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
 
@@ -97,7 +95,7 @@ module ChupaText
         private
         def add_text(text)
           return unless @in_p
-          @slides.last[:text] << CGI.unescapeHTML(text)
+          @slides.last[:text] << text
         end
       end
     end

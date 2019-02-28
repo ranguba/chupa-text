@@ -14,11 +14,9 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-require "cgi/util"
-require "rexml/parsers/sax2parser"
-require "rexml/sax2listener"
-
 require "archive/zip"
+
+require "chupa-text/sax-parser"
 
 module ChupaText
   module Decomposers
@@ -58,10 +56,8 @@ module ChupaText
       end
 
       private
-      def parse(io, listener)
-        source = REXML::Source.new(io.read)
-        parser = REXML::Parsers::SAX2Parser.new(source)
-        parser.listen(listener)
+      def parse(input, listener)
+        parser = SAXParser.new(input, listener)
         parser.parse
       end
 
@@ -70,9 +66,7 @@ module ChupaText
         parse(entry.file_data, listener)
       end
 
-      class AttributesListener
-        include REXML::SAX2Listener
-
+      class AttributesListener < SAXListener
         META_URI = "urn:oasis:names:tc:opendocument:xmlns:meta:1.0"
         DUBLIN_CORE_URI = "http://purl.org/dc/elements/1.1/"
 
@@ -122,7 +116,6 @@ module ChupaText
         def set_attribute(value)
           return if @name.nil?
 
-          value = CGI.unescapeHTML(value)
           case @type
           when :w3cdtf
             value = Time.xmlschema(value)

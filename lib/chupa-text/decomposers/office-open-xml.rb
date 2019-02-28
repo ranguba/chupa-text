@@ -14,11 +14,9 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-require "cgi/util"
-require "rexml/parsers/sax2parser"
-require "rexml/sax2listener"
-
 require "archive/zip"
+
+require "chupa-text/sax-parser"
 
 module ChupaText
   module Decomposers
@@ -67,10 +65,8 @@ module ChupaText
       end
 
       private
-      def parse(io, listener)
-        source = REXML::Source.new(io.read)
-        parser = REXML::Parsers::SAX2Parser.new(source)
-        parser.listen(listener)
+      def parse(input, listener)
+        parser = SAXParser.new(input, listener)
         parser.parse
       end
 
@@ -83,9 +79,7 @@ module ChupaText
         context[:text]
       end
 
-      class TextListener
-        include REXML::SAX2Listener
-
+      class TextListener < SAXListener
         def initialize(output, target_uri)
           @output = output
           @target_uri = target_uri
@@ -121,13 +115,11 @@ module ChupaText
         private
         def add_text(text)
           return unless @in_target
-          @output << CGI.unescapeHTML(text)
+          @output << text
         end
       end
 
-      class AttributesListener
-        include REXML::SAX2Listener
-
+      class AttributesListener < SAXListener
         CORE_PROPERTIES_URI =
           "http://schemas.openxmlformats.org/package/2006/metadata/core-properties"
         EXTENDED_PROPERTIES_URI =

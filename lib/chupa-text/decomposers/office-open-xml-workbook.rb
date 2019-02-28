@@ -71,9 +71,7 @@ module ChupaText
         sheet_texts.join("\n")
       end
 
-      class SheetListener
-        include REXML::SAX2Listener
-
+      class SheetListener < SAXListener
         URI = "http://schemas.openxmlformats.org/spreadsheetml/2006/main"
 
         def initialize(sheet)

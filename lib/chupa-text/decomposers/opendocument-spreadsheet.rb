@@ -51,9 +51,7 @@ module ChupaText
         end
       end
 
-      class SheetsListener
-        include REXML::SAX2Listener
-
+      class SheetsListener < SAXListener
         TEXT_URI = "urn:oasis:names:tc:opendocument:xmlns:text:1.0"
         TABLE_URI = "urn:oasis:names:tc:opendocument:xmlns:table:1.0"
 
@@ -126,7 +124,7 @@ module ChupaText
         private
         def add_text(text)
           return unless @in_p
-          @sheets.last[:rows].last.last[:text] << CGI.unescapeHTML(text)
+          @sheets.last[:rows].last.last[:text] << text
         end
       end
     end

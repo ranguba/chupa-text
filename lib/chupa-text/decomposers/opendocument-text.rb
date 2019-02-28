@@ -43,9 +43,7 @@ module ChupaText
         yield(text_data)
       end
 
-      class TextListener
-        include REXML::SAX2Listener
-
+      class TextListener < SAXListener
         TEXT_URI = "urn:oasis:names:tc:opendocument:xmlns:text:1.0"
         def initialize(output)
           @output = output
@@ -81,7 +79,7 @@ module ChupaText
         private
         def add_text(text)
           return unless @in_p
-          @output << CGI.unescapeHTML(text)
+          @output << text
         end
       end
     end
