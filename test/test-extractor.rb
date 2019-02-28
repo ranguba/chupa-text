@@ -130,6 +130,69 @@ class TestExtractor < Test::Unit::TestCase
         assert_equal(["こんにちは"], extract(data))
       end
 
+      def test_utf8_ascii_8bit
+        data = ChupaText::Data.new
+        data.mime_type = "text/plain"
+        data.body = "こんにちは".b
+        assert_equal(["こんにちは"], extract(data))
+      end
+
+      def test_utf16_le
+        data = ChupaText::Data.new
+        data.mime_type = "text/plain"
+        data.body = "こんにちは".encode("UTF-16LE")
+        assert_equal(["こんにちは"], extract(data))
+      end
+
+      def test_utf16_le_ascii_8bit
+        data = ChupaText::Data.new
+        data.mime_type = "text/plain"
+        data.body = "\ufeffこんにちは".encode("UTF-16LE").b
+        assert_equal(["こんにちは"], extract(data))
+      end
+
+      def test_utf16_be
+        data = ChupaText::Data.new
+        data.mime_type = "text/plain"
+        data.body = "こんにちは".encode("UTF-16BE")
+        assert_equal(["こんにちは"], extract(data))
+      end
+
+      def test_utf16_be_ascii_8bit
+        data = ChupaText::Data.new
+        data.mime_type = "text/plain"
+        data.body = "\ufeffこんにちは".encode("UTF-16BE").b
+        assert_equal(["こんにちは"], extract(data))
+      end
+
+      def test_utf32_le
+        data = ChupaText::Data.new
+        data.mime_type = "text/plain"
+        data.body = "こんにちは".encode("UTF-32LE")
+        assert_equal(["こんにちは"], extract(data))
+      end
+
+      def test_utf32_le_ascii_8bit
+        data = ChupaText::Data.new
+        data.mime_type = "text/plain"
+        data.body = "\ufeffこんにちは".encode("UTF-32LE").b
+        assert_equal(["こんにちは"], extract(data))
+      end
+
+      def test_utf32_be
+        data = ChupaText::Data.new
+        data.mime_type = "text/plain"
+        data.body = "こんにちは".encode("UTF-32BE")
+        assert_equal(["こんにちは"], extract(data))
+      end
+
+      def test_utf32_be_ascii_8bit
+        data = ChupaText::Data.new
+        data.mime_type = "text/plain"
+        data.body = "\ufeffこんにちは".encode("UTF-32BE").b
+        assert_equal(["こんにちは"], extract(data))
+      end
+
       def test_cp932
         data = ChupaText::Data.new
         data.mime_type = "text/plain"
@@ -137,10 +200,24 @@ class TestExtractor < Test::Unit::TestCase
         assert_equal(["こんにちは"], extract(data))
       end
 
+      def test_cp932_ascii_8bit
+        data = ChupaText::Data.new
+        data.mime_type = "text/plain"
+        data.body = "こんにちは".encode("cp932").b
+        assert_equal(["こんにちは"], extract(data))
+      end
+
       def test_euc_jp
         data = ChupaText::Data.new
         data.mime_type = "text/plain"
         data.body = "こんにちは".encode("euc-jp")
+        assert_equal(["こんにちは"], extract(data))
+      end
+
+      def test_euc_jp_ascii_8bit
+        data = ChupaText::Data.new
+        data.mime_type = "text/plain"
+        data.body = "こんにちは".encode("euc-jp").b
         assert_equal(["こんにちは"], extract(data))
       end
     end
