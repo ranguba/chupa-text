@@ -68,11 +68,13 @@ module ChupaText
         if decomposer.nil?
           if target.text_plain?
             debug {"#{log_tag}[extract][text-plain]"}
-            yield(target)
+            yield(ensure_utf8_body_data(target))
             next
           else
             debug {"#{log_tag}[extract][decomposer] not found"}
-            yield(target) if target.text?
+            if target.text?
+              yield(ensure_utf8_body_data(target))
+            end
             next
           end
         end
@@ -96,6 +98,36 @@ module ChupaText
       else
         InputData.new(input)
       end
+    end
+
+    def ensure_utf8_body_data(data)
+      body = data.body
+      return dat if body.nil?
+
+      encoding = body.encoding
+      case encoding
+      when Encoding::UTF_8
+        return data
+      when Encoding::ASCII_8BIT
+        return data if body.ascii_only?
+      end
+
+      candidates = [
+        Encoding::UTF_8,
+        Encoding::EUC_JP,
+        Encoding::Windows_31J,
+      ]
+      candidates.each do |candidate|
+        body.force_encoding(candidate)
+        if body.valid_encoding?
+          utf8_body = body.encode(Encoding::UTF_8,
+                                  invalid: :replace,
+                                  undef: :replace)
+          return TextData.new(utf8_body, source_data: data)
+        end
+      end
+      body.encoding = encoding
+      data
     end
 
     def find_decomposer(data)

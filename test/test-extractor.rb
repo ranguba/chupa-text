@@ -1,4 +1,4 @@
-# Copyright (C) 2013  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2019  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -119,6 +119,29 @@ class TestExtractor < Test::Unit::TestCase
         data.mime_type = "text/x-plain"
         data.body = "Hello"
         assert_equal(["Hello", "Hello"], extract(data))
+      end
+    end
+
+    sub_test_case("body") do
+      def test_utf8
+        data = ChupaText::Data.new
+        data.mime_type = "text/plain"
+        data.body = "こんにちは"
+        assert_equal(["こんにちは"], extract(data))
+      end
+
+      def test_cp932
+        data = ChupaText::Data.new
+        data.mime_type = "text/plain"
+        data.body = "こんにちは".encode("cp932")
+        assert_equal(["こんにちは"], extract(data))
+      end
+
+      def test_euc_jp
+        data = ChupaText::Data.new
+        data.mime_type = "text/plain"
+        data.body = "こんにちは".encode("euc-jp")
+        assert_equal(["こんにちは"], extract(data))
       end
     end
   end
