@@ -107,9 +107,33 @@ module ChupaText
       encoding = body.encoding
       case encoding
       when Encoding::UTF_8
-        return data
+        bom_size, bom_encoding = detect_bom(body)
+        if bom_size
+          body_without_bom = body.byteslice(bom_size,
+                                            body.byteslice - bom_size)
+          return TextData.new(body_without_bom, source_data: data)
+        else
+          return data
+        end
       when Encoding::ASCII_8BIT
         return data if body.ascii_only?
+      else
+        utf8_body = body.encode(Encoding::UTF_8,
+                                invalid: :replace,
+                                undef: :replace,
+                                replace: "")
+        return TextData.new(utf8_body, source_data: data)
+      end
+
+      bom_size, bom_encoding = detect_bom(body)
+      if bom_encoding
+        body_without_bom = body.byteslice(bom_size, body.bytesize - bom_size)
+        utf8_body = body_without_bom.encode(Encoding::UTF_8,
+                                            bom_encoding,
+                                            invalid: :replace,
+                                            undef: :replace,
+                                            replace: "")
+        return TextData.new(utf8_body, source_data: data)
       end
 
       candidates = [
@@ -122,12 +146,41 @@ module ChupaText
         if body.valid_encoding?
           utf8_body = body.encode(Encoding::UTF_8,
                                   invalid: :replace,
-                                  undef: :replace)
+                                  undef: :replace,
+                                  replace: "")
           return TextData.new(utf8_body, source_data: data)
         end
       end
-      body.encoding = encoding
+      body.force_encoding(encoding)
       data
+    end
+
+    UTF_8_BOM = "\xef\xbb\xbf".b
+    UTF_16BE_BOM = "\xfe\xff".b
+    UTF_16LE_BOM = "\xff\xfe".b
+    UTF_32BE_BOM = "\x00\x00\xfe\xff".b
+    UTF_32LE_BOM = "\xff\xfe\x00\x00".b
+    def detect_bom(text)
+      case text.byteslice(0, 4).b
+      when UTF_32BE_BOM
+        return 4, Encoding::UTF_32BE
+      when UTF_32LE_BOM
+        return 4, Encoding::UTF_32LE
+      end
+
+      case text.byteslice(0, 3).b
+      when UTF_8_BOM
+        return 3, Encoding::UTF_8
+      end
+
+      case text.byteslice(0, 2).b
+      when UTF_16BE_BOM
+        return 2, Encoding::UTF_16BE
+      when UTF_16LE_BOM
+        return 2, Encoding::UTF_16LE
+      end
+
+      nil
     end
 
     def find_decomposer(data)
