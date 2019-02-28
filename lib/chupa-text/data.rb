@@ -203,7 +203,10 @@ module ChupaText
     def guess_mime_type_from_body
       mime_type = nil
       change_encoding(body, "UTF-8") do |utf8_body|
-        mime_type = "text/plain" if utf8_body.valid_encoding?
+        return nil unless utf8_body.valid_encoding?
+        n_null_characters = utf8_body.count("\u0000")
+        return nil if n_null_characters > (utf8_body.bytesize * 0.01)
+        mime_type = "text/plain"
       end
       mime_type
     end

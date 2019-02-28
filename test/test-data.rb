@@ -1,4 +1,4 @@
-# Copyright (C) 2013  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2019  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -44,9 +44,13 @@ class TestData < Test::Unit::TestCase
 
       sub_test_case("body") do
         def test_txt
-          body = "Hello"
-          body.force_encoding("ASCII-8BIT")
+          body = "Hello".b
           assert_equal("text/plain", guess(body))
+        end
+
+        def test_utf8_valid_binary
+          body = "GROONGA:IO:00001@\0\0\0\0\0\0\0\0\0\0".b
+          assert_nil(guess(body))
         end
 
         private
