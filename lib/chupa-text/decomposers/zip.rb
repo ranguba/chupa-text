@@ -1,4 +1,4 @@
-# Copyright (C) 2017  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2017-2019  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -45,13 +45,39 @@ module ChupaText
             end
             entry_uri = data.uri.dup
             base_path = entry_uri.path.gsub(/\.zip\z/i, "")
-            entry_uri.path = "#{base_path}/#{entry.zip_path}"
+            path = convert_path_encoding(entry.zip_path, base_path.encoding)
+            entry_uri.path = "#{base_path}/#{convert_to_uri_path(path)}"
             entry_data = VirtualFileData.new(entry_uri,
                                              entry.file_data,
                                              source_data: data)
             yield(entry_data)
           end
         end
+      end
+
+      private
+      def convert_path_encoding(path, encoding)
+        return path if path.ascii_only?
+
+        candidates = [
+          Encoding::UTF_8,
+          Encoding::Windows_31J,
+        ]
+        candidates.each do |candidate|
+          path.force_encoding(candidate)
+          return path.encode(encoding) if path.valid_encoding?
+        end
+        path.encode(encoding,
+                    Encoding::UTF_8,
+                    invalid: :replace,
+                    undef: :replace)
+      end
+
+      def convert_to_uri_path(path)
+        converted_components = path.split("/").collect do |component|
+          CGI.escape(component)
+        end
+        converted_components.join("/")
       end
     end
   end

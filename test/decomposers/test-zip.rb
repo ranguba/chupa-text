@@ -1,4 +1,4 @@
-# Copyright (C) 2017  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2017-2019  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -61,6 +61,36 @@ class TestDecomposersZip < Test::Unit::TestCase
                      },
                    ],
                    decompose(data_path))
+    end
+
+    sub_test_case("multibyte") do
+      test("cp932") do
+        data_path = Pathname.new(fixture_path("cp932.zip"))
+        base_path = data_path.sub_ext("")
+        path = CGI.escape("こんにちは.txt")
+        assert_equal([
+                       {
+                         :uri    => file_uri("#{base_path}/cp932/#{path}").to_s,
+                         :body   => "こんにちは\n".encode("cp932").b,
+                         :source => file_uri(data_path).to_s,
+                       },
+                     ],
+                     decompose(data_path))
+      end
+
+      test("UTF-8") do
+        data_path = Pathname.new(fixture_path("utf-8.zip"))
+        base_path = data_path.sub_ext("")
+        path = CGI.escape("こんにちは.txt")
+        assert_equal([
+                       {
+                         :uri    => file_uri("#{base_path}/utf-8/#{path}").to_s,
+                         :body   => "こんにちは\n".b,
+                         :source => file_uri(data_path).to_s,
+                       },
+                     ],
+                     decompose(data_path))
+      end
     end
 
     sub_test_case("encrypted") do
