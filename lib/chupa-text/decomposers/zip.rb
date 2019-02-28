@@ -15,9 +15,10 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 require "stringio"
-require "tmpdir"
 
 require "archive/zip"
+
+require "chupa-text/path-converter"
 
 module ChupaText
   module Decomposers
@@ -45,8 +46,10 @@ module ChupaText
             end
             entry_uri = data.uri.dup
             base_path = entry_uri.path.gsub(/\.zip\z/i, "")
-            path = convert_path_encoding(entry.zip_path, base_path.encoding)
-            entry_uri.path = "#{base_path}/#{convert_to_uri_path(path)}"
+            path_converter = PathConverter.new(entry.zip_path,
+                                               encoding: base_path.encoding,
+                                               uri_escape: true)
+            entry_uri.path = "#{base_path}/#{path_converter.convert}"
             entry_data = VirtualFileData.new(entry_uri,
                                              entry.file_data,
                                              source_data: data)

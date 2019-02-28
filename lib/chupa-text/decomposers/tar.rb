@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2017  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2019  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -16,6 +16,8 @@
 
 require "stringio"
 require "rubygems/package"
+
+require "chupa-text/path-converter"
 
 module ChupaText
   module Decomposers
@@ -35,7 +37,9 @@ module ChupaText
             entry.extend(CopyStreamable)
             entry_uri = data.uri.dup
             base_path = entry_uri.path.gsub(/\.tar\z/i, "")
-            entry_uri.path = "#{base_path}/#{entry.full_name}"
+            path_converter = PathConverter.new(entry.full_name,
+                                               uri_escape: true)
+            entry_uri.path = "#{base_path}/#{path_converter.convert}"
             extracted = VirtualFileData.new(entry_uri,
                                             entry,
                                             :source_data => data)

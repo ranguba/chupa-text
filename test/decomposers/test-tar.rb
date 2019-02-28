@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2017  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2019  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -64,6 +64,23 @@ class TestDecomposersTar < Test::Unit::TestCase
                        {
                          :uri    => file_uri("#{base_path}/directory/hello.txt").to_s,
                          :body   => "Hello in directory\n",
+                         :source => data.uri.to_s,
+                       },
+                     ],
+                     decompose(data))
+      end
+    end
+
+    sub_test_case("multibyte") do
+      test("UTF-8") do
+        data_path = Pathname.new(fixture_path("utf-8.tar"))
+        base_path = data_path.sub_ext("")
+        data = ChupaText::InputData.new(data_path)
+        path = CGI.escape("こんにちは.txt")
+        assert_equal([
+                       {
+                         :uri    => file_uri("#{base_path}/utf-8/#{path}").to_s,
+                         :body   => "こんにちは\n".b,
                          :source => data.uri.to_s,
                        },
                      ],
