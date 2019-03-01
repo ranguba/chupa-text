@@ -50,7 +50,7 @@ Gem::Specification.new do |spec|
     spec.executables = Dir.glob("*")
   end
 
-  spec.add_runtime_dependency("archive-zip")
+  spec.add_runtime_dependency("archive-zip", ">= 0.12.0")
   spec.add_runtime_dependency("csv", ">= 3.0.4")
 
   spec.add_development_dependency("bundler")
