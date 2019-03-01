@@ -1,4 +1,4 @@
-# Copyright (C) 2013  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2019  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -22,13 +22,28 @@ class TestDecomposersCSV< Test::Unit::TestCase
   end
 
   sub_test_case("decompose") do
-    def test_body
+    def test_valid
       csv = <<-CSV
 Hello,World
 Ruby,ChupaText
       CSV
-      assert_equal([csv.gsub(/,/, " ")],
+      assert_equal([csv.gsub(/,/, "\t")],
                    decompose(csv).collect(&:body))
+    end
+
+    def test_invalid
+      messages = capture_log do
+        assert_equal([], decompose("He\x82\x00llo").collect(&:body))
+      end
+      assert_equal([
+                     [
+                       :error,
+                       "[decomposer][csv] Failed to parse CSV: " +
+                       "CSV::MalformedCSVError: " +
+                       "Invalid byte sequence in UTF-8 in line 1.",
+                     ],
+                   ],
+                   messages)
     end
 
     private

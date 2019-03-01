@@ -289,7 +289,7 @@ class TestCommandChupaText < Test::Unit::TestCase
                            "path"      => path.sub_ext(".txt").to_s,
                            "mime-type" => "text/plain",
                            "source-mime-types" => ["text/csv"],
-                           "body"      => "1 2 3\n4 5 6\n7 8 9\n",
+                           "body"      => "1\t2\t3\n4\t5\t6\n7\t8\t9\n",
                            "size"      => 18,
                            "screenshot" => {
                              "mime-type" => "image/svg+xml",
@@ -304,9 +304,9 @@ class TestCommandChupaText < Test::Unit::TestCase
     x="0"
     y="20"
     style="font-size: 20px; white-space: pre-wrap;"
-    xml:space="preserve">1 2 3
-4 5 6
-7 8 9
+    xml:space="preserve">1\t2\t3
+4\t5\t6
+7\t8\t9
 </text>
 </svg>
                              SVG

@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2017  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2019  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -31,5 +31,35 @@ module Helper
 
   def file_uri(path)
     URI.parse("file://#{path}")
+  end
+
+
+  class CaptureLogger
+    def initialize(output)
+      @output = output
+    end
+
+    def error(message=nil)
+      @output << [:error, message || yield]
+    end
+  end
+
+  def capture_log
+    original_logger = ChupaText.logger
+    begin
+      output = []
+      ChupaText.logger = CaptureLogger.new(output)
+      yield
+      normalize_log(output)
+    ensure
+      ChupaText.logger = original_logger
+    end
+  end
+
+  def normalize_log(log)
+    log.collect do |level, message|
+      message = message.split("\n", 2)[0]
+      [level, message]
+    end
   end
 end

@@ -20,6 +20,8 @@ require "csv"
 module ChupaText
   module Decomposers
     class CSV < Decomposer
+      include Loggable
+
       registry.register("csv", self)
 
       def target?(data)
@@ -36,10 +38,20 @@ module ChupaText
       def decompose(data)
         text = ""
         data.open do |input|
-          csv = ::CSV.new(input)
-          csv.each do |row|
-            text << row.join(" ")
-            text << "\n"
+          begin
+            csv = ::CSV.new(input, liberal_parsing: true)
+            csv.each do |row|
+              text << row.join("\t")
+              text << "\n"
+            end
+          rescue ::CSV::MalformedCSVError => csv_error
+            error do
+              message = "#{log_tag} Failed to parse CSV: "
+              message << "#{csv_error.class}: #{csv_error.message}\n"
+              message << csv_error.backtrace.join("\n")
+              message
+            end
+            return
           end
         end
 
@@ -77,6 +89,10 @@ module ChupaText
 </svg>
         SVG
         Screenshot.new(mime_type, data)
+      end
+
+      def log_tag
+        "[decomposer][csv]"
       end
     end
   end
