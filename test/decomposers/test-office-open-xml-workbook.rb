@@ -116,6 +116,20 @@ Sheet1 - A2\tSheet1 - B2
       end
     end
 
+    sub_test_case("not shared cell") do
+      def decompose
+        super(fixture_path("xlsx", "not-shared-cell.xlsx"))
+      end
+
+      def test_body
+        assert_equal([<<-BODY], decompose.collect(&:body))
+Sheet1 - A1\tSheet1 - B1
+Sheet1 - A2\tSheet1 - B2
+0.5\t0.5
+        BODY
+      end
+    end
+
     sub_test_case("multi sheets") do
       def decompose
         super(fixture_path("xlsx", "multi-sheets.xlsx"))

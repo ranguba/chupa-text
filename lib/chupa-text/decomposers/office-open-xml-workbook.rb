@@ -61,8 +61,13 @@ module ChupaText
         sheet_texts = sheets.collect do |sheet|
           sheet_text = ""
           sheet.each do |row|
-            row_texts = row.collect do |index|
-              shared_strings[index]
+            row_texts = row.collect do |cell|
+              case cell
+              when Integer
+                shared_strings[cell]
+              else
+                cell
+              end
             end
             sheet_text << row_texts.join("\t") << "\n"
           end
@@ -76,6 +81,7 @@ module ChupaText
 
         def initialize(sheet)
           @sheet = sheet
+          @cell_type = nil
           @in_v = false
         end
 
@@ -84,13 +90,22 @@ module ChupaText
           case local_name
           when "row"
             @sheet << []
+          when "c"
+            @cell_type = parse_cell_type(attributes["t"])
+          # when "is" # TODO
           when "v"
             @in_v = true
           end
         end
 
         def end_element(uri, local_name, qname)
-          @in_v = false
+          return unless uri == URI
+          case local_name
+          when "c"
+            @cell_type = nil
+          when "v"
+            @in_v = false
+          end
         end
 
         def characters(text)
@@ -102,9 +117,34 @@ module ChupaText
         end
 
         private
+        # https://c-rex.net/projects/samples/ooxml/e1/Part4/OOXML_P4_DOCX_ST_CellType_topic_ID0E6NEFB.html
+        def parse_cell_type(type)
+          case type
+          when "b"
+            :boolean
+          when "e"
+            :error
+          when "inlineStr"
+            :inline_string
+          when "n"
+            :number
+          when "s"
+            :shared_string
+          when "str"
+            :string
+          else
+            nil
+          end
+        end
+
         def add_column(text)
           return unless @in_v
-          @sheet.last << Integer(text, 10)
+          case @cell_type
+          when :shared_string
+            @sheet.last << Integer(text, 10)
+          else
+            @sheet.last << text
+          end
         end
       end
     end
