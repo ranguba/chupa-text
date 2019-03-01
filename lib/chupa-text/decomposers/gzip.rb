@@ -19,6 +19,8 @@ require "zlib"
 module ChupaText
   module Decomposers
     class Gzip < Decomposer
+      include Loggable
+
       registry.register("gzip", self)
 
       TARGET_EXTENSIONS = ["gz", "tgz"]
@@ -33,8 +35,7 @@ module ChupaText
       end
 
       def decompose(data)
-        data.open do |input|
-          reader = Zlib::GzipReader.new(input)
+        open_reader(data) do |reader|
           uri = nil
           case data.extension
           when "gz"
@@ -45,6 +46,26 @@ module ChupaText
           extracted = VirtualFileData.new(uri, reader, :source_data => data)
           yield(extracted)
         end
+      end
+
+      private
+      def open_reader(data)
+        data.open do |input|
+          begin
+            yield(Zlib::GzipReader.new(input))
+          rescue Zlib::Error => zlib_error
+            error do
+              message = "#{log_tag} Failed to uncompress: "
+              message << "#{zlib_error.class}: #{zlib_error.message}\n"
+              message << zlib_error.backtrace.join("\n")
+              message
+            end
+          end
+        end
+      end
+
+      def log_tag
+        "[decomposer][gzip]"
       end
     end
   end

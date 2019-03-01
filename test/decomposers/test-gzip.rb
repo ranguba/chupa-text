@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2017  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2019  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -83,7 +83,6 @@ class TestDecomposersGzip < Test::Unit::TestCase
       end
     end
 
-
     sub_test_case("tgz") do
       def setup
         super
@@ -108,6 +107,24 @@ class TestDecomposersGzip < Test::Unit::TestCase
         assert_equal([@data],
                      decompose(@data).collect(&:source))
       end
+    end
+
+    def test_invalid
+      data = ChupaText::Data.new
+      data.body = "Hello"
+      data.size = data.body.bytesize
+      data.mime_type = "application/gzip"
+      messages = capture_log do
+        assert_equal([], decompose(data).collect(&:body))
+      end
+      assert_equal([
+                     [
+                       :error,
+                       "[decomposer][gzip] Failed to uncompress: " +
+                       "Zlib::GzipFile::Error: not in gzip format",
+                     ],
+                   ],
+                   messages)
     end
   end
 end
