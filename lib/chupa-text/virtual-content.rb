@@ -34,7 +34,6 @@ module ChupaText
         end
       end
       @original_path = original_path
-      @body = nil
       setup_file do |file|
         @size = IO.copy_stream(input, file)
       end
@@ -45,7 +44,7 @@ module ChupaText
     end
 
     def body
-      @body ||= open {|file| file.read}
+      open {|file| file.read}
     end
 
     def path
