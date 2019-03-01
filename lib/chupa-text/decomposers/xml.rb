@@ -1,4 +1,4 @@
-# Copyright (C) 2013  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2019  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -20,6 +20,8 @@ require "rexml/streamlistener"
 module ChupaText
   module Decomposers
     class XML < Decomposer
+      include Loggable
+
       registry.register("xml", self)
 
       def target?(data)
@@ -31,13 +33,27 @@ module ChupaText
         text = ""
         listener = Listener.new(text)
         data.open do |input|
-          parser = REXML::Parsers::StreamParser.new(input, listener)
-          parser.parse
+          begin
+            parser = REXML::Parsers::StreamParser.new(input, listener)
+            parser.parse
+          rescue REXML::ParseException => xml_error
+            error do
+              message = "#{log_tag} Failed to parse XML: "
+              message << "#{xml_error.class}: #{xml_error.message}\n"
+              message << xml_error.backtrace.join("\n")
+              message
+            end
+            return
+          end
         end
         text_data = TextData.new(text, :source_data => data)
         yield(text_data)
       end
 
+      private
+      def log_tag
+        "[decomposer][xml]"
+      end
       class Listener
         include REXML::StreamListener
 

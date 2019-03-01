@@ -1,4 +1,4 @@
-# Copyright (C) 2013  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2019  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -39,6 +39,21 @@ class TestDecomposersXML < Test::Unit::TestCase
       TEXT
       assert_equal([text],
                    decompose(xml).collect(&:body))
+    end
+
+    def test_invalid
+      messages = capture_log do
+        assert_equal([], decompose("<root x=/>"))
+      end
+      assert_equal([
+                     [
+                       :error,
+                       "[decomposer][xml] Failed to parse XML: " +
+                       "REXML::ParseException: " +
+                       "Missing attribute value start quote: <x>",
+                     ],
+                   ],
+                   messages)
     end
 
     private
