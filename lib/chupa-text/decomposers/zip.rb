@@ -23,6 +23,8 @@ require "chupa-text/path-converter"
 module ChupaText
   module Decomposers
     class Zip < Decomposer
+      include Loggable
+
       registry.register("zip", self)
 
       def target?(data)
@@ -33,7 +35,7 @@ module ChupaText
       end
 
       def decompose(data)
-        Archive::Zip.open(StringIO.new(data.body)) do |zip|
+        open_zip(data) do |zip|
           zip.each do |entry|
             next unless entry.file?
 
@@ -59,28 +61,23 @@ module ChupaText
       end
 
       private
-      def convert_path_encoding(path, encoding)
-        return path if path.ascii_only?
-
-        candidates = [
-          Encoding::UTF_8,
-          Encoding::Windows_31J,
-        ]
-        candidates.each do |candidate|
-          path.force_encoding(candidate)
-          return path.encode(encoding) if path.valid_encoding?
+      def open_zip(data)
+        begin
+          Archive::Zip.open(StringIO.new(data.body)) do |zip|
+            yield(zip)
+          end
+        rescue Archive::Zip::Error => zip_error
+          error do
+            message = "#{log_tag} Failed to process zip: "
+            message << "#{zip_error.class}: #{zip_error.message}\n"
+            message << zip_error.backtrace.join("\n")
+            message
+          end
         end
-        path.encode(encoding,
-                    Encoding::UTF_8,
-                    invalid: :replace,
-                    undef: :replace)
       end
 
-      def convert_to_uri_path(path)
-        converted_components = path.split("/").collect do |component|
-          CGI.escape(component)
-        end
-        converted_components.join("/")
+      def log_tag
+        "[decomposer][zip]"
       end
     end
   end
