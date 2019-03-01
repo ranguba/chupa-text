@@ -14,8 +14,7 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-require "rexml/document"
-require "rexml/streamlistener"
+require "chupa-text/sax-parser"
 
 module ChupaText
   module Decomposers
@@ -34,9 +33,9 @@ module ChupaText
         listener = Listener.new(text)
         data.open do |input|
           begin
-            parser = REXML::Parsers::StreamParser.new(input, listener)
+            parser = SAXParser.new(input, listener)
             parser.parse
-          rescue REXML::ParseException => xml_error
+          rescue SAXParser::ParseError => xml_error
             error do
               message = "#{log_tag} Failed to parse XML: "
               message << "#{xml_error.class}: #{xml_error.message}\n"
@@ -54,15 +53,27 @@ module ChupaText
       def log_tag
         "[decomposer][xml]"
       end
-      class Listener
-        include REXML::StreamListener
 
+      class Listener < SAXListener
         def initialize(output)
           @output = output
+          @level = 0
         end
 
-        def text(text)
-          @output << text
+        def start_element(*args)
+          @level += 1
+        end
+
+        def end_element(*args)
+          @level -= 1
+        end
+
+        def characters(text)
+          @output << text if @level > 0
+        end
+
+        def cdata(content)
+          @output << content if @level > 0
         end
       end
     end

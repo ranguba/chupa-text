@@ -35,7 +35,6 @@ class TestDecomposersXML < Test::Unit::TestCase
   Hello
   &
   World
-
       TEXT
       assert_equal([text],
                    decompose(xml).collect(&:body))
@@ -45,15 +44,21 @@ class TestDecomposersXML < Test::Unit::TestCase
       messages = capture_log do
         assert_equal([], decompose("<root x=/>"))
       end
+      normalized_messages = messages.collect do |level, message|
+        [
+          level,
+          message.gsub(/(ChupaText::SAXParser::ParseError:) .*/,
+                       "\\1 ...")
+        ]
+      end
       assert_equal([
                      [
                        :error,
                        "[decomposer][xml] Failed to parse XML: " +
-                       "REXML::ParseException: " +
-                       "Missing attribute value start quote: <x>",
+                       "ChupaText::SAXParser::ParseError: ...",
                      ],
                    ],
-                   messages)
+                   normalized_messages)
     end
 
     private

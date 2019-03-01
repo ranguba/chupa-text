@@ -25,6 +25,9 @@ end
 
 module ChupaText
   class SAXParser
+    class ParseError < Error
+    end
+
     class << self
       def backend
         case ENV["CHUPA_TEXT_SAX_PARSER_BACKEND"]
@@ -94,6 +97,10 @@ module ChupaText
           @listener.cdata(content)
         end
 
+        def error(detail)
+          raise ParseError, detail
+        end
+
         private
         def build_qname(prefix, local_name)
           if prefix
@@ -105,10 +112,18 @@ module ChupaText
       end
     else
       def parse
-        source = REXML::Source.new(@input.read)
+        source = @input
+        if source.is_a?(Archive::Zip::Codec::Deflate::Decompress)
+          source = source.read
+        end
         parser = REXML::Parsers::SAX2Parser.new(source)
         parser.listen(Listener.new(@listener))
-        parser.parse
+        begin
+          parser.parse
+        rescue REXML::ParseException => error
+          message = "#{error.class}: #{error.message}"
+          raise ParseError, message
+        end
       end
 
       class Listener
