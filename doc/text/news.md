@@ -1,5 +1,13 @@
 # News
 
+## 1.1.7: 2019-03-01
+
+### Improvements
+
+  * Reduced memory usage.
+
+  * Reduced IO.
+
 ## 1.1.6: 2019-03-01
 
 ### Improvements
