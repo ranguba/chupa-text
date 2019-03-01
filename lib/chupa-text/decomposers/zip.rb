@@ -69,18 +69,18 @@ module ChupaText
 
       private
       def open_zip(data)
-        begin
-          data.open do |input|
+        data.open do |input|
+          begin
             Archive::Zip.open(input) do |zip|
               yield(zip)
             end
-          end
-        rescue Archive::Zip::Error => zip_error
-          error do
-            message = "#{log_tag} Failed to process zip: "
-            message << "#{zip_error.class}: #{zip_error.message}\n"
-            message << zip_error.backtrace.join("\n")
-            message
+          rescue Archive::Zip::Error => zip_error
+            error do
+              message = "#{log_tag} Failed to process zip: "
+              message << "#{zip_error.class}: #{zip_error.message}\n"
+              message << zip_error.backtrace.join("\n")
+              message
+            end
           end
         end
       end
