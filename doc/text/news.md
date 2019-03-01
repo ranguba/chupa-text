@@ -1,5 +1,47 @@
 # News
 
+## 1.1.6: 2019-03-01
+
+### Improvements
+
+  * `zip`:
+
+    * Added support for multibyte path.
+
+    * Added error check.
+
+  * `tar`:
+
+    * Added support for multibyte path.
+
+    * Reduced memory usage.
+
+  * Changed to the extracted text encoding to UTF-8.
+
+  * Added support BOM detection.
+
+  * Improved binary data detection.
+
+  * `office-open-xml-workbook`:
+
+    * Added support for not shared string cell values.
+
+    * Changed to emit data per sheet.
+
+  * `office-open-xml-presentation`:
+
+    * Changed to emit data per slide.
+
+  * `csv`:
+
+    * Added error check.
+
+  * `opendocument-spreadsheet`:
+
+    * Added support for concatenated cell.
+
+    * Added support for shapes.
+
 ## 1.1.5: 2019-02-28
 
 ### Improvements
