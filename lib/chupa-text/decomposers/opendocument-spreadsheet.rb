@@ -98,8 +98,12 @@ module ChupaText
         end
 
         def end_element(uri, local_name, qname)
-          @in_p = false
           case uri
+          when TEXT_URI
+            case local_name
+            when "p"
+              @in_p = false
+            end
           when TABLE_URI
             case local_name
             when "table"

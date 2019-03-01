@@ -87,9 +87,9 @@ class TestDecomposersOpenDocumentSpreadsheet < Test::Unit::TestCase
       end
     end
 
-    sub_test_case("one sheet") do
-      def decompose
-        super(fixture_path("ods", "one-sheet.ods")).collect do |data|
+    sub_test_case("sheets") do
+      def decompose(path)
+        super(path).collect do |data|
           [
             data["index"],
             data["name"],
@@ -98,7 +98,7 @@ class TestDecomposersOpenDocumentSpreadsheet < Test::Unit::TestCase
         end
       end
 
-      def test_body
+      def test_one_sheet
         assert_equal([
                        [nil, nil, ""],
                        [
@@ -108,22 +108,10 @@ class TestDecomposersOpenDocumentSpreadsheet < Test::Unit::TestCase
                          "Sheet1 - A2\tSheet1 - B2\n",
                        ],
                      ],
-                     decompose)
-      end
-    end
-
-    sub_test_case("multi sheets") do
-      def decompose
-        super(fixture_path("ods", "multi-sheets.ods")).collect do |data|
-          [
-            data["index"],
-            data["name"],
-            data.body,
-          ]
-        end
+                     decompose(fixture_path("ods", "one-sheet.ods")))
       end
 
-      def test_body
+      def test_multi_sheets
         assert_equal([
                        [nil, nil, ""],
                        [
@@ -145,7 +133,19 @@ class TestDecomposersOpenDocumentSpreadsheet < Test::Unit::TestCase
                          "Sheet3 - A2\tSheet3 - B2\n",
                        ],
                      ],
-                     decompose)
+                     decompose(fixture_path("ods", "multi-sheets.ods")))
+      end
+
+      def test_covered_table_cell
+        assert_equal([
+                       [nil, nil, ""],
+                       [
+                         0,
+                         "Sheet1",
+                         "Covered-table-cell\t\n",
+                       ],
+                     ],
+                     decompose(fixture_path("ods", "covered-table-cell.ods")))
       end
     end
   end
