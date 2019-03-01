@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2017  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2019  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -17,6 +17,8 @@
 require "cgi/util"
 require "uri"
 require "open-uri"
+
+require "chupa-text/utf8-converter"
 
 module ChupaText
   class Data
@@ -188,6 +190,18 @@ module ChupaText
     # @return [Bool] `true` when screenshot is needed if available.
     def need_screenshot?
       @need_screenshot
+    end
+
+    def to_utf8_body_data
+      b = body
+      return self if b.nil?
+      converter = UTF8Converter.new(b)
+      utf8_body = converter.convert
+      if b.equal?(utf8_body)
+        self
+      else
+        TextData.new(utf8_body, source_data: self)
+      end
     end
 
     private

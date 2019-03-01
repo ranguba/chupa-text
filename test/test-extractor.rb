@@ -137,6 +137,13 @@ class TestExtractor < Test::Unit::TestCase
         assert_equal(["こんにちは"], extract(data))
       end
 
+      def test_utf8_broken
+        data = ChupaText::Data.new
+        data.mime_type = "text/plain"
+        data.body = "\x82\x00こんにちは".b
+        assert_equal(["こんにちは"], extract(data))
+      end
+
       def test_utf16_le
         data = ChupaText::Data.new
         data.mime_type = "text/plain"
