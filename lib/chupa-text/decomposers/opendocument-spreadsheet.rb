@@ -91,6 +91,8 @@ module ChupaText
               @sheets.last[:rows] << []
             when "table-cell"
               @sheets.last[:rows].last << {text: ""}
+            when "covered-table-cell"
+              @sheets.last[:rows].last << {text: ""}
             end
           end
         end
