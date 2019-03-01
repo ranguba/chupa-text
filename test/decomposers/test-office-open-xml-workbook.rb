@@ -48,46 +48,36 @@ class TestDecomposersOfficeOpenXMLWorkbook < Test::Unit::TestCase
   sub_test_case("#decompose") do
     sub_test_case("attributes") do
       def decompose(attribute_name)
-        super(fixture_path("xlsx", "attributes.xlsx")).collect do |data|
-          data[attribute_name]
-        end
+        super(fixture_path("xlsx", "attributes.xlsx")).first[attribute_name]
       end
 
       def test_title
-        assert_equal(["Title"], decompose("title"))
+        assert_equal("Title", decompose("title"))
       end
 
       def test_author
-        assert_equal([nil], decompose("author"))
+        assert_equal(nil, decompose("author"))
       end
 
       def test_subject
-        assert_equal(["Subject"], decompose("subject"))
+        assert_equal("Subject", decompose("subject"))
       end
 
       def test_keywords
-        assert_equal(["Keyword1 Keyword2"], decompose("keywords"))
+        assert_equal("Keyword1 Keyword2", decompose("keywords"))
       end
 
       def test_created_time
-        assert_equal([Time],
-                     decompose("created_time").collect(&:class))
+        assert_equal(Time, decompose("created_time").class)
       end
 
       def test_modified_time
-        assert_equal([Time],
-                     decompose("modified_time").collect(&:class))
+        assert_equal(Time, decompose("modified_time").class)
       end
 
       def test_application
-        assert_equal(["LibreOffice"],
-                     normalize_applications(decompose("application")))
-      end
-
-      def normalize_applications(applications)
-        applications.collect do |application|
-          normalize_application(application)
-        end
+        assert_equal("LibreOffice",
+                     normalize_application(decompose("application")))
       end
 
       def normalize_application(application)
@@ -97,55 +87,69 @@ class TestDecomposersOfficeOpenXMLWorkbook < Test::Unit::TestCase
           application
         end
       end
-
-      def test_creation_date
-        assert_equal([nil], decompose("creation_date"))
-      end
     end
 
-    sub_test_case("one sheet") do
-      def decompose
-        super(fixture_path("xlsx", "one-sheet.xlsx"))
+    sub_test_case("sheets") do
+      def decompose(path)
+        super(path).collect do |data|
+          [
+            data["index"],
+            data["name"],
+            data.body,
+          ]
+        end
       end
 
-      def test_body
-        assert_equal([<<-BODY], decompose.collect(&:body))
-Sheet1 - A1\tSheet1 - B1
-Sheet1 - A2\tSheet1 - B2
-        BODY
-      end
-    end
-
-    sub_test_case("not shared cell") do
-      def decompose
-        super(fixture_path("xlsx", "not-shared-cell.xlsx"))
-      end
-
-      def test_body
-        assert_equal([<<-BODY], decompose.collect(&:body))
-Sheet1 - A1\tSheet1 - B1
-Sheet1 - A2\tSheet1 - B2
-0.5\t0.5
-        BODY
-      end
-    end
-
-    sub_test_case("multi sheets") do
-      def decompose
-        super(fixture_path("xlsx", "multi-sheets.xlsx"))
+      def test_one_sheet
+        assert_equal([
+                       [nil, nil, ""],
+                       [
+                         0,
+                         "Sheet1",
+                         "Sheet1 - A1\tSheet1 - B1\n" +
+                         "Sheet1 - A2\tSheet1 - B2\n",
+                       ],
+                     ],
+                     decompose(fixture_path("xlsx", "one-sheet.xlsx")))
       end
 
-      def test_body
-        assert_equal([<<-BODY], decompose.collect(&:body))
-Sheet1 - A1\tSheet1 - B1
-Sheet1 - A2\tSheet1 - B2
+      def test_no_shared_cell
+        assert_equal([
+                       [nil, nil, ""],
+                       [
+                         0,
+                         "Sheet1",
+                         "Sheet1 - A1\tSheet1 - B1\n" +
+                         "Sheet1 - A2\tSheet1 - B2\n" +
+                         "0.5\t0.5\n",
+                       ],
+                     ],
+                     decompose(fixture_path("xlsx", "not-shared-cell.xlsx")))
+      end
 
-Sheet2 - A1\tSheet2 - B1
-Sheet2 - A2\tSheet2 - B2
-
-Sheet3 - A1\tSheet3 - B1
-Sheet3 - A2\tSheet3 - B2
-        BODY
+      def test_multi_sheets
+        assert_equal([
+                       [nil, nil, ""],
+                       [
+                         0,
+                         "Sheet1",
+                         "Sheet1 - A1\tSheet1 - B1\n" +
+                         "Sheet1 - A2\tSheet1 - B2\n",
+                       ],
+                       [
+                         1,
+                         "Sheet2",
+                         "Sheet2 - A1\tSheet2 - B1\n" +
+                         "Sheet2 - A2\tSheet2 - B2\n",
+                       ],
+                       [
+                         2,
+                         "Sheet3",
+                         "Sheet3 - A1\tSheet3 - B1\n" +
+                         "Sheet3 - A2\tSheet3 - B2\n",
+                       ],
+                     ],
+                     decompose(fixture_path("xlsx", "multi-sheets.xlsx")))
       end
     end
   end

@@ -40,25 +40,39 @@ module ChupaText
       end
 
       private
+      def start_decompose(context)
+        context[:shared_strings] = []
+        context[:sheet_names] = []
+        context[:sheets] = []
+      end
+
       def process_entry(entry, context)
         case entry.zip_path
         when "xl/sharedStrings.xml"
-          context[:shared_strings] = []
           extract_text(entry, context[:shared_strings])
+        when "xl/workbook.xml"
+          listener = WorkbookListener.new(context[:sheet_names])
+          parse(entry.file_data, listener)
         when /\Axl\/worksheets\/sheet(\d+)\.xml\z/
           nth_sheet = Integer($1, 10)
           sheet = []
           listener = SheetListener.new(sheet)
           parse(entry.file_data, listener)
-          context[:sheets] ||= []
           context[:sheets] << [nth_sheet, sheet]
         end
       end
 
-      def accumulate_text(context)
+      def finish_decompose(context, &block)
+        metadata = TextData.new("", source_data: context[:data])
+        context[:attributes].each do |name, value|
+          metadata[name] = value
+        end
+        yield(metadata)
+
         shared_strings = context[:shared_strings]
         sheets = context[:sheets].sort_by(&:first).collect(&:last)
-        sheet_texts = sheets.collect do |sheet|
+        sheet_names = context[:sheet_names]
+        sheets.each_with_index do |sheet, i|
           sheet_text = ""
           sheet.each do |row|
             row_texts = row.collect do |cell|
@@ -71,9 +85,28 @@ module ChupaText
             end
             sheet_text << row_texts.join("\t") << "\n"
           end
-          sheet_text
+          text_data = TextData.new(sheet_text, source_data: context[:data])
+          text_data["index"] = i
+          name = sheet_names[i]
+          text_data["name"] = name if name
+          yield(text_data)
         end
-        sheet_texts.join("\n")
+      end
+
+      class WorkbookListener < SAXListener
+        URI = "http://schemas.openxmlformats.org/spreadsheetml/2006/main"
+
+        def initialize(sheet_names)
+          @sheet_names = sheet_names
+        end
+
+        def start_element(uri, local_name, qname, attributes)
+          return unless uri == URI
+          case local_name
+          when "sheet"
+            @sheet_names << attributes["name"]
+          end
+        end
       end
 
       class SheetListener < SAXListener

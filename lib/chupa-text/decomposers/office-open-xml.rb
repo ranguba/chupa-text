@@ -34,11 +34,12 @@ module ChupaText
         end
       end
 
-      def decompose(data)
+      def decompose(data, &block)
         context = {
-          text: "",
+          data: data,
           attributes: {},
         }
+        start_decompose(context)
         data.open do |input|
           Archive::Zip.open(input) do |zip|
             zip.each do |entry|
@@ -56,12 +57,7 @@ module ChupaText
             end
           end
         end
-        text = accumulate_text(context)
-        text_data = TextData.new(text, source_data: data)
-        context[:attributes].each do |name, value|
-          text_data[name] = value
-        end
-        yield(text_data)
+        finish_decompose(context, &block)
       end
 
       private

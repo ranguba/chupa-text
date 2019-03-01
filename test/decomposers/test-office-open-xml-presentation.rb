@@ -48,41 +48,32 @@ class TestDecomposersOfficeOpenXMLPresentation < Test::Unit::TestCase
   sub_test_case("#decompose") do
     sub_test_case("attributes") do
       def decompose(attribute_name)
-        super(fixture_path("pptx", "attributes.pptx")).collect do |data|
-          data[attribute_name]
-        end
+        super(fixture_path("pptx", "attributes.pptx")).first[attribute_name]
       end
 
       def test_title
-        assert_equal(["Title"], decompose("title"))
+        assert_equal("Title", decompose("title"))
       end
 
       def test_author
-        assert_equal([nil], decompose("author"))
+        assert_equal(nil, decompose("author"))
       end
 
       def test_subject
-        assert_equal(["Subject"], decompose("subject"))
+        assert_equal("Subject", decompose("subject"))
       end
 
       def test_keywords
-        assert_equal(["Keyword1 Keyword2"], decompose("keywords"))
+        assert_equal("Keyword1 Keyword2", decompose("keywords"))
       end
 
       def test_modified_time
-        assert_equal([Time],
-                     decompose("modified_time").collect(&:class))
+        assert_equal(Time, decompose("modified_time").class)
       end
 
       def test_application
-        assert_equal(["LibreOffice"],
-                     normalize_applications(decompose("application")))
-      end
-
-      def normalize_applications(applications)
-        applications.collect do |application|
-          normalize_application(application)
-        end
+        assert_equal("LibreOffice",
+                     normalize_application(decompose("application")))
       end
 
       def normalize_application(application)
@@ -92,41 +83,50 @@ class TestDecomposersOfficeOpenXMLPresentation < Test::Unit::TestCase
           application
         end
       end
-
-      def test_creation_date
-        assert_equal([nil], decompose("creation_date"))
-      end
     end
 
-    sub_test_case("one slide") do
-      def decompose
-        super(fixture_path("pptx", "one-slide.pptx"))
+    sub_test_case("slides") do
+      def decompose(path)
+        super(path).collect do |data|
+          [
+            data["index"],
+            data.body,
+          ]
+        end
       end
 
-      def test_body
-        assert_equal([<<-BODY], decompose.collect(&:body))
-Slide1 title
-Slide1 content
-        BODY
+      def test_one_slide
+        assert_equal([
+                       [nil, ""],
+                       [
+                         0,
+                         "Slide1 title\n" +
+                         "Slide1 content\n",
+                       ],
+                     ],
+                     decompose(fixture_path("pptx", "one-slide.pptx")))
       end
-    end
 
-    sub_test_case("multi slides") do
-      def decompose
-        super(fixture_path("pptx", "multi-slides.pptx"))
-      end
-
-      def test_body
-        assert_equal([<<-BODY], decompose.collect(&:body))
-Slide1 title
-Slide1 content
-
-Slide2 title
-Slide2 content
-
-Slide3 title
-Slide3 content
-        BODY
+      def test_multi_slides
+        assert_equal([
+                       [nil, ""],
+                       [
+                         0,
+                         "Slide1 title\n" +
+                         "Slide1 content\n",
+                       ],
+                       [
+                         1,
+                         "Slide2 title\n" +
+                         "Slide2 content\n",
+                       ],
+                       [
+                         2,
+                         "Slide3 title\n" +
+                         "Slide3 content\n",
+                       ],
+                     ],
+                     decompose(fixture_path("pptx", "multi-slides.pptx")))
       end
     end
   end

@@ -40,11 +40,23 @@ module ChupaText
       end
 
       private
+      def start_decompose(context)
+        context[:text] = ""
+      end
+
       def process_entry(entry, context)
         case entry.zip_path
         when "word/document.xml"
           extract_text(entry, context[:text])
         end
+      end
+
+      def finish_decompose(context, &block)
+        text_data = TextData.new(context[:text], source_data: context[:data])
+        context[:attributes].each do |name, value|
+          text_data[name] = value
+        end
+        yield(text_data)
       end
     end
   end

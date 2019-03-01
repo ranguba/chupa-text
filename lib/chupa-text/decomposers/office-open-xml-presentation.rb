@@ -48,19 +48,33 @@ module ChupaText
       end
 
       private
+      def start_decompose(context)
+        context[:slides] = []
+      end
+
       def process_entry(entry, context)
         case entry.zip_path
         when /\Appt\/slides\/slide(\d+)\.xml/
           nth_slide = Integer($1, 10)
           slide_text = ""
           extract_text(entry, slide_text)
-          context[:slides] ||= []
           context[:slides] << [nth_slide, slide_text]
         end
       end
 
-      def accumulate_text(context)
-        context[:slides].sort_by(&:first).collect(&:last).join("\n")
+      def finish_decompose(context, &block)
+        metadata = TextData.new("", source_data: context[:data])
+        context[:attributes].each do |name, value|
+          metadata[name] = value
+        end
+        yield(metadata)
+
+        slide_texts = context[:slides].sort_by(&:first).collect(&:last)
+        slide_texts.each_with_index do |slide_text, i|
+          text_data = TextData.new(slide_text, source_data: context[:data])
+          text_data["index"] = i
+          yield(text_data)
+        end
       end
     end
   end
