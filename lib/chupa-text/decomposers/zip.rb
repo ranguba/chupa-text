@@ -14,8 +14,6 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-require "stringio"
-
 require "archive/zip"
 
 require "chupa-text/path-converter"
@@ -63,8 +61,10 @@ module ChupaText
       private
       def open_zip(data)
         begin
-          Archive::Zip.open(StringIO.new(data.body)) do |zip|
-            yield(zip)
+          data.open do |input|
+            Archive::Zip.open(input) do |zip|
+              yield(zip)
+            end
           end
         rescue Archive::Zip::Error => zip_error
           error do
