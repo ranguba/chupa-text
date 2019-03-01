@@ -14,7 +14,6 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-require "stringio"
 require "rubygems/package"
 
 require "chupa-text/path-converter"
@@ -41,10 +40,17 @@ module ChupaText
               path_converter = PathConverter.new(entry.full_name,
                                                  uri_escape: true)
               entry_uri.path = "#{base_path}/#{path_converter.convert}"
-              extracted = VirtualFileData.new(entry_uri,
-                                              entry,
-                                              :source_data => data)
-              yield(extracted)
+              if entry.size < (32 * 1024)
+                entry_data = Data.new(source_data: data)
+                entry_data.uri = entry_uri
+                entry_data.body = entry.read || ""
+                entry_data.size = entry.size
+              else
+                entry_data = VirtualFileData.new(entry_uri,
+                                                 entry,
+                                                 :source_data => data)
+              end
+              yield(entry_data)
             end
           end
         end
