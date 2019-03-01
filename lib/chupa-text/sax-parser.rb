@@ -123,6 +123,13 @@ module ChupaText
         rescue REXML::ParseException => error
           message = "#{error.class}: #{error.message}"
           raise ParseError, message
+        rescue ArgumentError => error
+          if error.message.start_with?("invalid byte sequence")
+            message = "#{error.class}: #{error.message}"
+            raise ParseError, message
+          else
+            raise
+          end
         end
       end
 

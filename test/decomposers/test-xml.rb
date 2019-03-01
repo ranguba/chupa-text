@@ -40,16 +40,9 @@ class TestDecomposersXML < Test::Unit::TestCase
                    decompose(xml).collect(&:body))
     end
 
-    def test_invalid
+    def test_invalid_xml
       messages = capture_log do
         assert_equal([], decompose("<root x=/>"))
-      end
-      normalized_messages = messages.collect do |level, message|
-        [
-          level,
-          message.gsub(/(ChupaText::SAXParser::ParseError:) .*/,
-                       "\\1 ...")
-        ]
       end
       assert_equal([
                      [
@@ -58,7 +51,22 @@ class TestDecomposersXML < Test::Unit::TestCase
                        "ChupaText::SAXParser::ParseError: ...",
                      ],
                    ],
-                   normalized_messages)
+                   messages)
+    end
+
+    def test_invalid_encoding
+      messages = capture_log do
+        assert_equal([],
+                     decompose("\x00\x05\a\xA6"))
+      end
+      assert_equal([
+                     [
+                       :error,
+                       "[decomposer][xml] Failed to parse XML: " +
+                       "ChupaText::SAXParser::ParseError: ...",
+                     ],
+                   ],
+                   messages)
     end
 
     private
@@ -73,6 +81,17 @@ class TestDecomposersXML < Test::Unit::TestCase
         decomposed << decomposed_data
       end
       decomposed
+    end
+
+    def capture_log
+      messages = super
+      messages.collect do |level, message|
+        [
+          level,
+          message.gsub(/(ChupaText::SAXParser::ParseError:) .*/,
+                       "\\1 ...")
+        ]
+      end
     end
   end
 end
