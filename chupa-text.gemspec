@@ -51,6 +51,7 @@ Gem::Specification.new do |spec|
   end
 
   spec.add_runtime_dependency("archive-zip")
+  spec.add_runtime_dependency("csv", ">= 3.0.4")
 
   spec.add_development_dependency("bundler")
   spec.add_development_dependency("nokogiri")
