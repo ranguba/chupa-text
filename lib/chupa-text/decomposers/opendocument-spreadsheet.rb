@@ -60,6 +60,7 @@ module ChupaText
           @prefix_to_uri = {}
           @uri_to_prefix = {}
           @in_p = false
+          @in_shapes = false
         end
 
         def start_prefix_mapping(prefix, uri)
@@ -86,6 +87,7 @@ module ChupaText
               @sheets << {
                 name: attributes["#{table_prefix}:name"],
                 rows: [],
+                shape_texts: [],
               }
             when "table-row"
               @sheets.last[:rows] << []
@@ -93,6 +95,8 @@ module ChupaText
               @sheets.last[:rows].last << {text: ""}
             when "covered-table-cell"
               @sheets.last[:rows].last << {text: ""}
+            when "shapes"
+              @in_shapes = true
             end
           end
         end
@@ -109,12 +113,18 @@ module ChupaText
             when "table"
               sheet = @sheets.last
               text = ""
+              shape_texts = sheet[:shape_texts]
+              unless shape_texts.empty?
+                text << shape_texts.join("\n") << "\n"
+              end
               sheet[:rows].each do |row|
                 cell_texts = row.collect {|cell| cell[:text]}
                 next if cell_texts.all?(&:empty?)
                 text << cell_texts.join("\t") << "\n"
               end
               sheet[:text] = text
+            when "shapes"
+              @in_shapes = false
             end
           end
         end
@@ -130,7 +140,15 @@ module ChupaText
         private
         def add_text(text)
           return unless @in_p
-          @sheets.last[:rows].last.last[:text] << text
+          sheet = @sheets.last
+          if @in_shapes
+            sheet[:shape_texts] << text
+          else
+            sheet[:rows].last.last[:text] << text
+          end
+        rescue
+          pp [text, @sheets]
+          raise
         end
       end
     end

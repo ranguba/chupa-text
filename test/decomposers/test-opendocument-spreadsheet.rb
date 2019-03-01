@@ -147,6 +147,22 @@ class TestDecomposersOpenDocumentSpreadsheet < Test::Unit::TestCase
                      ],
                      decompose(fixture_path("ods", "covered-table-cell.ods")))
       end
+
+      def test_shapes
+        assert_equal([
+                       [nil, nil, ""],
+                       [
+                         0,
+                         "Sheet1",
+                         "Shape1\n" +
+                         "Shape1\n" +
+                         "Shape2\n" +
+                         "Shape2\n" +
+                         "Cell\n",
+                       ],
+                     ],
+                     decompose(fixture_path("ods", "shapes.ods")))
+      end
     end
   end
 end
