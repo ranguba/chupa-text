@@ -1,4 +1,4 @@
-# Copyright (C) 2013  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2019  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -29,7 +29,15 @@ module ChupaText
     end
 
     def body
-      @body ||= open {|file| file.read}
+      open do |file|
+        file.read
+      end
+    end
+
+    def peek_body(size)
+      open do |file|
+        file.read(size)
+      end
     end
   end
 end

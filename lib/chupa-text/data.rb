@@ -140,6 +140,10 @@ module ChupaText
       yield(StringIO.new(body))
     end
 
+    def peek_body(size)
+      body[0, size]
+    end
+
     def [](name)
       @attributes[name]
     end
@@ -216,10 +220,11 @@ module ChupaText
 
     def guess_mime_type_from_body
       mime_type = nil
-      change_encoding(body, "UTF-8") do |utf8_body|
-        return nil unless utf8_body.valid_encoding?
-        n_null_characters = utf8_body.count("\u0000")
-        return nil if n_null_characters > (utf8_body.bytesize * 0.01)
+      chunk = peek_body(1024)
+      change_encoding(chunk, "UTF-8") do |utf8_chunk|
+        return nil unless utf8_chunk.valid_encoding?
+        n_null_characters = utf8_chunk.count("\u0000")
+        return nil if n_null_characters > (utf8_chunk.bytesize * 0.01)
         mime_type = "text/plain"
       end
       mime_type
