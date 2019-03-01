@@ -30,20 +30,22 @@ module ChupaText
       end
 
       def decompose(data)
-        Gem::Package::TarReader.new(StringIO.new(data.body)) do |reader|
-          reader.each do |entry|
-            next unless entry.file?
+        data.open do |input|
+          Gem::Package::TarReader.new(input) do |reader|
+            reader.each do |entry|
+              next unless entry.file?
 
-            entry.extend(CopyStreamable)
-            entry_uri = data.uri.dup
-            base_path = entry_uri.path.gsub(/\.tar\z/i, "")
-            path_converter = PathConverter.new(entry.full_name,
-                                               uri_escape: true)
-            entry_uri.path = "#{base_path}/#{path_converter.convert}"
-            extracted = VirtualFileData.new(entry_uri,
-                                            entry,
-                                            :source_data => data)
-            yield(extracted)
+              entry.extend(CopyStreamable)
+              entry_uri = data.uri.dup
+              base_path = entry_uri.path.gsub(/\.tar\z/i, "")
+              path_converter = PathConverter.new(entry.full_name,
+                                                 uri_escape: true)
+              entry_uri.path = "#{base_path}/#{path_converter.convert}"
+              extracted = VirtualFileData.new(entry_uri,
+                                              entry,
+                                              :source_data => data)
+              yield(extracted)
+            end
           end
         end
       end
