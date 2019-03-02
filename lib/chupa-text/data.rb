@@ -141,7 +141,9 @@ module ChupaText
     end
 
     def peek_body(size)
-      body[0, size]
+      _body = body
+      return nil if _body.nil?
+      _body[0, size]
     end
 
     def [](name)
