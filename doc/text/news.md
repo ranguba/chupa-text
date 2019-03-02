@@ -1,5 +1,12 @@
 # News
 
+## 1.2.0: 2019-03-03
+
+### Improvements
+
+  * Added support timeout for external command execution by
+    `CHUPA_TEXT_EXTERNAL_COMMAND_TIMEOUT` environment variable.
+
 ## 1.1.9: 2019-03-03
 
 ### Improvements
