@@ -57,38 +57,8 @@ module ChupaText
     #   You can get text data by `text_data.body`.
     #
     # @return [void]
-    def extract(input)
-      targets = [ensure_data(input)]
-      until targets.empty?
-        target = targets.shift
-        debug do
-          "#{log_tag}[extract][target] <#{target.uri}>:<#{target.mime_type}>"
-        end
-        decomposer = find_decomposer(target)
-        if decomposer.nil?
-          if target.text_plain?
-            debug {"#{log_tag}[extract][text-plain]"}
-            yield(target.to_utf8_body_data)
-            next
-          else
-            debug {"#{log_tag}[extract][decomposer] not found"}
-            if target.text?
-              yield(target.to_utf8_body_data)
-            end
-            next
-          end
-        end
-        debug {"#{log_tag}[extract][decomposer] #{decomposer.class}"}
-        decomposer.decompose(target) do |decomposed|
-          debug do
-            "#{log_tag}[extract][decomposed] " +
-              "#{decomposer.class}: " +
-              "<#{target.uri}>: " +
-              "<#{target.mime_type}> -> <#{decomposed.mime_type}>"
-          end
-          targets.push(decomposed)
-        end
-      end
+    def extract(input, &block)
+      extract_recursive(ensure_data(input), &block)
     end
 
     private
@@ -110,6 +80,35 @@ module ChupaText
       return nil if candidates.empty?
       candidate = candidates.sort_by {|score, _| score}.first
       candidate[1]
+    end
+
+    def extract_recursive(target, &block)
+      debug do
+        "#{log_tag}[extract][target] <#{target.uri}>:<#{target.mime_type}>"
+      end
+      decomposer = find_decomposer(target)
+      if decomposer.nil?
+        if target.text_plain?
+          debug {"#{log_tag}[extract][text-plain]"}
+          yield(target.to_utf8_body_data)
+        else
+          debug {"#{log_tag}[extract][decomposer] not found"}
+          if target.text?
+            yield(target.to_utf8_body_data)
+          end
+        end
+      else
+        debug {"#{log_tag}[extract][decomposer] #{decomposer.class}"}
+        decomposer.decompose(target) do |decomposed|
+          debug do
+            "#{log_tag}[extract][decomposed] " +
+              "#{decomposer.class}: " +
+              "<#{target.uri}>: " +
+              "<#{target.mime_type}> -> <#{decomposed.mime_type}>"
+          end
+          extract_recursive(decomposed, &block)
+        end
+      end
     end
 
     def log_tag
