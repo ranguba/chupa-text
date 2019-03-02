@@ -21,8 +21,9 @@ module ChupaText
   class Extractor
     include Loggable
 
-    def initialize
+    def initialize(max_body_size: nil)
       @decomposers = []
+      @max_body_size = max_body_size
     end
 
     # Sets the extractor up by the configuration. It adds decomposers
@@ -90,11 +91,11 @@ module ChupaText
       if decomposer.nil?
         if target.text_plain?
           debug {"#{log_tag}[extract][text-plain]"}
-          yield(target.to_utf8_body_data)
+          yield(target.to_utf8_body_data(max_body_size: @max_body_size))
         else
           debug {"#{log_tag}[extract][decomposer] not found"}
           if target.text?
-            yield(target.to_utf8_body_data)
+            yield(target.to_utf8_body_data(max_body_size: @max_body_size))
           end
         end
       else

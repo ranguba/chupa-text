@@ -198,12 +198,20 @@ module ChupaText
       @need_screenshot
     end
 
-    def to_utf8_body_data
-      b = body
+    def to_utf8_body_data(max_body_size: nil)
+      b = nil
+      if max_body_size
+        open do |input|
+          b = input.read(max_body_size)
+        end
+      else
+        b = body
+      end
       return self if b.nil?
+
       converter = UTF8Converter.new(b)
       utf8_body = converter.convert
-      if b.equal?(utf8_body)
+      if max_body_size.nil? and b.equal?(utf8_body)
         self
       else
         TextData.new(utf8_body, source_data: self)

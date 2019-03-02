@@ -16,8 +16,9 @@
 
 module ChupaText
   class UTF8Converter
-    def initialize(string)
+    def initialize(string, max_size: nil)
       @string = string
+      @max_size = max_size
     end
 
     def convert
@@ -26,44 +27,51 @@ module ChupaText
       when Encoding::UTF_8
         bom_size, bom_encoding = detect_bom
         if bom_size
-          return @string.byteslice(bom_size,
-                                   @string.bytesize - bom_size)
+          utf8_string = @string.byteslice(bom_size,
+                                          @string.bytesize - bom_size)
         else
-          return @string
+          utf8_string = @string
         end
+        return truncate(utf8_string)
       when Encoding::ASCII_8BIT
-        return @string if @string.ascii_only?
+        return truncate(@string) if @string.ascii_only?
       else
-        return @string.encode(Encoding::UTF_8,
-                              invalid: :replace,
-                              undef: :replace,
-                              replace: "")
+        utf8_string = @string.encode(Encoding::UTF_8,
+                                     invalid: :replace,
+                                     undef: :replace,
+                                     replace: "")
+        return truncate(utf8_string)
       end
 
       bom_size, bom_encoding = detect_bom
       if bom_encoding
         string_without_bom = @string.byteslice(bom_size,
                                                @string.bytesize - bom_size)
-        return string_without_bom.encode(Encoding::UTF_8,
-                                         bom_encoding,
-                                         invalid: :replace,
-                                         undef: :replace,
-                                         replace: "")
+        utf8_string = string_without_bom.encode(Encoding::UTF_8,
+                                                bom_encoding,
+                                                invalid: :replace,
+                                                undef: :replace,
+                                                replace: "")
+        return truncate(utf8_string)
       end
 
       guessed_encoding = guess_encoding
       if guessed_encoding
-        @string.encode(Encoding::UTF_8,
-                       guessed_encoding,
-                       invalid: :replace,
-                       undef: :replace,
-                       replace: "")
+        truncate(@string.encode(Encoding::UTF_8,
+                                guessed_encoding,
+                                invalid: :replace,
+                                undef: :replace,
+                                replace: ""))
       else
-        utf8_body = @string.dup
-        utf8_body.force_encoding(Encoding::UTF_8)
-        utf8_body.scrub!("")
-        utf8_body.gsub!(/\p{Control}+/, "")
-        utf8_body
+        if @max_size
+          utf8_string = @string.byteslice(0, @max_size)
+        else
+          utf8_string = @string.dup
+        end
+        utf8_string.force_encoding(Encoding::UTF_8)
+        utf8_string.scrub!("")
+        utf8_string.gsub!(/\p{Control}+/, "")
+        utf8_string
       end
     end
 
@@ -111,6 +119,16 @@ module ChupaText
         nil
       ensure
         @string.force_encoding(original_encoding)
+      end
+    end
+
+    def truncate(string)
+      if @max_size and string.bytesize > @max_size
+        truncated = string.byteslice(0, @max_size)
+        truncated.scrub!("")
+        truncated
+      else
+        string
       end
     end
   end

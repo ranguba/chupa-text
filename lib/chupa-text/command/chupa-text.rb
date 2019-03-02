@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2017  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2019  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -49,6 +49,7 @@ module ChupaText
         @mime_formatter_options = {}
         @need_screenshot = true
         @expected_screenshot_size = [200, 200]
+        @max_body_size = nil
       end
 
       def run(*arguments)
@@ -143,6 +144,11 @@ module ChupaText
                   "(default: #{@expected_screenshot_size.join("x")})") do |size|
           @expected_screenshot_size = size
         end
+        parser.on("--max-body-size=BYTE", Integer,
+                  "The max byte of extracted body.",
+                  "(default: no limit)") do |size|
+          @max_body_size = size
+        end
 
         parser.separator("")
         parser.separator("Log related options:")
@@ -190,7 +196,7 @@ module ChupaText
       end
 
       def create_extractor
-        extractor = Extractor.new
+        extractor = Extractor.new(max_body_size: @max_body_size)
         extractor.apply_configuration(@configuration)
         extractor
       end
