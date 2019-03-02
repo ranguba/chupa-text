@@ -164,17 +164,22 @@ module ChupaText
     end
 
     def wait_process(pid, timeout)
+      tag = "[timeout]"
+
       if timeout.nil?
         timeout_env = ENV["CHUPA_TEXT_EXTERNAL_COMMAND_TIMEOUT"]
-        timeout = parse_time("[timeout]", timeout_env) if timeout_env
+        timeout = parse_time(tag, timeout_env) if timeout_env
       end
 
       if timeout
+        info("#{log_tag}#{tag}[use] <#{timeout}s>: <#{pid}>")
         status = wait_process_timeout(pid, timeout)
         return status if status
+        info("#{log_tag}#{tag}[terminate] <#{pid}>")
         Process.kill(:TERM, pid)
         status = wait_process_timeout(pid, 5)
         return status if status
+        info("#{log_tag}#{tag}[kill] <#{pid}>")
         Process.kill(:KILL, pid)
       end
       _, status = Process.waitpid2(pid)
