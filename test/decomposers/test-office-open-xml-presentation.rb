@@ -129,5 +129,23 @@ class TestDecomposersOfficeOpenXMLPresentation < Test::Unit::TestCase
                      decompose(fixture_path("pptx", "multi-slides.pptx")))
       end
     end
+
+    sub_test_case("invalid") do
+      def test_empty
+        messages = capture_log do
+          assert_equal([], decompose(fixture_path("pptx", "empty.pptx")))
+        end
+        assert_equal([
+                       [
+                         :error,
+                         "[decomposer][office-open-xml][presentation] " +
+                         "Failed to process zip: " +
+                         "Archive::Zip::UnzipError: " +
+                         "unable to locate end-of-central-directory record",
+                       ],
+                     ],
+                     messages)
+      end
+    end
   end
 end

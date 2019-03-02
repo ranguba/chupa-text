@@ -132,5 +132,23 @@ class TestDecomposersOpenDocumentPresentation < Test::Unit::TestCase
                      decompose.collect {|data| [data["index"], data.body]})
       end
     end
+
+    sub_test_case("invalid") do
+      def test_empty
+        messages = capture_log do
+          assert_equal([], decompose(fixture_path("odp", "empty.odp")))
+        end
+        assert_equal([
+                       [
+                         :error,
+                         "[decomposer][opendocument][presentation] " +
+                         "Failed to process zip: " +
+                         "Archive::Zip::UnzipError: " +
+                         "unable to locate end-of-central-directory record",
+                       ],
+                     ],
+                     messages)
+      end
+    end
   end
 end

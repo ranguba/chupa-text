@@ -51,6 +51,10 @@ module ChupaText
         end
       end
 
+      def log_tag
+        "#{super}[spreadsheet]"
+      end
+
       class SheetsListener < SAXListener
         TEXT_URI = "urn:oasis:names:tc:opendocument:xmlns:text:1.0"
         TABLE_URI = "urn:oasis:names:tc:opendocument:xmlns:table:1.0"

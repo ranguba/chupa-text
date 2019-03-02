@@ -49,6 +49,10 @@ module ChupaText
         end
       end
 
+      def log_tag
+        "#{super}[presentation]"
+      end
+
       class SlidesListener < SAXListener
         TEXT_URI = "urn:oasis:names:tc:opendocument:xmlns:text:1.0"
         DRAW_URI = "urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"

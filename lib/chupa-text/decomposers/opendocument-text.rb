@@ -43,6 +43,10 @@ module ChupaText
         yield(text_data)
       end
 
+      def log_tag
+        "#{super}[text]"
+      end
+
       class TextListener < SAXListener
         TEXT_URI = "urn:oasis:names:tc:opendocument:xmlns:text:1.0"
         def initialize(output)

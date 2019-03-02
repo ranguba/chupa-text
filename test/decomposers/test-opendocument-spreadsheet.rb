@@ -164,5 +164,23 @@ class TestDecomposersOpenDocumentSpreadsheet < Test::Unit::TestCase
                      decompose(fixture_path("ods", "shapes.ods")))
       end
     end
+
+    sub_test_case("invalid") do
+      def test_empty
+        messages = capture_log do
+          assert_equal([], decompose(fixture_path("ods", "empty.ods")))
+        end
+        assert_equal([
+                       [
+                         :error,
+                         "[decomposer][opendocument][spreadsheet] " +
+                         "Failed to process zip: " +
+                         "Archive::Zip::UnzipError: " +
+                         "unable to locate end-of-central-directory record",
+                       ],
+                     ],
+                     messages)
+      end
+    end
   end
 end

@@ -14,13 +14,14 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-require "archive/zip"
-
 require "chupa-text/sax-parser"
 
 module ChupaText
   module Decomposers
     class OfficeOpenXML < Decomposer
+      include Loggable
+      include Unzippable
+
       def target?(data)
         @extensions.include?(data.extension) or
           @mime_types.include?(data.mime_type)
@@ -35,29 +36,27 @@ module ChupaText
       end
 
       def decompose(data, &block)
-        context = {
-          data: data,
-          attributes: {},
-        }
-        start_decompose(context)
-        data.open do |input|
-          Archive::Zip.open(input) do |zip|
-            zip.each do |entry|
-              next unless entry.file?
-              case entry.zip_path
-              when "docProps/app.xml"
-                listener = AttributesListener.new(context[:attributes])
-                parse(entry.file_data, listener)
-              when "docProps/core.xml"
-                listener = AttributesListener.new(context[:attributes])
-                parse(entry.file_data, listener)
-              else
-                process_entry(entry, context)
-              end
+        unzip(data) do |zip|
+          context = {
+            data: data,
+            attributes: {},
+          }
+          start_decompose(context)
+          zip.each do |entry|
+            next unless entry.file?
+            case entry.zip_path
+            when "docProps/app.xml"
+              listener = AttributesListener.new(context[:attributes])
+              parse(entry.file_data, listener)
+            when "docProps/core.xml"
+              listener = AttributesListener.new(context[:attributes])
+              parse(entry.file_data, listener)
+            else
+              process_entry(entry, context)
             end
           end
+          finish_decompose(context, &block)
         end
-        finish_decompose(context, &block)
       end
 
       private
@@ -71,8 +70,8 @@ module ChupaText
         parse(entry.file_data, listener)
       end
 
-      def accumulate_text(context)
-        context[:text]
+      def log_tag
+        "[decomposer][office-open-xml]"
       end
 
       class TextListener < SAXListener

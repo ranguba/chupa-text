@@ -140,5 +140,23 @@ Single quote: ''
         BODY
       end
     end
+
+    sub_test_case("invalid") do
+      def test_empty
+        messages = capture_log do
+          assert_equal([], decompose(fixture_path("docx", "empty.docx")))
+        end
+        assert_equal([
+                       [
+                         :error,
+                         "[decomposer][office-open-xml][document] " +
+                         "Failed to process zip: " +
+                         "Archive::Zip::UnzipError: " +
+                         "unable to locate end-of-central-directory record",
+                       ],
+                     ],
+                     messages)
+      end
+    end
   end
 end

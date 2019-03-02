@@ -93,6 +93,10 @@ module ChupaText
         end
       end
 
+      def log_tag
+        "#{super}[workbook]"
+      end
+
       class WorkbookListener < SAXListener
         URI = "http://schemas.openxmlformats.org/spreadsheetml/2006/main"
 

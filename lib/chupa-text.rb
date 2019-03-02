@@ -23,6 +23,7 @@ require "chupa-text/default-logger"
 require "chupa-text/logger"
 
 require "chupa-text/loggable"
+require "chupa-text/unzippable"
 
 require "chupa-text/configuration"
 require "chupa-text/configuration-loader"

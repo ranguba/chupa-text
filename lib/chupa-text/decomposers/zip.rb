@@ -14,14 +14,13 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-require "archive/zip"
-
 require "chupa-text/path-converter"
 
 module ChupaText
   module Decomposers
     class Zip < Decomposer
       include Loggable
+      include Unzippable
 
       registry.register("zip", self)
 
@@ -33,7 +32,7 @@ module ChupaText
       end
 
       def decompose(data)
-        open_zip(data) do |zip|
+        unzip(data) do |zip|
           zip.each do |entry|
             next unless entry.file?
 
@@ -68,23 +67,6 @@ module ChupaText
       end
 
       private
-      def open_zip(data)
-        data.open do |input|
-          begin
-            Archive::Zip.open(input) do |zip|
-              yield(zip)
-            end
-          rescue Archive::Zip::Error => zip_error
-            error do
-              message = "#{log_tag} Failed to process zip: "
-              message << "#{zip_error.class}: #{zip_error.message}\n"
-              message << zip_error.backtrace.join("\n")
-              message
-            end
-          end
-        end
-      end
-
       def log_tag
         "[decomposer][zip]"
       end

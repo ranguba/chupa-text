@@ -14,13 +14,14 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-require "archive/zip"
-
 require "chupa-text/sax-parser"
 
 module ChupaText
   module Decomposers
     class OpenDocument < Decomposer
+      include Loggable
+      include Unzippable
+
       def target?(data)
         data.extension == @extension or
           data.mime_type == @mime_type
@@ -35,24 +36,22 @@ module ChupaText
       end
 
       def decompose(data, &block)
-        context = {
-          data: data,
-          attributes: {},
-        }
-        data.open do |input|
-          Archive::Zip.open(input) do |zip|
-            zip.each do |entry|
-              next unless entry.file?
-              case entry.zip_path
-              when "content.xml"
-                process_content(entry, context, &block)
-              when "meta.xml"
-                process_meta(entry, context, &block)
-              end
+        unzip(data) do |zip|
+          context = {
+            data: data,
+            attributes: {},
+          }
+          zip.each do |entry|
+            next unless entry.file?
+            case entry.zip_path
+            when "content.xml"
+              process_content(entry, context, &block)
+            when "meta.xml"
+              process_meta(entry, context, &block)
             end
           end
+          finish_decompose(context, &block)
         end
-        finish_decompose(context, &block)
       end
 
       private
@@ -64,6 +63,10 @@ module ChupaText
       def process_meta(entry, context, &block)
         listener = AttributesListener.new(context[:attributes])
         parse(entry.file_data, listener)
+      end
+
+      def log_tag
+        "[decomposer][opendocument]"
       end
 
       class AttributesListener < SAXListener

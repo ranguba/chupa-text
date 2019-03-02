@@ -58,6 +58,10 @@ module ChupaText
         end
         yield(text_data)
       end
+
+      def log_tag
+        "#{super}[document]"
+      end
     end
   end
 end
