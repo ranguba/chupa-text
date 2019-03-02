@@ -1,4 +1,4 @@
-# Copyright (C) 2014  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2014-2019  Kouhei Sutou <kou@clear-code.com>
 # Copyright (C) 2010  Yuto HAYAMIZU <y.hayamizu@gmail.com>
 #
 # This library is free software; you can redistribute it and/or
@@ -20,6 +20,8 @@ require "pathname"
 
 module ChupaText
   class ExternalCommand
+    include Loggable
+
     attr_reader :path
     def initialize(path)
       @path = Pathname.new(path)
@@ -31,12 +33,11 @@ module ChupaText
       else
         options = {}
       end
-      spawn_options = options[:spawn_options] || {}
       pid = spawn(options[:env] || {},
                   @path.to_s,
                   *arguments,
-                  default_spawn_options.merge(spawn_options))
-      pid, status = Process.waitpid2(pid)
+                  spawn_options(options[:spawn_options]))
+      status = wait_process(pid, options[:timeout])
       status.success?
     end
 
@@ -51,101 +52,147 @@ module ChupaText
     end
 
     private
-    def default_spawn_options
-      SpawnLimitOptions.new.options
+    def spawn_options(user_options)
+      options = (user_options || {}).dup
+      apply_default_spawn_limit(options, :cpu, :int)
+      apply_default_spawn_limit(options, :as, :size)
+      options
     end
 
-    class SpawnLimitOptions
-      include Loggable
+    def apply_default_spawn_limit(options, key, type)
+      # TODO: Workaround for Ruby 2.3.3p222
+      case key
+      when :cpu
+        option_key = :rlimit_cpu
+      when :as
+        option_key = :rlimit_as
+      else
+        option_key = :"rlimit_#{key}"
+      end
+      return if options[option_key]
 
-      attr_reader :options
-      def initialize
-        @options = {}
-        set_default_options
+      tag = "[limit][#{key}]"
+      value =
+        ENV["CHUPA_TEXT_EXTERNAL_COMMAND_LIMIT_#{key.to_s.upcase}"] ||
+        # For backward compatibility
+        ENV["CHUPA_EXTERNAL_COMMAND_LIMIT_#{key.to_s.upcase}"]
+      value = send("parse_#{type}", tag, value)
+      return if value.nil?
+      rlimit_number = Process.const_get("RLIMIT_#{key.to_s.upcase}")
+      soft_limit, hard_limit = Process.getrlimit(rlimit_number)
+      if hard_limit < value
+        log_hard_limit_over_value(tag, value, hard_limit)
+        return nil
+      end
+      limit_info = "soft-limit:#{soft_limit}, hard-limit:#{hard_limit}"
+      info("#{log_tag}#{tag}[set] <#{value}>(#{limit_info})")
+
+      options[option_key] = value
+    end
+
+    def log_hard_limit_over_value(tag, value, hard_limit)
+      warn("#{log_tag}#{tag}[large] " +
+           "<#{value}>(hard-limit:#{hard_limit})")
+    end
+
+    def parse_int(tag, value)
+      return nil if value.nil?
+      return nil if value.empty?
+      begin
+        Integer(value)
+      rescue ArgumentError
+        log_invalid_value(tag, value, type, "int")
+        nil
+      end
+    end
+
+    def parse_size(tag, value)
+      return nil if value.nil?
+      return nil if value.empty?
+      scale = 1
+      case value
+      when /GB?\z/i
+        scale = 1024 ** 3
+        number = $PREMATCH
+      when /MB?\z/i
+        scale = 1024 ** 2
+        number = $PREMATCH
+      when /KB?\z/i
+        scale = 1024 ** 1
+        number = $PREMATCH
+      when /B?\z/i
+        number = $PREMATCH
+      else
+        number = value
+      end
+      begin
+        number = Float(number)
+      rescue ArgumentError
+        log_invalid_value(tag, value, "size")
+        return nil
+      end
+      (number * scale).to_i
+    end
+
+    def parse_time(tag, value)
+      return nil if value.nil?
+      return nil if value.empty?
+      scale = 1
+      case value
+      when /h\z/i
+        scale = 60 * 60
+        number = $PREMATCH
+      when /m\z/i
+        scale = 60
+        number = $PREMATCH
+      when /s\z/i
+        number = $PREMATCH
+      else
+        number = value
+      end
+      begin
+        number = Float(number)
+      rescue ArgumentError
+        log_invalid_value(tag, value, "time")
+        return nil
+      end
+      (number * scale).to_f
+    end
+
+    def log_invalid_value(tag, value, type)
+      warn("#{log_tag}#{tag}[invalid] <#{value}>(#{type})")
+    end
+
+    def wait_process(pid, timeout)
+      if timeout.nil?
+        timeout_env = ENV["CHUPA_TEXT_EXTERNAL_COMMAND_TIMEOUT"]
+        timeout = parse_time("[timeout]", timeout_env) if timeout_env
       end
 
-      private
-      def set_default_options
-        set_option(:cpu, :int)
-        set_option(:as, :size)
+      if timeout
+        status = wait_process_timeout(pid, timeout)
+        return status if status
+        Process.kill(:TERM, pid)
+        status = wait_process_timeout(pid, 5)
+        return status if status
+        Process.kill(:KILL, pid)
       end
+      _, status = Process.waitpid2(pid)
+      status
+    end
 
-      def set_option(key, type)
-        value =
-          ENV["CHUPA_TEXT_EXTERNAL_COMMAND_LIMIT_#{key.to_s.upcase}"] ||
-          # For backward compatibility
-          ENV["CHUPA_EXTERNAL_COMMAND_LIMIT_#{key.to_s.upcase}"]
-        return if value.nil?
-        return if value.empty?
-        value = send("parse_#{type}", key, value)
-        return if value.nil?
-        rlimit_number = Process.const_get("RLIMIT_#{key.to_s.upcase}")
-        soft_limit, hard_limit = Process.getrlimit(rlimit_number)
-        if hard_limit < value
-          log_hard_limit_over_value(key, value, hard_limit)
-          return nil
-        end
-        limit_info = "soft-limit:#{soft_limit}, hard-limit:#{hard_limit}"
-        info("#{log_tag}[#{key}][set] <#{value}>(#{limit_info})")
-
-        # TODO: Workaround for Ruby 2.3.3p222
-        case key
-        when :cpu
-          @options[:rlimit_cpu] = value
-        when :as
-          @options[:rlimit_as] = value
-        else
-          @options[:"rlimit_#{key}"] = value
-        end
+    def wait_process_timeout(pid, timeout)
+      limit = Time.now + timeout
+      while Time.now < limit
+        _, status = Process.waitpid2(pid, Process::WNOHANG)
+        return status if status
+        sleep(1)
       end
+      nil
+    end
 
-      def parse_int(key, value)
-        begin
-          Integer(value)
-        rescue ArgumentError
-          log_invalid_value(key, value, type, "int")
-          nil
-        end
-      end
-
-      def parse_size(key, value)
-        return nil if value.nil?
-        scale = 1
-        case value
-        when /GB?\z/i
-          scale = 1024 ** 3
-          number = $PREMATCH
-        when /MB?\z/i
-          scale = 1024 ** 2
-          number = $PREMATCH
-        when /KB?\z/i
-          scale = 1024 ** 1
-          number = $PREMATCH
-        when /B?\z/i
-          number = $PREMATCH
-        else
-          number = value
-        end
-        begin
-          number = Float(number)
-        rescue ArgumentError
-          log_invalid_value(key, value, "size")
-          return nil
-        end
-        (number * scale).to_i
-      end
-
-      def log_hard_limit_over_value(key, value, hard_limit)
-        warn("#{log_tag}[#{key}][large] <#{value}>(hard-limit:#{hard_limit})")
-      end
-
-      def log_invalid_value(key, value, type)
-        warn("#{log_tag}[#{key}][invalid] <#{value}>(#{type})")
-      end
-
-      def log_tag
-        "[external-command][limit]"
-      end
+    def log_tag
+      "[external-command]"
     end
   end
 end
