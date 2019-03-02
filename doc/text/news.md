@@ -1,5 +1,25 @@
 # News
 
+## 1.1.8: 2019-03-03
+
+### Improvements
+
+  * `gzip`: Added error checks.
+
+  * `xml`:
+
+     * Added error checks.
+
+     * Added support for Nokogiri as an alternative backend.
+
+  * Reduced memory usage.
+
+  * Added support for body size limitation.
+
+  * `opendocument`: Added error checks.
+
+  * `office-open-xml`: Added error checks.
+
 ## 1.1.7: 2019-03-01
 
 ### Improvements
