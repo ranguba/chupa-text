@@ -20,6 +20,7 @@ require "chupa-text/error"
 
 require "chupa-text/size-parser"
 require "chupa-text/default-logger"
+require "chupa-text/capture-logger"
 require "chupa-text/logger"
 
 require "chupa-text/loggable"
