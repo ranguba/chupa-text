@@ -36,6 +36,10 @@ module ChupaText
       @content.body
     end
 
+    def peek_body(size)
+      @content.peek_body(size)
+    end
+
     def size
       @content.size
     end
