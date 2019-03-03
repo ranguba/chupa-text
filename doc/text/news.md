@@ -1,5 +1,21 @@
 # News
 
+## 1.2.1: 2019-03-04
+
+### Improvements
+
+  * `ChupaText::ExternalCommand`:
+
+    * Added more logs.
+
+    * Added support for ensuring killing external command.
+
+    * Added default value API.
+
+  * `ChupaText::VirtualFileContent`:
+
+    * Added support for inlining small data.
+
 ## 1.2.0: 2019-03-03
 
 ### Improvements
