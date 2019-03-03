@@ -40,18 +40,9 @@ module ChupaText
               path_converter = PathConverter.new(entry.full_name,
                                                  uri_escape: true)
               entry_uri.path = "#{base_path}/#{path_converter.convert}"
-              size = entry.header.size
-              if size < (32 * 1024)
-                entry_data = Data.new(source_data: data)
-                entry_data.uri = entry_uri
-                body = entry.read || ""
-                entry_data.body = body
-                entry_data.size = body.bytesize
-              else
-                entry_data = VirtualFileData.new(entry_uri,
-                                                 entry,
-                                                 :source_data => data)
-              end
+              entry_data = VirtualFileData.new(entry_uri,
+                                               entry,
+                                               :source_data => data)
               yield(entry_data)
             end
           end

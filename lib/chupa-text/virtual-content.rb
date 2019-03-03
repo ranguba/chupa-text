@@ -20,12 +20,10 @@ require "tempfile"
 
 module ChupaText
   class VirtualContent
-    KILO_BYTE = 1024
-    BUFFER_SIZE = 64 * KILO_BYTE
+    INLINE_MAX_SIZE = 64 * 1024
 
     attr_reader :size
     def initialize(input, original_path=nil)
-      @file = nil
       if original_path.is_a?(String)
         if original_path.empty?
           original_path = nil
@@ -34,28 +32,56 @@ module ChupaText
         end
       end
       @original_path = original_path
-      setup_file do |file|
-        @size = IO.copy_stream(input, file)
+      body = input.read(INLINE_MAX_SIZE) || ""
+      if body.bytesize < INLINE_MAX_SIZE
+        @body = body
+        @size = @body.bytesize
+        @file = nil
+        @path = nil
+      else
+        @body = nil
+        setup_file do |file|
+          file.write(body)
+          @size = body.bytesize
+          @size += IO.copy_stream(input, file)
+        end
       end
     end
 
     def open(&block)
-      File.open(path, "rb", &block)
+      if @body
+        super
+      else
+        File.open(path, "rb", &block)
+      end
     end
 
     def body
-      open do |file|
-        file.read
+      if @body
+        @body
+      else
+        open do |file|
+          file.read
+        end
       end
     end
 
     def peek_body(size)
-      open do |file|
-        file.read(size)
+      if @body
+        super
+      else
+        open do |file|
+          file.read(size)
+        end
       end
     end
 
     def path
+      if @path.nil?
+        setup_file do |file|
+          file.write(@body)
+        end
+      end
       @path
     end
 
@@ -77,6 +103,7 @@ module ChupaText
     def setup_file
       basename = compute_tempfile_basename
       @file = Tempfile.new(basename)
+      @file.binmode
       @path = @file.path
       yield(@file)
       @file.close
