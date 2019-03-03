@@ -49,7 +49,6 @@ module ChupaText
                                                encoding: base_path.encoding,
                                                uri_escape: true)
             entry_uri.path = "#{base_path}/#{path_converter.convert}"
-            size = entry.raw_data.window_size
             entry_data = VirtualFileData.new(entry_uri,
                                              entry.file_data,
                                              source_data: data)
