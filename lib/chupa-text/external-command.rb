@@ -37,7 +37,18 @@ module ChupaText
                   @path.to_s,
                   *arguments,
                   spawn_options(options[:spawn_options]))
-      status = wait_process(pid, options[:timeout])
+      status = nil
+      begin
+        status = wait_process(pid, options[:timeout])
+      ensure
+        unless status
+          begin
+            Process.kill(:KILL, pid)
+            Process.waitpid(pid)
+          rescue SystemCallError
+          end
+        end
+      end
       status.success?
     end
 
