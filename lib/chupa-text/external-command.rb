@@ -22,6 +22,42 @@ module ChupaText
   class ExternalCommand
     include Loggable
 
+    @default_timeout = nil
+    @default_limit_cpu = nil
+    @default_limit_as = nil
+    class << self
+      def default_timeout
+        @default_timeout || ENV["CHUPA_TEXT_EXTERNAL_COMMAND_TIMEOUT"]
+      end
+
+      def default_timeout=(timeout)
+        @default_timeout = timeout
+      end
+
+      def default_limit_cpu
+        @default_limit_cpu || limit_env("CPU")
+      end
+
+      def default_limit_cpu=(cpu)
+        @default_limit_cpu = cpu
+      end
+
+      def default_limit_as
+        @default_limit_as || limit_env("AS")
+      end
+
+      def default_limit_as=(as)
+        @default_limit_as = as
+      end
+
+      private
+      def limit_env(name)
+        ENV["CHUPA_TEXT_EXTERNAL_COMMAND_LIMIT_#{name}"] ||
+          # For backward compatibility
+          ENV["CHUPA_EXTERNAL_COMMAND_LIMIT_#{name}"]
+      end
+    end
+
     attr_reader :path
     def initialize(path)
       @path = Pathname.new(path)
@@ -83,11 +119,8 @@ module ChupaText
       return if options[option_key]
 
       tag = "[limit][#{key}]"
-      value =
-        ENV["CHUPA_TEXT_EXTERNAL_COMMAND_LIMIT_#{key.to_s.upcase}"] ||
-        # For backward compatibility
-        ENV["CHUPA_EXTERNAL_COMMAND_LIMIT_#{key.to_s.upcase}"]
-      value = send("parse_#{type}", tag, value)
+      value = self.class.__send__("default_limit_#{key}")
+      value = __send__("parse_#{type}", tag, value)
       return if value.nil?
       rlimit_number = Process.const_get("RLIMIT_#{key.to_s.upcase}")
       soft_limit, hard_limit = Process.getrlimit(rlimit_number)
@@ -107,67 +140,87 @@ module ChupaText
     end
 
     def parse_int(tag, value)
-      return nil if value.nil?
-      return nil if value.empty?
-      begin
-        Integer(value)
-      rescue ArgumentError
-        log_invalid_value(tag, value, type, "int")
+      case value
+      when nil
         nil
+      when Integer
+        value
+      when Float
+        value.round
+      else
+        return nil if value.empty?
+        begin
+          Integer(value)
+        rescue ArgumentError
+          log_invalid_value(tag, value, type, "int")
+          nil
+        end
       end
     end
 
     def parse_size(tag, value)
-      return nil if value.nil?
-      return nil if value.empty?
-      scale = 1
       case value
-      when /GB?\z/i
-        scale = 1024 ** 3
-        number = $PREMATCH
-      when /MB?\z/i
-        scale = 1024 ** 2
-        number = $PREMATCH
-      when /KB?\z/i
-        scale = 1024 ** 1
-        number = $PREMATCH
-      when /B?\z/i
-        number = $PREMATCH
+      when nil
+        nil
+      when Numeric
+        value
       else
-        number = value
+        return nil if value.empty?
+        scale = 1
+        case value
+        when /GB?\z/i
+          scale = 1024 ** 3
+          number = $PREMATCH
+        when /MB?\z/i
+          scale = 1024 ** 2
+          number = $PREMATCH
+        when /KB?\z/i
+          scale = 1024 ** 1
+          number = $PREMATCH
+        when /B?\z/i
+          number = $PREMATCH
+        else
+          number = value
+        end
+        begin
+          number = Float(number)
+        rescue ArgumentError
+          log_invalid_value(tag, value, "size")
+          return nil
+        end
+        (number * scale).to_i
       end
-      begin
-        number = Float(number)
-      rescue ArgumentError
-        log_invalid_value(tag, value, "size")
-        return nil
-      end
-      (number * scale).to_i
     end
 
     def parse_time(tag, value)
-      return nil if value.nil?
-      return nil if value.empty?
-      scale = 1
       case value
-      when /h\z/i
-        scale = 60 * 60
-        number = $PREMATCH
-      when /m\z/i
-        scale = 60
-        number = $PREMATCH
-      when /s\z/i
-        number = $PREMATCH
+      when nil
+        nil
+      when Numeric
+        value
       else
-        number = value
+        return nil if value.empty?
+        scale = 1
+        case value
+        when /h\z/i
+          scale = 60 * 60
+          number = $PREMATCH
+        when /m\z/i
+          scale = 60
+          number = $PREMATCH
+        when /s\z/i
+          number = $PREMATCH
+        else
+          number = value
+        end
+        begin
+          number = Float(number)
+        rescue ArgumentError
+          log_invalid_value(tag, value, "time")
+          return nil
+        end
+        (number * scale).to_f
       end
-      begin
-        number = Float(number)
-      rescue ArgumentError
-        log_invalid_value(tag, value, "time")
-        return nil
-      end
-      (number * scale).to_f
     end
 
     def log_invalid_value(tag, value, type)
@@ -176,12 +229,7 @@ module ChupaText
 
     def wait_process(pid, timeout)
       tag = "[timeout]"
-
-      if timeout.nil?
-        timeout_env = ENV["CHUPA_TEXT_EXTERNAL_COMMAND_TIMEOUT"]
-        timeout = parse_time(tag, timeout_env) if timeout_env
-      end
-
+      timeout = parse_time(tag, timeout || self.class.default_timeout)
       if timeout
         info("#{log_tag}#{tag}[use] <#{timeout}s>: <#{pid}>")
         status = wait_process_timeout(pid, timeout)
