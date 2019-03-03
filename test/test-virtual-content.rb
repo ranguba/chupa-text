@@ -1,4 +1,4 @@
-# Copyright (C) 2013  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2019  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -53,7 +53,7 @@ class TestVirtualContent < Test::Unit::TestCase
 
   sub_test_case("large data") do
     def setup
-      @body = "X" * (ChupaText::VirtualContent::BUFFER_SIZE + 1)
+      @body = "X" * (ChupaText::VirtualContent::INLINE_MAX_SIZE + 1)
     end
 
     def test_size

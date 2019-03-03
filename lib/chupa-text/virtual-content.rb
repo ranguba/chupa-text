@@ -32,8 +32,8 @@ module ChupaText
         end
       end
       @original_path = original_path
-      body = input.read(INLINE_MAX_SIZE) || ""
-      if body.bytesize < INLINE_MAX_SIZE
+      body = input.read(INLINE_MAX_SIZE + 1) || ""
+      if body.bytesize <= INLINE_MAX_SIZE
         @body = body
         @size = @body.bytesize
         @file = nil
@@ -50,7 +50,7 @@ module ChupaText
 
     def open(&block)
       if @body
-        super
+        yield(StringIO.new(@body))
       else
         File.open(path, "rb", &block)
       end
