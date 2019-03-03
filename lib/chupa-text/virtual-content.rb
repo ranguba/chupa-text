@@ -68,7 +68,7 @@ module ChupaText
 
     def peek_body(size)
       if @body
-        super
+        @body[0, size]
       else
         open do |file|
           file.read(size)
