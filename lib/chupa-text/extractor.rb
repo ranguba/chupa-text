@@ -79,7 +79,7 @@ module ChupaText
         candidates << [score, decomposer]
       end
       return nil if candidates.empty?
-      candidate = candidates.sort_by {|score, _| score}.first
+      candidate = candidates.sort_by {|score, _| -score}.first
       candidate[1]
     end
 
