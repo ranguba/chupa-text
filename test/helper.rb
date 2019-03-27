@@ -17,6 +17,7 @@
 require "pathname"
 require "tempfile"
 require "uri"
+require "webrick"
 
 module Helper
   def fixture_path(*components)
