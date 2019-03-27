@@ -18,6 +18,13 @@ class TestDecomposersHTTPServer < Test::Unit::TestCase
   include Helper
 
   def setup
+    ChupaText::Decomposers::HTTPServer.default_url = nil
+    setup_server
+    setup_data
+    setup_decomposer
+  end
+
+  def setup_server
     @port = 40080
     @path = "/extraction.json"
     @server_url = "http://127.0.0.1:#{@port}#{@path}"
@@ -28,54 +35,75 @@ class TestDecomposersHTTPServer < Test::Unit::TestCase
                                       AccessLog: [])
     @server.mount_proc(@path) do |request, response|
       response["Content-Type"] = "application/json"
-      response.body = JSON.generate(@actual)
+      response.body = JSON.generate(@extracted)
     end
     @server_thread = Thread.new do
       @server.start
     end
+  end
+
+  def setup_data
+    @input_data = <<-CSV
+Hello,World
+Ruby,ChupaText
+    CSV
+    @input_mime_type = "text/csv"
+    @input_path = "/tmp/hello.csv"
+    @extracted_text = @input_data.gsub(/,/, "\t")
+    @extracted_path = @input_path.gsub(/\.csv\z/, ".txt")
+    @extracted = {
+        "mime-type" => @input_mime_type,
+        "uri" => "file://#{@input_path}",
+        "path" => @input_path,
+        "size" => @input_data.bytesize,
+        "texts" => [
+          {
+            "mime-type" => "text/plain",
+            "uri" => "file://#{@extracted_path}",
+            "path" => @extracted_path,
+            "size" => @extracted_text.bytesize,
+            "source-mime-types" => [
+              @input_mime_type,
+            ],
+            "body" => @extracted_text,
+          },
+        ],
+      }
+
+  end
+
+  def setup_decomposer
     @decomposer = ChupaText::Decomposers::HTTPServer.new(:url => @server_url)
   end
 
   def teardown
+    teardown_server
+  end
+
+  def teardown_server
     @server.shutdown
     @server_thread.join
   end
 
   sub_test_case("decompose") do
     def test_valid
-      csv = <<-CSV
-Hello,World
-Ruby,ChupaText
-      CSV
-      extracted = csv.gsub(/,/, "\t")
-      @actual = {
-        "mime-type" => "text/csv",
-        "uri" => "file:///tmp/hello.csv",
-        "path" => "/tmp/hello.csv",
-        "size" => csv.bytesize,
-        "texts" => [
-          {
-            "mime-type" => "text/plain",
-            "uri" => "file:///tmp/hello.txt",
-            "path" => "/tmp/hello.txt",
-            "size" => extracted.bytesize,
-            "source-mime-types" => [
-              "text/csv",
-            ],
-            "body" => extracted,
-          },
-        ],
-      }
-      assert_equal([extracted],
-                   decompose(csv).collect(&:body))
+      assert_equal([@extracted_text],
+                   decompose.collect(&:body))
+    end
+
+    def test_default_url
+      ChupaText::Decomposers::HTTPServer.default_url = @server_url
+      @decomposer = ChupaText::Decomposers::HTTPServer.new({})
+      assert_equal([@extracted_text],
+                   decompose.collect(&:body))
     end
 
     private
-    def decompose(csv)
+    def decompose
       data = ChupaText::Data.new
-      data.path = "/tmp/hello.csv"
-      data.mime_type = "text/csv"
-      data.body = csv
+      data.path = @input_path
+      data.mime_type = @input_mime_type
+      data.body = @input_data
 
       decomposed = []
       @decomposer.decompose(data) do |decomposed_data|

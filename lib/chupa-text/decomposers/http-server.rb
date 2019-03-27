@@ -22,9 +22,22 @@ module ChupaText
     class HTTPServer < Decomposer
       registry.register("http-server", self)
 
+      @@default_url = nil
+      class << self
+        def default_url
+          @@default_url
+        end
+
+        def default_url=(url)
+          @@default_url = url
+        end
+      end
+
       def initialize(options)
         super
-        @url = @options[:url] || ENV["CHUPA_TEXT_HTTP_SERVER_URL"]
+        @url = @options[:url] ||
+               self.class.default_url ||
+               ENV["CHUPA_TEXT_HTTP_SERVER_URL"]
         @url = URI(@url) if @url
       end
 
@@ -36,7 +49,7 @@ module ChupaText
 
       def target_score(data)
         if target?(data)
-          -100
+          100
         else
           nil
         end
