@@ -64,7 +64,9 @@ module ChupaText
         if data.timeout.is_a?(Numeric)
           http.open_timeout = data.timeout * 1.5
           http.read_timeout = data.timeout * 1.5
-          http.write_timeout = data.timeout * 1.5
+          if http.respond_to?(:write_timeout=)
+            http.write_timeout = data.timeout * 1.5
+          end
         end
         begin
           http.start do
