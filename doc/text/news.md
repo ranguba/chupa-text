@@ -1,5 +1,36 @@
 # News
 
+## 1.2.2: 2019-03-28
+
+### Improvements
+
+  * Added `http-server` decomposer.
+
+  * `ChupaText::Data#max_body_size`: Added.
+
+  * `ChupaText::Data#max_body_size=`: Added.
+
+  * `ChupaText::Data#timeout`: Added.
+
+  * `ChupaText::Data#timeout=`: Added.
+
+  * `ChupaText::Data#limit_cpu`: Added.
+
+  * `ChupaText::Data#limit_cpu=`: Added.
+
+  * `ChupaText::Data#limit_ax`: Added.
+
+  * `ChupaText::Data#limit_ax=`: Added.
+
+  * `ChupaText::ExternalCommand`: Added support for soft timeout and limits.
+
+  * `ChupaText::Extractor`: Stopped receiving the max body size as an
+    option. Use `ChupaText::Data#max_body_size=` instead.
+
+### Fixes
+
+  * Fixed decomposer choose logic.
+
 ## 1.2.1: 2019-03-04
 
 ### Improvements
