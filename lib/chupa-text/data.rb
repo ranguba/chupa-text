@@ -68,6 +68,17 @@ module ChupaText
     # @return [Integer, nil] the max body size in bytes.
     attr_accessor :max_body_size
 
+    # @return [Numeric, String, nil] the timeout on extraction.
+    attr_accessor :timeout
+
+    # @return [Numeric, String, nil] the max CPU time on extraction by
+    #   external command.
+    attr_accessor :limit_cpu
+
+    # @return [Numeric, String, nil] the max memory on extraction by
+    #   external command.
+    attr_accessor :limit_as
+
     def initialize(options={})
       @uri = nil
       @body = nil
@@ -80,6 +91,9 @@ module ChupaText
       @need_screenshot = true
       @expected_screenshot_size = [200, 200]
       @max_body_size = nil
+      @timeout = nil
+      @limit_cpu = nil
+      @limit_as = nil
       @options = options || {}
       source_data = @options[:source_data]
       if source_data
@@ -112,6 +126,9 @@ module ChupaText
       self.need_screenshot = data.need_screenshot?
       self.expected_screenshot_size = data.expected_screenshot_size
       self.max_body_size = data.max_body_size
+      self.timeout = data.timeout
+      self.limit_cpu = data.limit_cpu
+      self.limit_as = data.limit_as
     end
 
     # @param [String, URI, nil] uri The URI for the data. If `uri` is

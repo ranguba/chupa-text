@@ -23,11 +23,8 @@ module ChupaText
     include Loggable
 
     @default_timeout = nil
-    @default_soft_timeout = nil
     @default_limit_cpu = nil
-    @default_soft_limit_cpu = nil
     @default_limit_as = nil
-    @default_soft_limit_as = nil
     class << self
       def default_timeout
         @default_timeout || ENV["CHUPA_TEXT_EXTERNAL_COMMAND_TIMEOUT"]
@@ -35,14 +32,6 @@ module ChupaText
 
       def default_timeout=(timeout)
         @default_timeout = timeout
-      end
-
-      def default_soft_timeout
-        @default_soft_timeout
-      end
-
-      def default_soft_timeout=(timeout)
-        @default_soft_timeout = timeout
       end
 
       def default_limit_cpu
@@ -53,28 +42,12 @@ module ChupaText
         @default_limit_cpu = cpu
       end
 
-      def default_soft_limit_cpu
-        @default_soft_limit_cpu
-      end
-
-      def default_soft_limit_cpu=(cpu)
-        @default_soft_limit_cpu = cpu
-      end
-
       def default_limit_as
         @default_limit_as || limit_env("AS")
       end
 
       def default_limit_as=(as)
         @default_limit_as = as
-      end
-
-      def default_soft_limit_as
-        @default_soft_limit_as
-      end
-
-      def default_soft_limit_as=(as)
-        @default_soft_limit_as = as
       end
 
       private
@@ -96,13 +69,19 @@ module ChupaText
       else
         options = {}
       end
+      data = options[:data]
       pid = spawn(options[:env] || {},
                   @path.to_s,
                   *arguments,
-                  spawn_options(options[:spawn_options]))
+                  spawn_options(options[:spawn_options], data))
+      if data
+        soft_timeout = data.timeout
+      else
+        soft_timeout = nil
+      end
       status = nil
       begin
-        status = wait_process(pid, options[:timeout], options[:soft_timeout])
+        status = wait_process(pid, options[:timeout], soft_timeout)
       ensure
         unless status
           begin
@@ -126,14 +105,21 @@ module ChupaText
     end
 
     private
-    def spawn_options(user_options)
+    def spawn_options(user_options, data)
       options = (user_options || {}).dup
-      apply_default_spawn_limit(options, :cpu, :time)
-      apply_default_spawn_limit(options, :as, :size)
+      if data
+        soft_limit_cpu = data.limit_cpu
+        soft_limit_as = data.limit_as
+      else
+        soft_limit_cpu = nil
+        soft_limit_as = nil
+      end
+      apply_default_spawn_limit(options, soft_limit_cpu, :cpu, :time)
+      apply_default_spawn_limit(options, soft_limit_as, :as, :size)
       options
     end
 
-    def apply_default_spawn_limit(options, key, type)
+    def apply_default_spawn_limit(options, soft_value, key, type)
       # TODO: Workaround for Ruby 2.3.3p222
       case key
       when :cpu
@@ -151,7 +137,6 @@ module ChupaText
       tag = "[limit][#{key}]"
       value = self.class.__send__("default_limit_#{key}")
       value = __send__("parse_#{type}", tag, value)
-      soft_value = self.class.__send__("default_soft_limit_#{key}")
       soft_value = __send__("parse_#{type}", tag, soft_value)
       if value
         value = soft_value if soft_value and soft_value < value
@@ -275,10 +260,8 @@ module ChupaText
 
     def wait_process(pid, timeout, soft_timeout)
       tag = "[timeout]"
-      timeout = parse_time(tag,
-                           timeout || self.class.default_timeout)
-      soft_timeout = parse_time(tag,
-                                soft_timeout || self.class.default_soft_timeout)
+      timeout = parse_time(tag, timeout || self.class.default_timeout)
+      soft_timeout = parse_time(tag, soft_timeout)
       if timeout
         timeout = soft_timeout if soft_timeout and soft_timeout < timeout
       else

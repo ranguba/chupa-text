@@ -75,13 +75,12 @@ class TestExternalCommand < Test::Unit::TestCase
 
   class TestTimeout < self
     def setup
+      @data = ChupaText::TextData.new("Hello")
       timeout = ChupaText::ExternalCommand.default_timeout
-      soft_timeout = ChupaText::ExternalCommand.default_soft_timeout
       begin
         yield
       ensure
         ChupaText::ExternalCommand.default_timeout = timeout
-        ChupaText::ExternalCommand.default_soft_timeout = soft_timeout
       end
     end
 
@@ -89,7 +88,8 @@ class TestExternalCommand < Test::Unit::TestCase
       IO.pipe do |input, output|
         command = create_command(ruby)
         command.run("-e", "puts(Process.pid)",
-                    options.merge(spawn_options: {out: output}))
+                    options.merge(data: @data,
+                                  spawn_options: {out: output}))
         input.gets.chomp
       end
     end
@@ -108,11 +108,11 @@ class TestExternalCommand < Test::Unit::TestCase
                    messages)
     end
 
-    def test_option_soft_not_use
+    def test_data_not_use
+      @data.timeout = "90s"
       pid = nil
       messages = capture_log do
-        pid = run_command(timeout: "60s",
-                          soft_timeout: "90s")
+        pid = run_command(timeout: "60s")
       end
       assert_equal([
                      [
@@ -123,11 +123,11 @@ class TestExternalCommand < Test::Unit::TestCase
                    messages)
     end
 
-    def test_option_soft_use
+    def test_data_use
+      @data.timeout = "30s"
       pid = nil
       messages = capture_log do
-        pid = run_command(timeout: "60s",
-                          soft_timeout: "30s")
+        pid = run_command(timeout: "60s")
       end
       assert_equal([
                      [
@@ -138,10 +138,11 @@ class TestExternalCommand < Test::Unit::TestCase
                    messages)
     end
 
-    def test_option_soft_only
+    def test_data_only
+      @data.timeout = "30s"
       pid = nil
       messages = capture_log do
-        pid = run_command(soft_timeout: "30s")
+        pid = run_command
       end
       assert_equal([
                      [
@@ -167,9 +168,9 @@ class TestExternalCommand < Test::Unit::TestCase
                    messages)
     end
 
-    def test_default_soft_not_use
+    def test_default_data_not_use
       ChupaText::ExternalCommand.default_timeout = "60s"
-      ChupaText::ExternalCommand.default_soft_timeout = "90s"
+      @data.timeout = "90s"
       pid = nil
       messages = capture_log do
         pid = run_command
@@ -183,9 +184,9 @@ class TestExternalCommand < Test::Unit::TestCase
                    messages)
     end
 
-    def test_default_soft_use
+    def test_default_data_use
       ChupaText::ExternalCommand.default_timeout = "60s"
-      ChupaText::ExternalCommand.default_soft_timeout = "30s"
+      @data.timeout = "30s"
       pid = nil
       messages = capture_log do
         pid = run_command
@@ -199,9 +200,8 @@ class TestExternalCommand < Test::Unit::TestCase
                    messages)
     end
 
-    def test_default_soft_only
-      ChupaText::ExternalCommand.default_timeout = nil
-      ChupaText::ExternalCommand.default_soft_timeout = "30s"
+    def test_default_data_only
+      @data.timeout = "30s"
       pid = nil
       messages = capture_log do
         pid = run_command
@@ -218,19 +218,19 @@ class TestExternalCommand < Test::Unit::TestCase
 
   class TestLimitCPU < self
     def setup
+      @data = ChupaText::TextData.new("Hello")
       limit_cpu = ChupaText::ExternalCommand.default_limit_cpu
-      soft_limit_cpu = ChupaText::ExternalCommand.default_soft_limit_cpu
       begin
         yield
       ensure
         ChupaText::ExternalCommand.default_limit_cpu = limit_cpu
-        ChupaText::ExternalCommand.default_soft_limit_cpu = soft_limit_cpu
       end
     end
 
     def run_command(spawn_options={})
       command = create_command(ruby)
       command.run("-e", "true",
+                  data: @data,
                   spawn_options: spawn_options)
     end
 
@@ -250,9 +250,9 @@ class TestExternalCommand < Test::Unit::TestCase
                    messages)
     end
 
-    def test_default_soft_not_use
+    def test_default_data_not_use
       ChupaText::ExternalCommand.default_limit_cpu = "60s"
-      ChupaText::ExternalCommand.default_soft_limit_cpu = "90s"
+      @data.limit_cpu = "90s"
       messages = capture_log do
         run_command
       end
@@ -267,9 +267,9 @@ class TestExternalCommand < Test::Unit::TestCase
                    messages)
     end
 
-    def test_default_soft_use
+    def test_default_data_use
       ChupaText::ExternalCommand.default_limit_cpu = "60s"
-      ChupaText::ExternalCommand.default_soft_limit_cpu = "30s"
+      @data.limit_cpu = "30s"
       messages = capture_log do
         run_command
       end
@@ -284,8 +284,8 @@ class TestExternalCommand < Test::Unit::TestCase
                    messages)
     end
 
-    def test_default_soft_only
-      ChupaText::ExternalCommand.default_soft_limit_cpu = "30s"
+    def test_default_data_only
+      @data.limit_cpu = "30s"
       messages = capture_log do
         run_command
       end
@@ -303,19 +303,19 @@ class TestExternalCommand < Test::Unit::TestCase
 
   class TestLimitAS < self
     def setup
+      @data = ChupaText::TextData.new("Hello")
       limit_as = ChupaText::ExternalCommand.default_limit_as
-      soft_limit_as = ChupaText::ExternalCommand.default_soft_limit_as
       begin
         yield
       ensure
         ChupaText::ExternalCommand.default_limit_as = limit_as
-        ChupaText::ExternalCommand.default_soft_limit_as = soft_limit_as
       end
     end
 
     def run_command(spawn_options={})
       command = create_command(ruby)
       command.run("-e", "true",
+                  data: @data,
                   spawn_options: spawn_options)
     end
 
@@ -336,9 +336,9 @@ class TestExternalCommand < Test::Unit::TestCase
                    messages)
     end
 
-    def test_default_soft_not_use
+    def test_default_data_not_use
       ChupaText::ExternalCommand.default_limit_as = "100MiB"
-      ChupaText::ExternalCommand.default_soft_limit_as = "150MiB"
+      @data.limit_as = "150MiB"
       messages = capture_log do
         run_command
       end
@@ -356,7 +356,7 @@ class TestExternalCommand < Test::Unit::TestCase
 
     def test_default_soft_use
       ChupaText::ExternalCommand.default_limit_as = "100MiB"
-      ChupaText::ExternalCommand.default_soft_limit_as = "50MiB"
+      @data.limit_as = "50MiB"
       messages = capture_log do
         run_command
       end
@@ -373,7 +373,7 @@ class TestExternalCommand < Test::Unit::TestCase
     end
 
     def test_default_soft_only
-      ChupaText::ExternalCommand.default_soft_limit_as = "50MiB"
+      @data.limit_as = "50MiB"
       messages = capture_log do
         run_command
       end
