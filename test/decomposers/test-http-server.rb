@@ -35,6 +35,7 @@ class TestDecomposersHTTPServer < Test::Unit::TestCase
                                       AccessLog: [])
     @response_status = 200
     @server.mount_proc(@path) do |request, response|
+      sleep(@timeout * 2) if @timeout
       response.status = @response_status
       response.content_type = "application/json"
       response.body = JSON.generate(@response)
@@ -51,6 +52,7 @@ Ruby,ChupaText
     CSV
     @input_mime_type = "text/csv"
     @input_path = "/tmp/hello.csv"
+    @timeout = nil
     @extracted_text = @input_data.gsub(/,/, "\t")
     @extracted_path = @input_path.gsub(/\.csv\z/, ".txt")
     @response = {
@@ -71,7 +73,6 @@ Ruby,ChupaText
         },
       ],
     }
-
   end
 
   def setup_decomposer
@@ -88,12 +89,12 @@ Ruby,ChupaText
   end
 
   sub_test_case("decompose") do
-    def test_valid
+    def test_success
       assert_equal([@extracted_text],
                    decompose.collect(&:body))
     end
 
-    def test_invalid
+    def test_not_ok
       @response_status = 404
       messages = capture_log do
         assert_equal([], decompose.collect(&:body))
@@ -105,6 +106,45 @@ Ruby,ChupaText
                        "Failed to process data in server: " +
                        "#{@server_url}: " +
                        "#{@response_status}: Not Found",
+                     ],
+                   ],
+                   messages)
+    end
+
+    def test_no_server
+      no_server_url = "http://127.0.0.1:2929/extraction.json"
+      @decomposer = ChupaText::Decomposers::HTTPServer.new(:url => no_server_url)
+      messages = capture_log do
+        assert_equal([], decompose.collect(&:body))
+      end
+      messages = messages.collect do |level, message|
+        [level, message.gsub(/Errno::.*\z/, "")]
+      end
+      assert_equal([
+                     [
+                       :error,
+                       "[decomposer][http-server][connection] " +
+                       "Failed to process data in server: " +
+                       "#{no_server_url}: ",
+                     ],
+                   ],
+                   messages)
+    end
+
+    def test_read_timeout
+      @timeout = 0.1
+      messages = capture_log do
+        assert_equal([], decompose.collect(&:body))
+      end
+      messages = messages.collect do |level, message|
+        [level, message.gsub(/Net::.*\z/, "")]
+      end
+      assert_equal([
+                     [
+                       :error,
+                       "[decomposer][http-server][timeout] " +
+                       "Failed to process data in server: " +
+                       "#{@server_url}: ",
                      ],
                    ],
                    messages)
@@ -123,6 +163,7 @@ Ruby,ChupaText
       data.path = @input_path
       data.mime_type = @input_mime_type
       data.body = @input_data
+      data.timeout = @timeout
 
       decomposed = []
       @decomposer.decompose(data) do |decomposed_data|

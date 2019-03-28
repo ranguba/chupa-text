@@ -58,40 +58,49 @@ module ChupaText
         end
       end
 
-      def decompose(data)
+      def decompose(data, &block)
         http = Net::HTTP.new(@url.host, @url.port)
         http.use_ssl = true if @url.is_a?(URI::HTTPS)
-        http.start do
-          request = Net::HTTP::Post.new(@url)
-          request["transfer-encoding"] = "chunked"
-          data.open do |input|
-            request.set_form([
-                               [
-                                 "data",
-                                 input,
-                                 {
-                                   filename: data.path.to_s,
-                                   content_type: data.mime_type,
-                                 },
-                               ],
-                             ],
-                             "multipart/form-data")
-            response = http.request(request)
-            unless response.is_a?(Net::HTTPOK)
-              error do
-                message = "#{log_tag} Failed to process data in server: "
-                message << "#{@url}: "
-                message << "#{response.code}: #{response.message.strip}\n"
-                case response.content_type
-                when "application/json"
-                  PP.pp(JSON.parse(response.body), message)
-                else
-                  message << response.body
-                end
-                message
-              end
-              break
-            end
+        if data.timeout.is_a?(Numeric)
+          http.open_timeout = data.timeout * 1.5
+          http.read_timeout = data.timeout * 1.5
+          http.write_timeout = data.timeout * 1.5
+        end
+        begin
+          http.start do
+            process_request(http, data, &block)
+          end
+        rescue SystemCallError => error
+          error do
+            message = "#{log_tag}[connection] "
+            message << "Failed to process data in server: "
+            message << "#{@url}: "
+            message << "#{error.class}: #{error.message}\n"
+            message << error.backtrace.join("\n")
+            message
+          end
+        rescue Net::ReadTimeout => error
+          error do
+            message = "#{log_tag}[timeout] "
+            message << "Failed to process data in server: "
+            message << "#{@url}: "
+            message << "#{error.class}: #{error.message}\n"
+            message << error.backtrace.join("\n")
+            message
+          end
+        end
+      end
+
+      private
+      def process_request(http, data)
+        request = Net::HTTP::Post.new(@url)
+        request["transfer-encoding"] = "chunked"
+        data.open do |input|
+          request.set_form(build_parameters(data, input),
+                           "multipart/form-data")
+          response = http.request(request)
+          case response
+          when Net::HTTPOK
             extracted = JSON.parse(response.body)
             (extracted["texts"] || []).each do |text|
               text_data = TextData.new(text["body"], source_data: data)
@@ -101,11 +110,48 @@ module ChupaText
               end
               yield(text_data)
             end
+          else
+            error do
+              message = "#{log_tag} Failed to process data in server: "
+              message << "#{@url}: "
+              message << "#{response.code}: #{response.message.strip}\n"
+              case response.content_type
+              when "application/json"
+                PP.pp(JSON.parse(response.body), message)
+              else
+                message << response.body
+              end
+              message
+            end
           end
         end
       end
 
-      private
+      def build_parameters(data, input)
+        parameters = []
+        [
+          ["timeout",
+           data.timeout || ChupaText::ExternalCommand.default_timeout],
+          ["limit_cpu",
+           data.limit_cpu || ChupaText::ExternalCommand.default_limit_cpu],
+          ["limit_as",
+           data.limit_as || ChupaText::ExternalCommand.default_limit_as],
+          ["max_body_size", data.max_body_size],
+        ].each do |key, value|
+          next if value.nil?
+          parameters << [key, StringIO.new(value.to_s)]
+        end
+        parameters << [
+          "data",
+          input,
+          {
+            filename: data.path.to_s,
+            content_type: data.mime_type,
+          },
+        ]
+        parameters
+      end
+
       def log_tag
         "[decomposer][http-server]"
       end
