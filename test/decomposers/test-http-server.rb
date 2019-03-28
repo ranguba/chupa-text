@@ -33,9 +33,11 @@ class TestDecomposersHTTPServer < Test::Unit::TestCase
     @server = WEBrick::HTTPServer.new(Port: @port,
                                       Logger: logger,
                                       AccessLog: [])
+    @response_status = 200
     @server.mount_proc(@path) do |request, response|
-      response["Content-Type"] = "application/json"
-      response.body = JSON.generate(@extracted)
+      response.status = @response_status
+      response.content_type = "application/json"
+      response.body = JSON.generate(@response)
     end
     @server_thread = Thread.new do
       @server.start
@@ -51,24 +53,24 @@ Ruby,ChupaText
     @input_path = "/tmp/hello.csv"
     @extracted_text = @input_data.gsub(/,/, "\t")
     @extracted_path = @input_path.gsub(/\.csv\z/, ".txt")
-    @extracted = {
-        "mime-type" => @input_mime_type,
-        "uri" => "file://#{@input_path}",
-        "path" => @input_path,
-        "size" => @input_data.bytesize,
-        "texts" => [
-          {
-            "mime-type" => "text/plain",
-            "uri" => "file://#{@extracted_path}",
-            "path" => @extracted_path,
-            "size" => @extracted_text.bytesize,
-            "source-mime-types" => [
-              @input_mime_type,
-            ],
-            "body" => @extracted_text,
-          },
-        ],
-      }
+    @response = {
+      "mime-type" => @input_mime_type,
+      "uri" => "file://#{@input_path}",
+      "path" => @input_path,
+      "size" => @input_data.bytesize,
+      "texts" => [
+        {
+          "mime-type" => "text/plain",
+          "uri" => "file://#{@extracted_path}",
+          "path" => @extracted_path,
+          "size" => @extracted_text.bytesize,
+          "source-mime-types" => [
+            @input_mime_type,
+          ],
+          "body" => @extracted_text,
+        },
+      ],
+    }
 
   end
 
@@ -89,6 +91,23 @@ Ruby,ChupaText
     def test_valid
       assert_equal([@extracted_text],
                    decompose.collect(&:body))
+    end
+
+    def test_invalid
+      @response_status = 404
+      messages = capture_log do
+        assert_equal([], decompose.collect(&:body))
+      end
+      assert_equal([
+                     [
+                       :error,
+                       "[decomposer][http-server] " +
+                       "Failed to process data in server: " +
+                       "#{@server_url}: " +
+                       "#{@response_status}: Not Found",
+                     ],
+                   ],
+                   messages)
     end
 
     def test_default_url

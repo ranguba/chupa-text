@@ -15,11 +15,14 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 require "net/http"
+require "pp"
 require "uri"
 
 module ChupaText
   module Decomposers
     class HTTPServer < Decomposer
+      include Loggable
+
       registry.register("http-server", self)
 
       @@default_url = nil
@@ -74,7 +77,21 @@ module ChupaText
                              ],
                              "multipart/form-data")
             response = http.request(request)
-            # TODO: Check response
+            unless response.is_a?(Net::HTTPOK)
+              error do
+                message = "#{log_tag} Failed to process data in server: "
+                message << "#{@url}: "
+                message << "#{response.code}: #{response.message.strip}\n"
+                case response.content_type
+                when "application/json"
+                  PP.pp(JSON.parse(response.body), message)
+                else
+                  message << response.body
+                end
+                message
+              end
+              break
+            end
             extracted = JSON.parse(response.body)
             (extracted["texts"] || []).each do |text|
               text_data = TextData.new(text["body"], source_data: data)
@@ -86,6 +103,11 @@ module ChupaText
             end
           end
         end
+      end
+
+      private
+      def log_tag
+        "[decomposer][http-server]"
       end
     end
   end
