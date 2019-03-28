@@ -25,7 +25,9 @@ module ChupaText
     @default_timeout = nil
     @default_soft_timeout = nil
     @default_limit_cpu = nil
+    @default_soft_limit_cpu = nil
     @default_limit_as = nil
+    @default_soft_limit_as = nil
     class << self
       def default_timeout
         @default_timeout || ENV["CHUPA_TEXT_EXTERNAL_COMMAND_TIMEOUT"]
@@ -51,12 +53,28 @@ module ChupaText
         @default_limit_cpu = cpu
       end
 
+      def default_soft_limit_cpu
+        @default_soft_limit_cpu
+      end
+
+      def default_soft_limit_cpu=(cpu)
+        @default_soft_limit_cpu = cpu
+      end
+
       def default_limit_as
         @default_limit_as || limit_env("AS")
       end
 
       def default_limit_as=(as)
         @default_limit_as = as
+      end
+
+      def default_soft_limit_as
+        @default_soft_limit_as
+      end
+
+      def default_soft_limit_as=(as)
+        @default_soft_limit_as = as
       end
 
       private
@@ -110,7 +128,7 @@ module ChupaText
     private
     def spawn_options(user_options)
       options = (user_options || {}).dup
-      apply_default_spawn_limit(options, :cpu, :int)
+      apply_default_spawn_limit(options, :cpu, :time)
       apply_default_spawn_limit(options, :as, :size)
       options
     end
@@ -120,16 +138,26 @@ module ChupaText
       case key
       when :cpu
         option_key = :rlimit_cpu
+        unit = "s"
       when :as
         option_key = :rlimit_as
+        unit = ""
       else
         option_key = :"rlimit_#{key}"
+        unit = ""
       end
       return if options[option_key]
 
       tag = "[limit][#{key}]"
       value = self.class.__send__("default_limit_#{key}")
       value = __send__("parse_#{type}", tag, value)
+      soft_value = self.class.__send__("default_soft_limit_#{key}")
+      soft_value = __send__("parse_#{type}", tag, soft_value)
+      if value
+        value = soft_value if soft_value and soft_value < value
+      else
+        value = soft_value
+      end
       return if value.nil?
       rlimit_number = Process.const_get("RLIMIT_#{key.to_s.upcase}")
       soft_limit, hard_limit = Process.getrlimit(rlimit_number)
@@ -138,7 +166,7 @@ module ChupaText
         return nil
       end
       limit_info = "soft-limit:#{soft_limit}, hard-limit:#{hard_limit}"
-      info("#{log_tag}#{tag}[set] <#{value}>(#{limit_info})")
+      info("#{log_tag}#{tag}[set] <#{value}#{unit}>(#{limit_info})")
 
       options[option_key] = value
     end
@@ -178,12 +206,21 @@ module ChupaText
         scale = 1
         case value
         when /GB?\z/i
+          scale = 1000 ** 3
+          number = $PREMATCH
+        when /GiB?\z/i
           scale = 1024 ** 3
           number = $PREMATCH
         when /MB?\z/i
+          scale = 1000 ** 2
+          number = $PREMATCH
+        when /MiB?\z/i
           scale = 1024 ** 2
           number = $PREMATCH
-        when /KB?\z/i
+        when /[kK]B?\z/i
+          scale = 1000 ** 1
+          number = $PREMATCH
+        when /KiB?\z/i
           scale = 1024 ** 1
           number = $PREMATCH
         when /B?\z/i

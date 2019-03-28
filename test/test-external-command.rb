@@ -215,4 +215,178 @@ class TestExternalCommand < Test::Unit::TestCase
                    messages)
     end
   end
+
+  class TestLimitCPU < self
+    def setup
+      limit_cpu = ChupaText::ExternalCommand.default_limit_cpu
+      soft_limit_cpu = ChupaText::ExternalCommand.default_soft_limit_cpu
+      begin
+        yield
+      ensure
+        ChupaText::ExternalCommand.default_limit_cpu = limit_cpu
+        ChupaText::ExternalCommand.default_soft_limit_cpu = soft_limit_cpu
+      end
+    end
+
+    def run_command(spawn_options={})
+      command = create_command(ruby)
+      command.run("-e", "true",
+                  spawn_options: spawn_options)
+    end
+
+    def test_default
+      ChupaText::ExternalCommand.default_limit_cpu = "60s"
+      messages = capture_log do
+        run_command
+      end
+      soft_limit, hard_limit = Process.getrlimit(Process::RLIMIT_CPU)
+      assert_equal([
+                     [
+                       :info,
+                       "[external-command][limit][cpu][set] <60.0s>" +
+                       "(soft-limit:#{soft_limit}, hard-limit:#{hard_limit})",
+                     ]
+                   ],
+                   messages)
+    end
+
+    def test_default_soft_not_use
+      ChupaText::ExternalCommand.default_limit_cpu = "60s"
+      ChupaText::ExternalCommand.default_soft_limit_cpu = "90s"
+      messages = capture_log do
+        run_command
+      end
+      soft_limit, hard_limit = Process.getrlimit(Process::RLIMIT_CPU)
+      assert_equal([
+                     [
+                       :info,
+                       "[external-command][limit][cpu][set] <60.0s>" +
+                       "(soft-limit:#{soft_limit}, hard-limit:#{hard_limit})",
+                     ]
+                   ],
+                   messages)
+    end
+
+    def test_default_soft_use
+      ChupaText::ExternalCommand.default_limit_cpu = "60s"
+      ChupaText::ExternalCommand.default_soft_limit_cpu = "30s"
+      messages = capture_log do
+        run_command
+      end
+      soft_limit, hard_limit = Process.getrlimit(Process::RLIMIT_CPU)
+      assert_equal([
+                     [
+                       :info,
+                       "[external-command][limit][cpu][set] <30.0s>" +
+                       "(soft-limit:#{soft_limit}, hard-limit:#{hard_limit})",
+                     ]
+                   ],
+                   messages)
+    end
+
+    def test_default_soft_only
+      ChupaText::ExternalCommand.default_soft_limit_cpu = "30s"
+      messages = capture_log do
+        run_command
+      end
+      soft_limit, hard_limit = Process.getrlimit(Process::RLIMIT_CPU)
+      assert_equal([
+                     [
+                       :info,
+                       "[external-command][limit][cpu][set] <30.0s>" +
+                       "(soft-limit:#{soft_limit}, hard-limit:#{hard_limit})",
+                     ]
+                   ],
+                   messages)
+    end
+  end
+
+  class TestLimitAS < self
+    def setup
+      limit_as = ChupaText::ExternalCommand.default_limit_as
+      soft_limit_as = ChupaText::ExternalCommand.default_soft_limit_as
+      begin
+        yield
+      ensure
+        ChupaText::ExternalCommand.default_limit_as = limit_as
+        ChupaText::ExternalCommand.default_soft_limit_as = soft_limit_as
+      end
+    end
+
+    def run_command(spawn_options={})
+      command = create_command(ruby)
+      command.run("-e", "true",
+                  spawn_options: spawn_options)
+    end
+
+    def test_default
+      ChupaText::ExternalCommand.default_limit_as = "100MiB"
+      messages = capture_log do
+        run_command
+      end
+      soft_limit, hard_limit = Process.getrlimit(Process::RLIMIT_AS)
+      assert_equal([
+                     [
+                       :info,
+                       "[external-command][limit][as][set] " +
+                       "<#{100 * 1024 * 1024}>" +
+                       "(soft-limit:#{soft_limit}, hard-limit:#{hard_limit})",
+                     ]
+                   ],
+                   messages)
+    end
+
+    def test_default_soft_not_use
+      ChupaText::ExternalCommand.default_limit_as = "100MiB"
+      ChupaText::ExternalCommand.default_soft_limit_as = "150MiB"
+      messages = capture_log do
+        run_command
+      end
+      soft_limit, hard_limit = Process.getrlimit(Process::RLIMIT_AS)
+      assert_equal([
+                     [
+                       :info,
+                       "[external-command][limit][as][set] " +
+                       "<#{100 * 1024 * 1024}>" +
+                       "(soft-limit:#{soft_limit}, hard-limit:#{hard_limit})",
+                     ]
+                   ],
+                   messages)
+    end
+
+    def test_default_soft_use
+      ChupaText::ExternalCommand.default_limit_as = "100MiB"
+      ChupaText::ExternalCommand.default_soft_limit_as = "50MiB"
+      messages = capture_log do
+        run_command
+      end
+      soft_limit, hard_limit = Process.getrlimit(Process::RLIMIT_AS)
+      assert_equal([
+                     [
+                       :info,
+                       "[external-command][limit][as][set] " +
+                       "<#{50 * 1024 * 1024}>" +
+                       "(soft-limit:#{soft_limit}, hard-limit:#{hard_limit})",
+                     ]
+                   ],
+                   messages)
+    end
+
+    def test_default_soft_only
+      ChupaText::ExternalCommand.default_soft_limit_as = "50MiB"
+      messages = capture_log do
+        run_command
+      end
+      soft_limit, hard_limit = Process.getrlimit(Process::RLIMIT_AS)
+      assert_equal([
+                     [
+                       :info,
+                       "[external-command][limit][as][set] " +
+                       "<#{50 * 1024 * 1024}>" +
+                       "(soft-limit:#{soft_limit}, hard-limit:#{hard_limit})",
+                     ]
+                   ],
+                   messages)
+    end
+  end
 end
