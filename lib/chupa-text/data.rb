@@ -65,6 +65,9 @@ module ChupaText
     # @return [Array<Integer, Integer>] the expected screenshot size.
     attr_accessor :expected_screenshot_size
 
+    # @return [Integer, nil] the max body size in bytes.
+    attr_accessor :max_body_size
+
     def initialize(options={})
       @uri = nil
       @body = nil
@@ -76,6 +79,7 @@ module ChupaText
       @screenshot = nil
       @need_screenshot = true
       @expected_screenshot_size = [200, 200]
+      @max_body_size = nil
       @options = options || {}
       source_data = @options[:source_data]
       if source_data
@@ -107,6 +111,7 @@ module ChupaText
       end
       self.need_screenshot = data.need_screenshot?
       self.expected_screenshot_size = data.expected_screenshot_size
+      self.max_body_size = data.max_body_size
     end
 
     # @param [String, URI, nil] uri The URI for the data. If `uri` is
@@ -198,11 +203,11 @@ module ChupaText
       @need_screenshot
     end
 
-    def to_utf8_body_data(max_body_size: nil)
+    def to_utf8_body_data
       b = nil
-      if max_body_size
+      if @max_body_size
         open do |input|
-          b = input.read(max_body_size)
+          b = input.read(@max_body_size)
         end
       else
         b = body
@@ -211,7 +216,7 @@ module ChupaText
 
       converter = UTF8Converter.new(b)
       utf8_body = converter.convert
-      if max_body_size.nil? and b.equal?(utf8_body)
+      if @max_body_size.nil? and b.equal?(utf8_body)
         self
       else
         TextData.new(utf8_body, source_data: self)

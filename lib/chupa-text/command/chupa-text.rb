@@ -196,7 +196,7 @@ module ChupaText
       end
 
       def create_extractor
-        extractor = Extractor.new(max_body_size: @max_body_size)
+        extractor = Extractor.new
         extractor.apply_configuration(@configuration)
         extractor
       end
@@ -222,6 +222,7 @@ module ChupaText
         data.mime_type = @mime_type if @mime_type
         data.need_screenshot = @need_screenshot
         data.expected_screenshot_size = @expected_screenshot_size
+        data.max_body_size = @max_body_size
         data
       end
 

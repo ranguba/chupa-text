@@ -231,10 +231,11 @@ class TestExtractor < Test::Unit::TestCase
 
     sub_test_case("max body size") do
       def test_last_invalid
-        @extractor = ChupaText::Extractor.new(max_body_size: 5)
+        @extractor = ChupaText::Extractor.new
         data = ChupaText::Data.new
         data.mime_type = "text/plain"
         data.body = "こん"
+        data.max_body_size = 5
         assert_equal(["こ"], extract(data))
       end
     end
