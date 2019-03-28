@@ -1,5 +1,11 @@
 # News
 
+## 1.2.3: 2019-03-28
+
+### Fixes
+
+  * Added support for Ruby 2.5 or earlier again.
+
 ## 1.2.2: 2019-03-28
 
 ### Improvements
