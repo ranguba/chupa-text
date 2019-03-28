@@ -23,6 +23,7 @@ module ChupaText
     include Loggable
 
     @default_timeout = nil
+    @default_soft_timeout = nil
     @default_limit_cpu = nil
     @default_limit_as = nil
     class << self
@@ -32,6 +33,14 @@ module ChupaText
 
       def default_timeout=(timeout)
         @default_timeout = timeout
+      end
+
+      def default_soft_timeout
+        @default_soft_timeout
+      end
+
+      def default_soft_timeout=(timeout)
+        @default_soft_timeout = timeout
       end
 
       def default_limit_cpu
@@ -75,7 +84,7 @@ module ChupaText
                   spawn_options(options[:spawn_options]))
       status = nil
       begin
-        status = wait_process(pid, options[:timeout])
+        status = wait_process(pid, options[:timeout], options[:soft_timeout])
       ensure
         unless status
           begin
@@ -227,9 +236,17 @@ module ChupaText
       warn("#{log_tag}#{tag}[invalid] <#{value}>(#{type})")
     end
 
-    def wait_process(pid, timeout)
+    def wait_process(pid, timeout, soft_timeout)
       tag = "[timeout]"
-      timeout = parse_time(tag, timeout || self.class.default_timeout)
+      timeout = parse_time(tag,
+                           timeout || self.class.default_timeout)
+      soft_timeout = parse_time(tag,
+                                soft_timeout || self.class.default_soft_timeout)
+      if timeout
+        timeout = soft_timeout if soft_timeout and soft_timeout < timeout
+      else
+        timeout = soft_timeout
+      end
       if timeout
         info("#{log_tag}#{tag}[use] <#{timeout}s>: <#{pid}>")
         status = wait_process_timeout(pid, timeout)

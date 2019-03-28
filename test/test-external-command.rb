@@ -1,4 +1,4 @@
-# Copyright (C) 2014  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2014-2019  Kouhei Sutou <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -14,12 +14,8 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-require "rbconfig"
-
 class TestExternalCommand < Test::Unit::TestCase
-  def ruby
-    RbConfig.ruby
-  end
+  include Helper
 
   def create_command(command)
     ChupaText::ExternalCommand.new(command)
@@ -74,6 +70,149 @@ class TestExternalCommand < Test::Unit::TestCase
 
     def test_not_exist
       assert_false(exist?("nonexistent"))
+    end
+  end
+
+  class TestTimeout < self
+    def setup
+      timeout = ChupaText::ExternalCommand.default_timeout
+      soft_timeout = ChupaText::ExternalCommand.default_soft_timeout
+      begin
+        yield
+      ensure
+        ChupaText::ExternalCommand.default_timeout = timeout
+        ChupaText::ExternalCommand.default_soft_timeout = soft_timeout
+      end
+    end
+
+    def run_command(options={})
+      IO.pipe do |input, output|
+        command = create_command(ruby)
+        command.run("-e", "puts(Process.pid)",
+                    options.merge(spawn_options: {out: output}))
+        input.gets.chomp
+      end
+    end
+
+    def test_option
+      pid = nil
+      messages = capture_log do
+        pid = run_command(timeout: "60s")
+      end
+      assert_equal([
+                     [
+                       :info,
+                       "[external-command][timeout][use] <60.0s>: <#{pid}>",
+                     ]
+                   ],
+                   messages)
+    end
+
+    def test_option_soft_not_use
+      pid = nil
+      messages = capture_log do
+        pid = run_command(timeout: "60s",
+                          soft_timeout: "90s")
+      end
+      assert_equal([
+                     [
+                       :info,
+                       "[external-command][timeout][use] <60.0s>: <#{pid}>",
+                     ]
+                   ],
+                   messages)
+    end
+
+    def test_option_soft_use
+      pid = nil
+      messages = capture_log do
+        pid = run_command(timeout: "60s",
+                          soft_timeout: "30s")
+      end
+      assert_equal([
+                     [
+                       :info,
+                       "[external-command][timeout][use] <30.0s>: <#{pid}>",
+                     ]
+                   ],
+                   messages)
+    end
+
+    def test_option_soft_only
+      pid = nil
+      messages = capture_log do
+        pid = run_command(soft_timeout: "30s")
+      end
+      assert_equal([
+                     [
+                       :info,
+                       "[external-command][timeout][use] <30.0s>: <#{pid}>",
+                     ]
+                   ],
+                   messages)
+    end
+
+    def test_default
+      ChupaText::ExternalCommand.default_timeout = "60s"
+      pid = nil
+      messages = capture_log do
+        pid = run_command
+      end
+      assert_equal([
+                     [
+                       :info,
+                       "[external-command][timeout][use] <60.0s>: <#{pid}>",
+                     ]
+                   ],
+                   messages)
+    end
+
+    def test_default_soft_not_use
+      ChupaText::ExternalCommand.default_timeout = "60s"
+      ChupaText::ExternalCommand.default_soft_timeout = "90s"
+      pid = nil
+      messages = capture_log do
+        pid = run_command
+      end
+      assert_equal([
+                     [
+                       :info,
+                       "[external-command][timeout][use] <60.0s>: <#{pid}>",
+                     ]
+                   ],
+                   messages)
+    end
+
+    def test_default_soft_use
+      ChupaText::ExternalCommand.default_timeout = "60s"
+      ChupaText::ExternalCommand.default_soft_timeout = "30s"
+      pid = nil
+      messages = capture_log do
+        pid = run_command
+      end
+      assert_equal([
+                     [
+                       :info,
+                       "[external-command][timeout][use] <30.0s>: <#{pid}>",
+                     ]
+                   ],
+                   messages)
+    end
+
+    def test_default_soft_only
+      ChupaText::ExternalCommand.default_timeout = nil
+      ChupaText::ExternalCommand.default_soft_timeout = "30s"
+      pid = nil
+      messages = capture_log do
+        pid = run_command
+      end
+      assert_equal([
+                     [
+                       :info,
+                       "[external-command][timeout][use] <30.0s>: <#{pid}>",
+                     ]
+                   ],
+                   messages)
     end
   end
 end

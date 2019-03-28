@@ -15,6 +15,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 require "pathname"
+require "rbconfig"
 require "tempfile"
 require "uri"
 require "webrick"
@@ -39,5 +40,9 @@ module Helper
       message = message.split("\n", 2)[0]
       [level, message]
     end
+  end
+
+  def ruby
+    RbConfig.ruby
   end
 end
