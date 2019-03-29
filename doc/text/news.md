@@ -1,5 +1,11 @@
 # News
 
+## 1.2.4: 2019-03-29
+
+### Fixes
+
+  * `http-server`: Fixed score.
+
 ## 1.2.3: 2019-03-28
 
 ### Fixes
