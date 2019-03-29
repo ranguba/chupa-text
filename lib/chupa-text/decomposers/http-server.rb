@@ -52,7 +52,7 @@ module ChupaText
 
       def target_score(data)
         if target?(data)
-          100
+          -100
         else
           nil
         end
