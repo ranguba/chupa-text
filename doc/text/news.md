@@ -1,5 +1,11 @@
 # News
 
+## 1.2.5: 2019-05-20
+
+### Improvements
+
+  * `http-server`: Added support for changing the default URL at run-time.
+
 ## 1.2.4: 2019-03-29
 
 ### Fixes
