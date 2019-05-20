@@ -38,16 +38,13 @@ module ChupaText
 
       def initialize(options)
         super
-        @url = @options[:url] ||
-               self.class.default_url ||
-               ENV["CHUPA_TEXT_HTTP_SERVER_URL"]
+        @url = @options[:url]
         @url = URI(@url) if @url
       end
 
       def target?(data)
-        return false unless @url
         return false if data.text_plain?
-        true
+        @url or default_url
       end
 
       def target_score(data)
@@ -59,8 +56,9 @@ module ChupaText
       end
 
       def decompose(data, &block)
-        http = Net::HTTP.new(@url.host, @url.port)
-        http.use_ssl = true if @url.is_a?(URI::HTTPS)
+        url = @url || default_url
+        http = Net::HTTP.new(url.host, url.port)
+        http.use_ssl = true if url.is_a?(URI::HTTPS)
         if data.timeout.is_a?(Numeric)
           http.open_timeout = data.timeout * 1.5
           http.read_timeout = data.timeout * 1.5
@@ -70,13 +68,13 @@ module ChupaText
         end
         begin
           http.start do
-            process_request(http, data, &block)
+            process_request(url, http, data, &block)
           end
         rescue SystemCallError => error
           error do
             message = "#{log_tag}[connection] "
             message << "Failed to process data in server: "
-            message << "#{@url}: "
+            message << "#{url}: "
             message << "#{error.class}: #{error.message}\n"
             message << error.backtrace.join("\n")
             message
@@ -85,7 +83,7 @@ module ChupaText
           error do
             message = "#{log_tag}[timeout] "
             message << "Failed to process data in server: "
-            message << "#{@url}: "
+            message << "#{url}: "
             message << "#{error.class}: #{error.message}\n"
             message << error.backtrace.join("\n")
             message
@@ -94,8 +92,14 @@ module ChupaText
       end
 
       private
-      def process_request(http, data)
-        request = Net::HTTP::Post.new(@url)
+      def default_url
+        url = self.class.default_url || ENV["CHUPA_TEXT_HTTP_SERVER_URL"]
+        return nil if url.nil?
+        URI(url)
+      end
+
+      def process_request(url, http, data)
+        request = Net::HTTP::Post.new(url)
         request["transfer-encoding"] = "chunked"
         data.open do |input|
           request.set_form(build_parameters(data, input),
@@ -115,7 +119,7 @@ module ChupaText
           else
             error do
               message = "#{log_tag} Failed to process data in server: "
-              message << "#{@url}: "
+              message << "#{url}: "
               message << "#{response.code}: #{response.message.strip}\n"
               case response.content_type
               when "application/json"
