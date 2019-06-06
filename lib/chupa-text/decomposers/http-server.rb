@@ -60,11 +60,11 @@ module ChupaText
         http = Net::HTTP.new(url.host, url.port)
         http.use_ssl = true if url.is_a?(URI::HTTPS)
         if data.timeout.is_a?(Numeric)
-          http.open_timeout = data.timeout * 1.5
-          http.read_timeout = data.timeout * 1.5
-          if http.respond_to?(:write_timeout=)
-            http.write_timeout = data.timeout * 1.5
-          end
+          timeout = data.timeout * 1.5
+          http.open_timeout = timeout
+          http.read_timeout = timeout
+          http.write_timeout = timeout if http.respond_to?(:write_timeout=)
+          http.continue_timeout = timeout
         end
         begin
           http.start do
@@ -101,6 +101,7 @@ module ChupaText
       def process_request(url, http, data)
         request = Net::HTTP::Post.new(url)
         request["transfer-encoding"] = "chunked"
+        request["expect"] = "100-continue" if http.continue_timeout
         data.open do |input|
           request.set_form(build_parameters(data, input),
                            "multipart/form-data")
