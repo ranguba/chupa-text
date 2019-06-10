@@ -1,5 +1,13 @@
 # News
 
+## 1.2.6: 2019-06-10
+
+### Improvements
+
+  * `http-server`: Added support for `Expect: 100-continue`.
+
+  * Removed temporary files immediately.
+
 ## 1.2.5: 2019-05-20
 
 ### Improvements
