@@ -38,5 +38,9 @@ module ChupaText
     def open(&block)
       @content.open(&block)
     end
+
+    def release
+      @content.release
+    end
   end
 end

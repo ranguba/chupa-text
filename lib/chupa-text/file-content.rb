@@ -28,6 +28,9 @@ module ChupaText
       File.open(@path, "rb", &block)
     end
 
+    def release
+    end
+
     def body
       open do |file|
         file.read

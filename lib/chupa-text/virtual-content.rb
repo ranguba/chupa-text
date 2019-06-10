@@ -56,6 +56,14 @@ module ChupaText
       end
     end
 
+    def release
+      @body = nil
+      if @file
+        @file.delete
+        @file = nil
+      end
+    end
+
     def body
       if @body
         @body

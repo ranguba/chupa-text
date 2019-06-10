@@ -48,6 +48,10 @@ module ChupaText
       @content.open(&block)
     end
 
+    def release
+      @content.release
+    end
+
     private
     def download
       begin

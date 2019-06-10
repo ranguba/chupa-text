@@ -162,6 +162,9 @@ module ChupaText
       yield(StringIO.new(body))
     end
 
+    def release
+    end
+
     def peek_body(size)
       _body = body
       return nil if _body.nil?

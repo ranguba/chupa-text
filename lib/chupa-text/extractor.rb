@@ -90,11 +90,15 @@ module ChupaText
       if decomposer.nil?
         if target.text_plain?
           debug {"#{log_tag}[extract][text-plain]"}
-          yield(target.to_utf8_body_data)
+          utf8_data = target.to_utf8_body_data
+          yield(utf8_data)
+          utf8_data.release unless target == utf8_data
         else
           debug {"#{log_tag}[extract][decomposer] not found"}
           if target.text?
-            yield(target.to_utf8_body_data)
+            utf8_data = target.to_utf8_body_data
+            yield(utf8_data)
+            utf8_data.release unless target == utf8_data
           end
         end
       else
@@ -107,6 +111,7 @@ module ChupaText
               "<#{target.mime_type}> -> <#{decomposed.mime_type}>"
           end
           extract_recursive(decomposed, &block)
+          decomposed.release
         end
       end
     end
