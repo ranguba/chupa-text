@@ -104,7 +104,7 @@ Ruby,ChupaText
                        :error,
                        "[decomposer][http-server] " +
                        "Failed to process data in server: " +
-                       "#{@server_url}: " +
+                       "<>(#{@input_mime_type}): #{@server_url}: " +
                        "#{@response_status}: Not Found",
                      ],
                    ],

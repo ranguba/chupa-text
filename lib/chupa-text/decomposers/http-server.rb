@@ -120,7 +120,7 @@ module ChupaText
           else
             error do
               message = "#{log_tag} Failed to process data in server: "
-              message << "#{url}: "
+              message << "<#{data.uri}>(#{data.mime_type}): #{url}: "
               message << "#{response.code}: #{response.message.strip}\n"
               case response.content_type
               when "application/json"
