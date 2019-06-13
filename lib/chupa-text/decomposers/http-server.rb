@@ -60,7 +60,7 @@ module ChupaText
         http = Net::HTTP.new(url.host, url.port)
         http.use_ssl = true if url.is_a?(URI::HTTPS)
         if data.timeout.is_a?(Numeric)
-          timeout = data.timeout * 1.5
+          timeout = data.timeout * 0.9
           http.open_timeout = timeout
           http.read_timeout = timeout
           http.write_timeout = timeout if http.respond_to?(:write_timeout=)
