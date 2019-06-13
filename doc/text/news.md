@@ -1,5 +1,11 @@
 # News
 
+## 1.2.9: 2019-06-13
+
+### Improvements
+
+  * `http-server`: Logged more information on error.
+
 ## 1.2.8: 2019-06-13
 
 ### Improvements
