@@ -1,5 +1,11 @@
 # News
 
+## 1.2.7: 2019-06-13
+
+### Improvements
+
+  * Added support for timeout.
+
 ## 1.2.6: 2019-06-10
 
 ### Improvements
