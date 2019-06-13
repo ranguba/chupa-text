@@ -1,5 +1,11 @@
 # News
 
+## 1.2.8: 2019-06-13
+
+### Improvements
+
+  * `http-server`: Reduced timeout in server.
+
 ## 1.2.7: 2019-06-13
 
 ### Improvements
