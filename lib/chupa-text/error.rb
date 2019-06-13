@@ -53,4 +53,13 @@ module ChupaText
       super("Unknown encoding data: <#{data.uri}>(#{data.mime_type}): <#{encoding}>")
     end
   end
+
+  class TimeoutError < Error
+    attr_reader :data, :timeout
+    def initialize(data, timeout)
+      @data = data
+      @timeout = timeout
+      super("Timeout error: <#{data.uri}>(#{data.mime_type}): <#{timeout}>")
+    end
+  end
 end

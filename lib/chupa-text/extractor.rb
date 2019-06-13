@@ -16,6 +16,7 @@
 
 require "pathname"
 require "uri"
+require "timeout"
 
 module ChupaText
   class Extractor
@@ -103,16 +104,34 @@ module ChupaText
         end
       else
         debug {"#{log_tag}[extract][decomposer] #{decomposer.class}"}
-        decomposer.decompose(target) do |decomposed|
-          debug do
-            "#{log_tag}[extract][decomposed] " +
-              "#{decomposer.class}: " +
-              "<#{target.uri}>: " +
-              "<#{target.mime_type}> -> <#{decomposed.mime_type}>"
+        with_timeout(target) do
+          decomposer.decompose(target) do |decomposed|
+            begin
+              debug do
+                "#{log_tag}[extract][decomposed] " +
+                  "#{decomposer.class}: " +
+                  "<#{target.uri}>: " +
+                  "<#{target.mime_type}> -> <#{decomposed.mime_type}>"
+              end
+              extract_recursive(decomposed, &block)
+            ensure
+              decomposed.release
+            end
           end
-          extract_recursive(decomposed, &block)
-          decomposed.release
         end
+      end
+    end
+
+    def with_timeout(data, &block)
+      timeout = data.timeout
+      if timeout
+        begin
+          Timeout.timeout(timeout, &block)
+        rescue Timeout::Error
+          raise TimeoutError.new(data, timeout)
+        end
+      else
+        yield
       end
     end
 

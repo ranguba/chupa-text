@@ -76,6 +76,7 @@ class TestExtractor < Test::Unit::TestCase
           extracted = ChupaText::Data.new
           extracted.mime_type = "text/plain"
           extracted.body = data.body.gsub(/<.+?>/, "")
+          sleep(data.timeout * 2) if data.timeout
           yield(extracted)
         end
       end
@@ -91,6 +92,17 @@ class TestExtractor < Test::Unit::TestCase
         data.mime_type = "text/html"
         data.body = "<html><body>Hello</body></html>"
         assert_equal(["Hello"], extract(data))
+      end
+
+      def test_timeout
+        data = ChupaText::Data.new
+        data.mime_type = "text/html"
+        data.body = "<html><body>Hello</body></html>"
+        data.timeout = 0.0001
+        error = ChupaText::TimeoutError.new(data, data.timeout)
+        assert_raise(error) do
+          extract(data)
+        end
       end
     end
 
