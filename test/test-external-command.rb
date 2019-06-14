@@ -102,7 +102,7 @@ class TestExternalCommand < Test::Unit::TestCase
       assert_equal([
                      [
                        :info,
-                       "[external-command][timeout][use] <60.0s>: <#{pid}>",
+                       "[external-command][timeout][use] <1.00m>: <#{pid}>",
                      ]
                    ],
                    messages)
@@ -117,7 +117,7 @@ class TestExternalCommand < Test::Unit::TestCase
       assert_equal([
                      [
                        :info,
-                       "[external-command][timeout][use] <60.0s>: <#{pid}>",
+                       "[external-command][timeout][use] <1.00m>: <#{pid}>",
                      ]
                    ],
                    messages)
@@ -132,7 +132,7 @@ class TestExternalCommand < Test::Unit::TestCase
       assert_equal([
                      [
                        :info,
-                       "[external-command][timeout][use] <30.0s>: <#{pid}>",
+                       "[external-command][timeout][use] <30.00s>: <#{pid}>",
                      ]
                    ],
                    messages)
@@ -147,7 +147,7 @@ class TestExternalCommand < Test::Unit::TestCase
       assert_equal([
                      [
                        :info,
-                       "[external-command][timeout][use] <30.0s>: <#{pid}>",
+                       "[external-command][timeout][use] <30.00s>: <#{pid}>",
                      ]
                    ],
                    messages)
@@ -162,7 +162,7 @@ class TestExternalCommand < Test::Unit::TestCase
       assert_equal([
                      [
                        :info,
-                       "[external-command][timeout][use] <60.0s>: <#{pid}>",
+                       "[external-command][timeout][use] <1.00m>: <#{pid}>",
                      ]
                    ],
                    messages)
@@ -178,7 +178,7 @@ class TestExternalCommand < Test::Unit::TestCase
       assert_equal([
                      [
                        :info,
-                       "[external-command][timeout][use] <60.0s>: <#{pid}>",
+                       "[external-command][timeout][use] <1.00m>: <#{pid}>",
                      ]
                    ],
                    messages)
@@ -194,7 +194,7 @@ class TestExternalCommand < Test::Unit::TestCase
       assert_equal([
                      [
                        :info,
-                       "[external-command][timeout][use] <30.0s>: <#{pid}>",
+                       "[external-command][timeout][use] <30.00s>: <#{pid}>",
                      ]
                    ],
                    messages)
@@ -209,7 +209,7 @@ class TestExternalCommand < Test::Unit::TestCase
       assert_equal([
                      [
                        :info,
-                       "[external-command][timeout][use] <30.0s>: <#{pid}>",
+                       "[external-command][timeout][use] <30.00s>: <#{pid}>",
                      ]
                    ],
                    messages)

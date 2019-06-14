@@ -123,7 +123,7 @@ module ChupaText
     end
 
     def with_timeout(data, &block)
-      timeout = data.timeout
+      timeout = TimeoutValue.new("#{log_tag}[timeout]", data.timeout).raw
       if timeout
         begin
           Timeout.timeout(timeout, &block)

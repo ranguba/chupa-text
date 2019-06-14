@@ -1,4 +1,4 @@
-# Copyright (C) 2013  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2019  Sutou Kouhei <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -44,6 +44,10 @@ module ChupaText
 
     def unknown(*arguments, &block)
       logger.unknown(*arguments, &block)
+    end
+
+    def log_invalid_value(tag, value, type)
+      warn("#{tag}[invalid] <#{value}>(#{type})")
     end
   end
 end

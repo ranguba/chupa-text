@@ -1,4 +1,4 @@
-# Copyright (C) 2013  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2019  Sutou Kouhei <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -25,6 +25,8 @@ require "chupa-text/logger"
 
 require "chupa-text/loggable"
 require "chupa-text/unzippable"
+
+require "chupa-text/timeout-value"
 
 require "chupa-text/configuration"
 require "chupa-text/configuration-loader"

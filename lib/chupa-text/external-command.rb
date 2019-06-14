@@ -255,20 +255,21 @@ module ChupaText
     end
 
     def log_invalid_value(tag, value, type)
-      warn("#{log_tag}#{tag}[invalid] <#{value}>(#{type})")
+      super("#{log_tag}#{tag}", value, type)
     end
 
     def wait_process(pid, timeout, soft_timeout)
       tag = "[timeout]"
-      timeout = parse_time(tag, timeout || self.class.default_timeout)
-      soft_timeout = parse_time(tag, soft_timeout)
+      timeout = TimeoutValue.new(tag, timeout || self.class.default_timeout).raw
+      soft_timeout = TimeoutValue.new(tag, soft_timeout).raw
       if timeout
         timeout = soft_timeout if soft_timeout and soft_timeout < timeout
       else
         timeout = soft_timeout
       end
       if timeout
-        info("#{log_tag}#{tag}[use] <#{timeout}s>: <#{pid}>")
+        info("#{log_tag}#{tag}[use] " +
+             "<#{TimeoutValue.new(tag, timeout)}>: <#{pid}>")
         status = wait_process_timeout(pid, timeout)
         return status if status
         info("#{log_tag}#{tag}[terminate] <#{pid}>")
