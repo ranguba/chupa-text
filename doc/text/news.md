@@ -1,5 +1,11 @@
 # News
 
+## 1.3.0: 2019-06-14
+
+### Fixes
+
+  * Added support for timeout as string again.
+
 ## 1.2.9: 2019-06-13
 
 ### Improvements
