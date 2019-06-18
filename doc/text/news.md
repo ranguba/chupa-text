@@ -1,5 +1,11 @@
 # News
 
+## 1.3.1: 2019-06-18
+
+### Fixes
+
+  * `http-server`: Added support for `need_screenshot` parameter.
+
 ## 1.3.0: 2019-06-14
 
 ### Fixes
