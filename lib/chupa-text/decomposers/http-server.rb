@@ -144,6 +144,7 @@ module ChupaText
           ["limit_as",
            data.limit_as || ChupaText::ExternalCommand.default_limit_as],
           ["max_body_size", data.max_body_size],
+          ["need_screenshot", data.need_screenshot?],
         ].each do |key, value|
           next if value.nil?
           parameters << [key, StringIO.new(value.to_s)]
