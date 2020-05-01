@@ -9,19 +9,19 @@ jobs:
       fail-fast: false
       matrix:
         ruby-version:
-          - 2.5
-          - 2.6
-          - 2.7
+          - "2.5"
+          - "2.6"
+          - "2.7"
         runs-on:
           - macos-latest
           - ubuntu-latest
           - windows-latest
-    runs-on: ${{ matrix.ruby-version }}
+    runs-on: ${{ matrix.runs-on }}
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-ruby@v1
         with:
-          ruby-version: '${{ matrix.ruby-version }}'
+          ruby-version: "${{ matrix.ruby-version }}"
       - name: Install dependencies
         run: |
           bundle install
