@@ -1,5 +1,11 @@
 # News
 
+## 1.3.2: 2020-05-01
+
+### Improvements
+
+  * Added support for Ruby 2.8.
+
 ## 1.3.1: 2019-06-18
 
 ### Fixes
