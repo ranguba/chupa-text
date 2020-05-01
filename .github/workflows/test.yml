@@ -1,0 +1,35 @@
+name: Test
+on:
+  - push
+  - pull_request
+jobs:
+  test:
+    name: Ruby ${{ matrix.ruby-version }} on ${{ matrix.runs-on }}
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby-version:
+          - 2.5
+          - 2.6
+          - 2.7
+        runs-on:
+          - macos-latest
+          - ubuntu-latest
+          - windows-latest
+    runs-on: ${{ matrix.ruby-version }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-ruby@v1
+        with:
+          ruby-version: '${{ matrix.ruby-version }}'
+      - name: Install dependencies
+        run: |
+          bundle install
+      - name: Test
+        run: |
+          bundle exec rake
+      - name: Test with REXML
+        run: |
+          bundle exec rake
+        env:
+          CHUPA_TEXT_SAX_PARSER_BACKEND: rexml

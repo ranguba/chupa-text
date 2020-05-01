@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 #
-# Copyright (C) 2013  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2020  Sutou Kouhei <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -24,6 +24,8 @@ require "test-unit"
 
 base_dir = Pathname(__FILE__).dirname.parent
 lib_dir = base_dir + "lib"
+test_dir = base_dir + "test"
+
 $LOAD_PATH.unshift(lib_dir.to_s)
 
 require "chupa-text"
@@ -32,4 +34,4 @@ ChupaText::Decomposers.load
 
 require_relative "helper"
 
-exit(Test::Unit::AutoRunner.run(true))
+exit(Test::Unit::AutoRunner.run(true, test_dir.to_s))

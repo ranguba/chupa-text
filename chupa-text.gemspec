@@ -1,6 +1,6 @@
 # -*- ruby -*-
 #
-# Copyright (C) 2013-2017  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2020  Sutou Kouhei <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -32,7 +32,7 @@ Gem::Specification.new do |spec|
   spec.name = "chupa-text"
   spec.version = ChupaText::VERSION
   spec.homepage = "http://ranguba.org/#about-chupa-text"
-  spec.authors = ["Kouhei Sutou"]
+  spec.authors = ["Sutou Kouhei"]
   spec.email = ["kou@clear-code.com"]
   readme = File.read("README.md", :encoding => "UTF-8")
   entries = readme.split(/^\#\#\s(.*)$/)
@@ -52,11 +52,12 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency("archive-zip", ">= 0.12.0")
   spec.add_runtime_dependency("csv", ">= 3.0.4")
+  spec.add_runtime_dependency("rexml")
 
   spec.add_development_dependency("bundler")
+  spec.add_development_dependency("kramdown")
   spec.add_development_dependency("nokogiri")
   spec.add_development_dependency("packnga")
   spec.add_development_dependency("rake")
-  spec.add_development_dependency("redcarpet")
   spec.add_development_dependency("test-unit")
 end
