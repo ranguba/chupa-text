@@ -76,7 +76,7 @@ class TestExtractor < Test::Unit::TestCase
           extracted = ChupaText::Data.new
           extracted.mime_type = "text/plain"
           extracted.body = data.body.gsub(/<.+?>/, "")
-          sleep(data.timeout * 2) if data.timeout
+          sleep(data.timeout * 10) if data.timeout
           yield(extracted)
         end
       end
