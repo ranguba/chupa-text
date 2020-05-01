@@ -45,4 +45,8 @@ module Helper
   def ruby
     RbConfig.ruby
   end
+
+  def omit_on_windows(message)
+    omit("Omit on Windows: #{message}") if Gem.win_platform?
+  end
 end

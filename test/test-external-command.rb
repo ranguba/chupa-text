@@ -218,6 +218,7 @@ class TestExternalCommand < Test::Unit::TestCase
 
   class TestLimitCPU < self
     def setup
+      omit_on_windows("RLIMIT_CPU doesn't exist")
       @data = ChupaText::TextData.new("Hello")
       limit_cpu = ChupaText::ExternalCommand.default_limit_cpu
       begin
@@ -303,6 +304,7 @@ class TestExternalCommand < Test::Unit::TestCase
 
   class TestLimitAS < self
     def setup
+      omit_on_windows("RLIMIT_AS doesn't exist")
       @data = ChupaText::TextData.new("Hello")
       limit_as = ChupaText::ExternalCommand.default_limit_as
       begin
