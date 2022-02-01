@@ -5,6 +5,7 @@ on:
 jobs:
   test:
     name: Ruby ${{ matrix.ruby-version }} on ${{ matrix.runs-on }}
+    timeout-minutes: 10
     strategy:
       fail-fast: false
       matrix:
