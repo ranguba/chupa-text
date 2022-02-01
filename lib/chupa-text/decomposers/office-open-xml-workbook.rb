@@ -119,7 +119,8 @@ module ChupaText
         def initialize(sheet)
           @sheet = sheet
           @cell_type = nil
-          @in_v = false
+          @in_is = false # inline string
+          @in_v = false # value
         end
 
         def start_element(uri, local_name, qname, attributes)
@@ -129,7 +130,8 @@ module ChupaText
             @sheet << []
           when "c"
             @cell_type = parse_cell_type(attributes["t"])
-          # when "is" # TODO
+          when "is"
+            @in_is = true
           when "v"
             @in_v = true
           end
@@ -140,6 +142,8 @@ module ChupaText
           case local_name
           when "c"
             @cell_type = nil
+          when "is"
+            @in_is = false
           when "v"
             @in_v = false
           end
@@ -174,8 +178,14 @@ module ChupaText
           end
         end
 
+        def have_text?
+          return true if @in_is
+          return true if @in_v
+          false
+        end
+
         def add_column(text)
-          return unless @in_v
+          return unless have_text?
           case @cell_type
           when :shared_string
             @sheet.last << Integer(text, 10)
