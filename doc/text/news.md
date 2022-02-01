@@ -1,5 +1,11 @@
 # News
 
+## 1.3.3: 2022-02-01
+
+### Improvements
+
+  * `xlsx`: Added support for inline string.
+
 ## 1.3.2: 2020-05-01
 
 ### Improvements
