@@ -9,9 +9,10 @@ jobs:
       fail-fast: false
       matrix:
         ruby-version:
-          - "2.5"
           - "2.6"
           - "2.7"
+          - "3.0"
+          - "3.1"
         runs-on:
           - macos-latest
           - ubuntu-latest
@@ -19,12 +20,10 @@ jobs:
     runs-on: ${{ matrix.runs-on }}
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-ruby@v1
+      - uses: ruby/setup-ruby@v1
         with:
           ruby-version: "${{ matrix.ruby-version }}"
-      - name: Install dependencies
-        run: |
-          bundle install
+          bundler-cache: true
       - name: Test
         run: |
           bundle exec rake
