@@ -39,7 +39,7 @@ Ruby,ChupaText
                      [
                        :error,
                        "[decomposer][csv] Failed to parse CSV: " +
-                       "CSV::MalformedCSVError: " +
+                       "CSV::InvalidEncodingError: " +
                        "Invalid byte sequence in UTF-8 in line 1.",
                      ],
                    ],
