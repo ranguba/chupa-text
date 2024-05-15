@@ -136,14 +136,7 @@ module ChupaText
     def uri=(uri)
       case uri
       when Pathname
-        file_uri = ""
-        target = uri.expand_path
-        loop do
-          target, base = target.split
-          file_uri = "/#{CGI.escape(base.to_s)}#{file_uri}"
-          break if target.root?
-        end
-        file_uri = "file://#{file_uri}"
+        file_uri = convert_pathname_to_file_uri(uri)
         @uri = URI.parse(file_uri)
         self.path = uri
       when NilClass
@@ -244,6 +237,21 @@ module ChupaText
     end
 
     private
+    def convert_pathname_to_file_uri(path)
+      components = []
+      escaped_path = nil
+      target = path.expand_path
+      loop do
+        target, base = target.split
+        components.unshift(CGI.escape(base.to_s))
+        if target.root?
+          escaped_path = target + components.join("/")
+          break
+        end
+      end
+      "file://#{escaped_path}"
+    end
+
     def guess_mime_type
       guess_mime_type_from_uri or
         guess_mime_type_from_body
