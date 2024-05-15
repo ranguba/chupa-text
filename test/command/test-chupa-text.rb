@@ -56,7 +56,7 @@ class TestCommandChupaText < Test::Unit::TestCase
   sub_test_case("output") do
     sub_test_case("file") do
       def test_single
-        body = "Hello\n"
+        body = "Hello" + (Gem.win_platform? ? "\r\n" : "\n")
         fixture_name = "hello.txt"
         uri = fixture_uri(fixture_name).to_s
         path = fixture_path(fixture_name).to_s
