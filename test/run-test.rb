@@ -34,4 +34,5 @@ ChupaText::Decomposers.load
 
 require_relative "helper"
 
+ENV["TEST_UNIT_MAX_DIFF_TARGET_STRING_SIZE"] = "1_000_000"
 exit(Test::Unit::AutoRunner.run(true, test_dir.to_s))
