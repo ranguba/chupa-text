@@ -18,8 +18,7 @@ module ChupaText
   class TextData < Data
     def initialize(text, options={})
       super(options)
-      self.uri = uri.to_s.gsub(/\.[a-z\d]+\z/i, ".txt")
-      self.path = path.to_s.gsub(/\.[a-z\d]+\z/i, ".txt")
+      self.uri = Pathname(path.to_s.gsub(/\.[a-z\d]+\z/i, ".txt"))
       self.mime_type = "text/plain"
       self.body = text
       self.size = text.bytesize
