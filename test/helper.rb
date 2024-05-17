@@ -49,4 +49,8 @@ module Helper
   def omit_on_windows(message)
     omit("Omit on Windows: #{message}") if Gem.win_platform?
   end
+
+  def omit_on_macos(message)
+    omit("Omit on macOS: #{message}") if RUBY_PLATFORM.include?("darwin")
+  end
 end
