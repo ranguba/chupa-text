@@ -51,6 +51,6 @@ module Helper
   end
 
   def omit_on_macos(message)
-    omit("Omit on macOS: #{message}") if Object::RUBY_PLATFORM.include?("darwin")
+    omit("Omit on macOS: #{message}") if RUBY_PLATFORM.include?("darwin")
   end
 end
