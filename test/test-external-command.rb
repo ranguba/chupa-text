@@ -305,6 +305,7 @@ class TestExternalCommand < Test::Unit::TestCase
   class TestLimitAS < self
     def setup
       omit_on_windows("RLIMIT_AS doesn't exist")
+      omit_on_macos("RLIMIT_AS doesn't exist")
       @data = ChupaText::TextData.new("Hello")
       limit_as = ChupaText::ExternalCommand.default_limit_as
       begin
