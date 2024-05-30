@@ -40,9 +40,7 @@ class TestDefaultLogger < Test::Unit::TestCase
       ENV["CHUPA_TEXT_LOG_OUTPUT"] = value
       logger = ChupaText::DefaultLogger.new
       device = logger.instance_variable_get(:@logdev)
-      dev = device.dev
-      logger.close if dev.class == File
-      dev
+      device.dev
     end
 
     def test_minus
@@ -55,7 +53,9 @@ class TestDefaultLogger < Test::Unit::TestCase
 
     def test_string
       Tempfile.create("chupa-text-default-logger-output") do |file|
-        assert_equal(file.path, output(file.path).path)
+        device = output(file.path)
+        device.close
+        assert_equal(file.path, device.path)
       end
     end
 
