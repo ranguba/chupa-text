@@ -52,8 +52,11 @@ class TestDefaultLogger < Test::Unit::TestCase
     end
 
     def test_string
-      file = Tempfile.new("chupa-text-default-logger-output")
-      assert_equal(file.path, output(file.path).path)
+      Tempfile.create("chupa-text-default-logger-output") do |file|
+        device = output(file.path)
+        device.close
+        assert_equal(file.path, device.path)
+      end
     end
 
     def test_default
@@ -63,12 +66,14 @@ class TestDefaultLogger < Test::Unit::TestCase
 
   sub_test_case("rotation period") do
     def rotation_period(value)
-      file = Tempfile.new("chupa-text-default-logger-output")
-      ENV["CHUPA_TEXT_LOG_OUTPUT"] = file.path
-      ENV["CHUPA_TEXT_LOG_ROTATION_PERIOD"] = value
-      logger = ChupaText::DefaultLogger.new
-      device = logger.instance_variable_get(:@logdev)
-      device.instance_variable_get(:@shift_age)
+      Tempfile.create("chupa-text-default-logger-output") do |file|
+        ENV["CHUPA_TEXT_LOG_OUTPUT"] = file.path
+        ENV["CHUPA_TEXT_LOG_ROTATION_PERIOD"] = value
+        logger = ChupaText::DefaultLogger.new
+        logger.close
+        device = logger.instance_variable_get(:@logdev)
+        device.instance_variable_get(:@shift_age)
+      end
     end
 
     def test_daily
@@ -94,12 +99,14 @@ class TestDefaultLogger < Test::Unit::TestCase
 
   sub_test_case("N generation") do
     def n_generations(value)
-      file = Tempfile.new("chupa-text-default-logger-output")
-      ENV["CHUPA_TEXT_LOG_OUTPUT"] = file.path
-      ENV["CHUPA_TEXT_LOG_N_GENERATIONS"] = value
-      logger = ChupaText::DefaultLogger.new
-      device = logger.instance_variable_get(:@logdev)
-      device.instance_variable_get(:@shift_age)
+      Tempfile.create("chupa-text-default-logger-output") do |file|
+        ENV["CHUPA_TEXT_LOG_OUTPUT"] = file.path
+        ENV["CHUPA_TEXT_LOG_N_GENERATIONS"] = value
+        logger = ChupaText::DefaultLogger.new
+        logger.close
+        device = logger.instance_variable_get(:@logdev)
+        device.instance_variable_get(:@shift_age)
+      end
     end
 
     def test_integer
@@ -117,12 +124,14 @@ class TestDefaultLogger < Test::Unit::TestCase
 
   sub_test_case("max size") do
     def max_size(value)
-      file = Tempfile.new("chupa-text-default-logger-output")
-      ENV["CHUPA_TEXT_LOG_OUTPUT"] = file.path
-      ENV["CHUPA_TEXT_LOG_MAX_SIZE"] = value
-      logger = ChupaText::DefaultLogger.new
-      device = logger.instance_variable_get(:@logdev)
-      device.instance_variable_get(:@shift_size)
+      Tempfile.create("chupa-text-default-logger-output") do |file|
+        ENV["CHUPA_TEXT_LOG_OUTPUT"] = file.path
+        ENV["CHUPA_TEXT_LOG_MAX_SIZE"] = value
+        logger = ChupaText::DefaultLogger.new
+        logger.close
+        device = logger.instance_variable_get(:@logdev)
+        device.instance_variable_get(:@shift_size)
+      end
     end
 
     def test_unit
