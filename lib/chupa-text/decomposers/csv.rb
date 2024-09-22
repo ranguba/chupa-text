@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2017  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2024  Sutou Kouhei <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -36,7 +36,7 @@ module ChupaText
       end
 
       def decompose(data)
-        text = ""
+        text = +""
         data.open do |input|
           begin
             csv = ::CSV.new(input, liberal_parsing: true)
@@ -68,7 +68,7 @@ module ChupaText
         width, height = data.expected_screenshot_size
         max_n_lines = 10
         font_size = height / max_n_lines
-        target_text = ""
+        target_text = +""
         text.each_line.with_index do |line, i|
           break if i == max_n_lines
           target_text << line
