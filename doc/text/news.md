@@ -1,5 +1,23 @@
 # News
 
+## 1.3.4: 2024-09-22
+
+### Improvements
+
+  * Windows: Fixed file URI.
+    * GH-7
+    * Patch by Abe Tomoaki
+
+  * `ChupaText::TextData`: Fixed path generation.
+    * GH-13
+    * Patch by Abe Tomoaki
+
+  * Added `logger` dependency explicitly for Ruby 3.4.
+
+### Thanks
+
+  * Abe Tomoaki
+
 ## 1.3.3: 2022-02-01
 
 ### Improvements
