@@ -54,12 +54,4 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency("csv", ">= 3.0.4")
   spec.add_runtime_dependency("logger")
   spec.add_runtime_dependency("rexml")
-
-  spec.add_development_dependency("bundler")
-  spec.add_development_dependency("kramdown")
-  spec.add_development_dependency("nokogiri")
-  spec.add_development_dependency("packnga")
-  spec.add_development_dependency("rake")
-  spec.add_development_dependency("test-unit")
-  spec.add_development_dependency("webrick")
 end
