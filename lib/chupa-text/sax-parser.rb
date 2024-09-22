@@ -1,4 +1,4 @@
-# Copyright (C) 2019  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2019-2024  Sutou Kouhei <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -16,6 +16,7 @@
 
 require "cgi/util"
 require "rexml/parsers/sax2parser"
+require "rexml/rexml"
 require "rexml/sax2listener"
 
 begin
@@ -156,12 +157,22 @@ module ChupaText
           @listener.end_element(*args)
         end
 
-        def characters(text)
-          @listener.characters(CGI.unescapeHTML(text))
-        end
+        if (REXML::VERSION <=> "3.3.2") >= 0
+          def characters(text)
+            @listener.characters(text)
+          end
 
-        def cdata(content)
-          @listener.cdata(CGI.unescapeHTML(content))
+          def cdata(content)
+            @listener.cdata(content)
+          end
+        else
+          def characters(text)
+            @listener.characters(CGI.unescapeHTML(text))
+          end
+
+          def cdata(content)
+            @listener.cdata(CGI.unescapeHTML(content))
+          end
         end
       end
     end
