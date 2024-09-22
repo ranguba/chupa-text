@@ -1,4 +1,4 @@
-# Copyright (C) 2019  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2019-2024  Sutou Kouhei <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -56,7 +56,7 @@ module ChupaText
         case entry.zip_path
         when /\Appt\/slides\/slide(\d+)\.xml/
           nth_slide = Integer($1, 10)
-          slide_text = ""
+          slide_text = +""
           extract_text(entry, slide_text)
           context[:slides] << [nth_slide, slide_text]
         end
