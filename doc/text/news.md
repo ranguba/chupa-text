@@ -1,5 +1,11 @@
 # News
 
+## 1.3.5: 2024-09-22
+
+### Improvements
+
+  * Added support for REXML 3.3.2 or later.
+
 ## 1.3.4: 2024-09-22
 
 ### Improvements
