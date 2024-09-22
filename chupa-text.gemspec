@@ -1,6 +1,6 @@
 # -*- ruby -*-
 #
-# Copyright (C) 2013-2020  Sutou Kouhei <kou@clear-code.com>
+# Copyright (C) 2013-2024  Sutou Kouhei <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -52,6 +52,7 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency("archive-zip", ">= 0.12.0")
   spec.add_runtime_dependency("csv", ">= 3.0.4")
+  spec.add_runtime_dependency("logger")
   spec.add_runtime_dependency("rexml")
 
   spec.add_development_dependency("bundler")
