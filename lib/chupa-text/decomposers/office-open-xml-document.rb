@@ -41,7 +41,7 @@ module ChupaText
 
       private
       def start_decompose(context)
-        context[:text] = ""
+        context[:text] = +""
       end
 
       def process_entry(entry, context)
