@@ -1,4 +1,4 @@
-# Copyright (C) 2019-2022  Sutou Kouhei <kou@clear-code.com>
+# Copyright (C) 2019-2024  Sutou Kouhei <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -73,7 +73,7 @@ module ChupaText
         sheets = context[:sheets].sort_by(&:first).collect(&:last)
         sheet_names = context[:sheet_names]
         sheets.each_with_index do |sheet, i|
-          sheet_text = ""
+          sheet_text = +""
           sheet.each do |row|
             row_texts = row.collect do |cell|
               case cell
