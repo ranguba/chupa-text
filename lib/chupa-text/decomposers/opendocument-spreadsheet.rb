@@ -1,4 +1,4 @@
-# Copyright (C) 2019  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2019-2024  Sutou Kouhei <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -96,9 +96,9 @@ module ChupaText
             when "table-row"
               @sheets.last[:rows] << []
             when "table-cell"
-              @sheets.last[:rows].last << {text: ""}
+              @sheets.last[:rows].last << {text: +""}
             when "covered-table-cell"
-              @sheets.last[:rows].last << {text: ""}
+              @sheets.last[:rows].last << {text: +""}
             when "shapes"
               @in_shapes = true
             end
@@ -116,7 +116,7 @@ module ChupaText
             case local_name
             when "table"
               sheet = @sheets.last
-              text = ""
+              text = +""
               shape_texts = sheet[:shape_texts]
               unless shape_texts.empty?
                 text << shape_texts.join("\n") << "\n"
