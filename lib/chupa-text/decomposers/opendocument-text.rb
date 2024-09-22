@@ -1,4 +1,4 @@
-# Copyright (C) 2019  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2019-2024  Sutou Kouhei <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -29,7 +29,7 @@ module ChupaText
 
       private
       def process_content(entry, context, &block)
-        context[:text] = ""
+        context[:text] = +""
         listener = TextListener.new(context[:text])
         parse(entry.file_data, listener)
       end
