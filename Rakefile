@@ -1,6 +1,6 @@
-# -*- mode: ruby; coding: utf-8 -*-
+# -*- ruby -*-
 #
-# Copyright (C) 2013  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2013-2025  Sutou Kouhei <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -45,4 +45,14 @@ end
 desc "Run tests"
 task :test do
   ruby("test/run-test.rb")
+end
+
+release_task = Rake.application["release"]
+# We use Trusted Publishing.
+release_task.prerequisites.delete("build")
+release_task.prerequisites.delete("release:rubygem_push")
+release_task_comment = release_task.comment
+if release_task_comment
+  release_task.clear_comments
+  release_task.comment = release_task_comment.gsub(/ and build.*$/, "")
 end
