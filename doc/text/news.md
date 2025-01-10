@@ -1,5 +1,17 @@
 # News
 
+## 1.3.6: 2025-01-10
+
+### Fixes
+
+  * xlsx: Fixed a bug that wrong text is extracted with complex shared
+    strings.
+    * Reported by Tomohisa Kusukawa.
+
+### Thanks
+
+  * Tomohisa Kusukawa
+
 ## 1.3.5: 2024-09-22
 
 ### Improvements
