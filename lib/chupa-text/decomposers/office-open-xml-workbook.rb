@@ -1,4 +1,4 @@
-# Copyright (C) 2019-2024  Sutou Kouhei <kou@clear-code.com>
+# Copyright (C) 2019-2025  Sutou Kouhei <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -49,7 +49,7 @@ module ChupaText
       def process_entry(entry, context)
         case entry.zip_path
         when "xl/sharedStrings.xml"
-          extract_text(entry, context[:shared_strings])
+          extract_shared_strings(entry, context[:shared_strings])
         when "xl/workbook.xml"
           listener = WorkbookListener.new(context[:sheet_names])
           parse(entry.file_data, listener)

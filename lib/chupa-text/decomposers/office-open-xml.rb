@@ -1,4 +1,4 @@
-# Copyright (C) 2019  Kouhei Sutou <kou@clear-code.com>
+# Copyright (C) 2019-2025  Sutou Kouhei <kou@clear-code.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -70,6 +70,11 @@ module ChupaText
         parse(entry.file_data, listener)
       end
 
+      def extract_shared_strings(entry, shared_strings)
+        listener = SharedStringsListener.new(shared_strings, @namespace_uri)
+        parse(entry.file_data, listener)
+      end
+
       def log_tag
         "[decomposer][office-open-xml]"
       end
@@ -90,12 +95,13 @@ module ChupaText
         end
 
         def end_element(uri, local_name, qname)
-          @in_target = false
-
-          return unless uri == @target_uri
-          case local_name
-          when "p", "br"
-            @output << "\n"
+          if uri == @target_uri
+            case local_name
+            when "p", "br"
+              @output << "\n"
+            when "t"
+              @in_target = false
+            end
           end
         end
 
@@ -110,6 +116,53 @@ module ChupaText
         private
         def add_text(text)
           return unless @in_target
+          @output << text
+        end
+      end
+
+      class SharedStringsListener < SAXListener
+        def initialize(output, target_uri)
+          @output = output
+          @target_uri = target_uri
+          @tag_stack = []
+          @in_target = false
+          @current_text = +""
+        end
+
+        def start_element(uri, local_name, qname, attributes)
+          @tag_stack << local_name
+
+          return unless uri == @target_uri
+          case local_name
+          when "t"
+            @in_target = true
+            @current_text = +""
+          end
+        end
+
+        def end_element(uri, local_name, qname)
+          return unless uri == @target_uri
+          case local_name
+          when "t"
+            add_text(@current_text)
+            @in_target = false
+          end
+        ensure
+          @tag_stack.pop
+        end
+
+        def characters(text)
+          @current_text << text if @in_target
+        end
+
+        def cdata(content)
+          @current_text << content if @in_target
+        end
+
+        private
+        def add_text(text)
+          parent_tag = @tag_stack[-2]
+          return unless parent_tag == "si"
           @output << text
         end
       end
