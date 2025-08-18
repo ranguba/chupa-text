@@ -24,7 +24,7 @@ jobs:
     name: GitHub
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Release
         run: |
           ruby \
@@ -47,7 +47,7 @@ jobs:
       id-token: write
     environment: release
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: ruby
